@@ -4,9 +4,9 @@
 #include <QtCore/qglobal.h>
 
 #if defined(TAKAO_LIBRARY)
-#  define TAKAOSHARED_EXPORT Q_DECL_EXPORT
+#  define SHARED_EXPORT Q_DECL_EXPORT
 #else
-#  define TAKAOSHARED_EXPORT Q_DECL_IMPORT
+#  define SHARED_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // TAKAO_GLOBAL_HPP

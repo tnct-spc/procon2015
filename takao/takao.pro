@@ -11,12 +11,14 @@ TEMPLATE = lib
 
 DEFINES += TAKAO_LIBRARY
 
-SOURCES += takao.cpp
+SOURCES +=
 
-HEADERS += takao.hpp\
+HEADERS += data_type.hpp\
         takao_global.hpp
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+QMAKE_CXXFLAGS += -std=c++14

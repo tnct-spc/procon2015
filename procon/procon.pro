@@ -23,3 +23,5 @@ else:unix: LIBS += -L$$OUT_PWD/../takao/ -ltakao
 
 INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao
+
+QMAKE_CXXFLAGS += -std=c++14
