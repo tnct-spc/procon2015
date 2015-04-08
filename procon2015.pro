@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     procon \
-    takao
+    takao \
+    test
