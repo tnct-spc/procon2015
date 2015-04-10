@@ -94,7 +94,7 @@ std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_t
     std::copy(std::next(split.begin()),
               split.end(),
               std::back_inserter(stones));
-    stones.front().erase(0, stones.front().find('\n'));
+    stones.front().erase(0, stones.front().find('\n') + 1);
 
     return result;
 }

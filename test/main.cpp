@@ -104,8 +104,9 @@ namespace {
 
     BOOST_AUTO_TEST_CASE(_split_problem_text_test)
     {
-        auto expected = "\
-00000000000000001111111111111111\r\n\
+        decltype(problem_type::_split_problem_text(problem_text)) expected, result;
+        expected = std::make_tuple(
+"00000000000000001111111111111111\r\n\
 00000000000000001111111111111111\r\n\
 01000000000000001111111111111111\r\n\
 00000000000000001111111111111111\r\n\
@@ -136,9 +137,43 @@ namespace {
 11111111111111111111111111111111\r\n\
 11111111111111111111111111111111\r\n\
 11111111111111111111111111111111\r\n\
-11111111111111111111111111111111";
-        auto result = std::get<0>(problem_type::_split_problem_text(problem_text));
-        BOOST_CHECK_EQUAL(expected, result);
+11111111111111111111111111111111", 
+std::vector<std::string>({
+"01000000\r\n\
+01000000\r\n\
+01000000\r\n\
+01000000\r\n\
+01000000\r\n\
+01000000\r\n\
+01110000\r\n\
+00000000",
+"00000000\r\n\
+01100000\r\n\
+01100000\r\n\
+01100000\r\n\
+01100000\r\n\
+00000000\r\n\
+00000000\r\n\
+00000000",
+"00000000\r\n\
+00010000\r\n\
+00010000\r\n\
+01111000\r\n\
+00000000\r\n\
+00000000\r\n\
+00000000\r\n\
+00000000",
+"10000000\r\n\
+11000000\r\n\
+01100000\r\n\
+00110000\r\n\
+00011000\r\n\
+00001100\r\n\
+00000110\r\n\
+00000011"}));
+        result = problem_type::_split_problem_text(problem_text);
+        BOOST_CHECK_EQUAL(std::get<0>(expected), std::get<0>(result));
+        BOOST_CHECK_EQUAL(std::get<1>(expected), std::get<1>(result));
     }
 
     BOOST_AUTO_TEST_CASE(constructor_test)
