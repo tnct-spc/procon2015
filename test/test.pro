@@ -17,7 +17,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp
 
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++1z
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../takao/release/ -ltakao
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../takao/debug/ -ltakao
