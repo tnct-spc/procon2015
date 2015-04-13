@@ -54,12 +54,14 @@ class SHARED_EXPORT stone_type
             case 0:
                 return_data = raw_data;
                 break;
+
             case 1:
                 for(i=0;i<8;i++) for(j=0;j<8;j++)
                 {
                     return_data[i][j] = raw_data[j-3][i];
                 }
                 break;
+
             case 2:
                 return_data = raw_data;
                 for(auto& each_raw_data:return_data)
@@ -68,12 +70,14 @@ class SHARED_EXPORT stone_type
                 }
                 std::reverse(return_data);
                 break;
+
             case 3:
                 for(i=0;i<8;i++) for(j=0;j<8;j++)
                 {
                     return_data[i][j] = raw_data[j][3-i];
                 }
                 break;
+
             default:
                 break;
             }
@@ -95,9 +99,9 @@ class SHARED_EXPORT stone_type
         size_t get_area()
         {
             int sum =0;
-            for(auto const& each_raw_data:raw_data) for(auto const& each_element:each_raw_data)
+            for(auto const& each_raw_data:raw_data)
             {
-                sum+=each_element;
+                sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
             }
         }
         return sum;
