@@ -2,28 +2,22 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
+#include <type_traits>
 
 // こうするとプライベートメンバ関数のテストができるぞい
 #define private public
 #include "data_type.hpp"
 
-template <typename CharT, typename Traits, typename T>
-std::basic_ostream<CharT, Traits> &
-operator<< (std::basic_ostream<CharT, Traits> & os, T const & container)
-{
-    for (auto && element : container) {
-        os << element << std::endl;
-    }
-    return os;
-}
-
 namespace boost::test_tools {
-    template <>
-    struct print_log_value<std::vector<std::string>> {
+    template <template <class...> class T, typename U>
+    struct print_log_value<T<U>> {
         template <typename CharT, typename Traits>
-        void operator()(std::basic_ostream<CharT, Traits> & os, std::vector<std::string> const& container)
+        void operator()(std::basic_ostream<CharT, Traits> & os,
+                        std::enable_if_t<std::is_same<typename T<U>::value_type, U>::value, T<U>> const& container)
         {
-            ::operator<<(os, container);
+            for (auto && element : container) {
+                os << element << std::endl;
+            }
         }
     };
 }
