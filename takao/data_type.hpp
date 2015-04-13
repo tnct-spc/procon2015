@@ -2,6 +2,10 @@
 #define TAKAO_HPP
 
 #include "takao_global.hpp"
+#include <array>
+#include <cstdint>
+#include <algorithm>
+
 
 // SHARED_EXPORT って書けば外から見える
 
@@ -22,9 +26,72 @@ class SHARED_EXPORT point_type
 // 石
 class SHARED_EXPORT stone_type
 {
+    private:
+        std::array<std::arrray<uint8_t,8>> raw_data;
+
     public:
         stone_type() = default;
+
         ~stone_type() = default;
+
+        //時計回りを正方向として指定された角度だけ回転する
+        // 自身への参照を返す
+        stone_type& rotate(int angle)
+        {
+            std::array<std::arrray<uint8_t,8>> return_data;
+
+            switch (std::abs(angle/90))
+            {
+            case 0:
+                return_data = raw_data;
+                break;
+            case 1:
+                for(i=0;i<8;i++) for(j=0;j<8;j++)
+                {
+                    return_data[i][j] = raw_data[j-3][i];
+                }
+                break;
+            case 2:
+                return_data = raw_data;
+                for(auto& each_raw_data:return_data)
+                {
+                    std::reverse(each_raw_data);
+                }
+                std::reverse(return_data);
+                break;
+            case 3:
+                for(i=0;i<8;i++) for(j=0;j<8;j++)
+                {
+                    return_data[i][j] = raw_data[j][3-i];
+                }
+                break;
+            default:
+                break;
+            }
+            return return_data;
+        }
+
+        //左右に反転する
+        //自身への参照を返す
+        stone_type& flip()
+        {
+            for(auto& each_raw_data:raw_data)
+            {
+                std::reverse(each_raw_data);
+            }
+            return raw_data;
+        }
+
+        //面積を返す
+        size_t get_area()
+        {
+            int sum =0;
+            for(auto const& each_raw_data:raw_data) for(auto const& each_element:each_raw_data)
+            {
+                sum+=each_element;
+            }
+        }
+        return sum;
 };
 
 // 敷地に置かれた石の情報
@@ -33,6 +100,11 @@ class SHARED_EXPORT placed_stone_type
     public:
         placed_stone_type() = default;
         ~placed_stone_type() = default;
+
+        stone_type& stone;
+        point_type p_in_field;
+        point_type p_in_stone;
+
 };
 
 // 敷地
@@ -41,8 +113,45 @@ class SHARED_EXPORT field_type
     public:
         field_type() = default;
         ~field_type() = default;
-};
 
+        //現在の状態における得点を返す
+        size_t get_score()
+        {
+
+        }
+
+        //石を置く  自身への参照を返す   失敗したら例外を出す
+        field_type& put_stone(stone_type const& stone, int y, int x)
+        {
+
+        }
+
+        //指定された場所に指定された石が置けるかどうかを返す
+        bool is_puttable(stone_type const& stone, int y, int x)
+        {
+
+        }
+
+        //指定された石を取り除く
+        //その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
+        field_type& remove_stone(stone_type const& stone)
+        {
+
+        }
+
+         //指定された石を取り除けるかどうかを返す
+        bool is_removable(stone_type const& stone)
+        {
+
+        }
+
+        //置かれた石の一覧を表す配列を返す
+        std::vector<stone_type>& list_of_stones() const
+        {
+
+        }
+};
+//-----------------------------------------------------------
 // 問題データ
 class SHARED_EXPORT problem_type
 {
