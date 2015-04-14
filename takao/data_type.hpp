@@ -36,7 +36,7 @@ class SHARED_EXPORT point_type
 class SHARED_EXPORT stone_type
 {
     private:
-        std::array<std::arrray<uint8_t,8>> raw_data;
+        std::array<std::array<uint8_t,8>,8> raw_data;
 
     public:
         stone_type() = default;
@@ -47,34 +47,35 @@ class SHARED_EXPORT stone_type
         // 自身への参照を返す
         stone_type& rotate(int angle)
         {
-            std::array<std::arrray<uint8_t,8>> return_data;
+            //std::array<std::array<uint8_t,8>,8> return_data;
+            stone_type return_data;
 
             switch (std::abs(angle/90))
             {
             case 0:
-                return_data = raw_data;
+                return_data.raw_data = raw_data;
                 break;
 
             case 1:
-                for(i=0;i<8;i++) for(j=0;j<8;j++)
+                for(int i=0;i<8;i++) for(int j=0;j<8;j++)
                 {
-                    return_data[i][j] = raw_data[j-3][i];
+                    return_data.raw_data[i][j] = raw_data[j-3][i];
                 }
                 break;
 
             case 2:
-                return_data = raw_data;
-                for(auto& each_raw_data:return_data)
+                return_data.raw_data = raw_data;
+                for(auto& each_raw_data:return_data.raw_data)
                 {
-                    std::reverse(each_raw_data);
+                    std::reverse(each_raw_data.begin(),each_raw_data.end());
                 }
-                std::reverse(return_data);
+                std::reverse(return_data.raw_data.begin(),return_data.raw_data.end());
                 break;
 
             case 3:
-                for(i=0;i<8;i++) for(j=0;j<8;j++)
+                for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
                 {
-                    return_data[i][j] = raw_data[j][3-i];
+                    return_data.raw_data[i][j] = raw_data[j][3-i];
                 }
                 break;
 
@@ -90,21 +91,21 @@ class SHARED_EXPORT stone_type
         {
             for(auto& each_raw_data:raw_data)
             {
-                std::reverse(each_raw_data);
+                std::reverse(each_raw_data.begin(),each_raw_data.end());
             }
-            return raw_data;
+            return *this;
         }
 
         //面積を返す
         size_t get_area()
         {
-            int sum =0;
+            size_t sum = 0;
             for(auto const& each_raw_data:raw_data)
             {
                 sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
             }
+            return sum;
         }
-        return sum;
 };
 
 // 敷地に置かれた石の情報
