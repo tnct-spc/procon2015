@@ -43,6 +43,20 @@ class SHARED_EXPORT stone_type
 
         ~stone_type() = default;
 
+        //生配列へのアクセサ
+        //座標を受け取ってそこの値を返す
+        uint8_t at(size_t y,size_t x)
+        {
+            return raw_data.at(y).at(x);
+        }
+
+        //石へのアクセサ
+        //生配列への参照を返す
+        stone_type const& get_array()
+        {
+            return raw_data;
+        }
+
         //時計回りを正方向として指定された角度だけ回転する
         // 自身への参照を返す
         stone_type& rotate(int angle)
