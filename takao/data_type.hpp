@@ -167,6 +167,7 @@ class SHARED_EXPORT field_type
                 for(int j = 0;j < 8;++j)
                 {
                     if(raw_data.at(i+y).at(j+x) == 0) raw_data.at(i+y).at(j+x) = stone.at(i,j);
+                    else if(stone.at(i,j) == 0) continue;
                     else std::runtime_error("Failed to put the stone.");
                 }
             }
@@ -176,7 +177,16 @@ class SHARED_EXPORT field_type
         //指定された場所に指定された石が置けるかどうかを返す
         bool is_puttable(stone_type const& stone, int y, int x)
         {
-
+            for(int i = 0;i < 8;++i)
+            {
+                for(int j = 0;j < 8;++j)
+                {
+                    if(raw_data.at(i+y).at(j+x) == 0) continue;
+                    else if(stone.at(i,j) == 0)continue;
+                    else return false;
+                }
+            }
+            return true;
         }
 
         //指定された石を取り除く
