@@ -69,7 +69,7 @@ class SHARED_EXPORT stone_type
         {
             stone_type return_data;
 
-            switch (std::abs(angle/90))
+            switch ((angle + 360)/90)
             {
             case 0:
                break;
