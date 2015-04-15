@@ -21,6 +21,7 @@ using namespace std::string_literals;
 // 敷地のブロックの状態
 enum struct BlockState { BLANK, STONE, OBSTACLE };
 
+
 // 何らかの座標を表すクラス
 class SHARED_EXPORT point_type
 {
@@ -256,6 +257,9 @@ class SHARED_EXPORT process_type
     public:
         process_type() = default;
         ~process_type() = default;
+
+        stone_type stone;
+        point_type position;
 };
 
 // 解答データ
