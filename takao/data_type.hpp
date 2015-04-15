@@ -132,9 +132,9 @@ class SHARED_EXPORT field_type
         size_t get_score()
         {
             size_t sum = 0;
-            for(auto const& each_raw_data:raw_data)
+            for(size_t i = 8;i < 40;++i)
             {
-                sum += std::cout(each_raw_data.begin(),each_raw_data.end(),0)
+                sum += std::count(raw_data.at(i).begin()+8,raw_data.at(i).end(),0);
             }
             return sum;
         }
