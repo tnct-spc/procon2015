@@ -123,6 +123,7 @@ class SHARED_EXPORT placed_stone_type
 // 敷地
 class SHARED_EXPORT field_type
 {
+    std::array<std::array<uint8_t,40>,40> raw_data;
     public:
         field_type() = default;
         ~field_type() = default;
@@ -130,7 +131,12 @@ class SHARED_EXPORT field_type
         //現在の状態における得点を返す
         size_t get_score()
         {
-
+            size_t sum = 0;
+            for(auto const& each_raw_data:raw_data)
+            {
+                sum += std::cout(each_raw_data.begin(),each_raw_data.end(),0)
+            }
+            return sum;
         }
 
         //石を置く  自身への参照を返す   失敗したら例外を出す
