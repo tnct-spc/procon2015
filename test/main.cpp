@@ -8,18 +8,20 @@
 #define private public
 #include "data_type.hpp"
 
-namespace boost::test_tools {
-    template <template <class...> class T, typename U>
-    struct print_log_value<T<U>> {
-        template <typename CharT, typename Traits>
-        void operator()(std::basic_ostream<CharT, Traits> & os,
-                        std::enable_if_t<std::is_same<typename T<U>::value_type, U>::value, T<U>> const& container)
-        {
-            for (auto && element : container) {
-                os << element << std::endl;
+namespace boost {
+    namespace test_tools {
+        template <template <class...> class T, typename U>
+        struct print_log_value<T<U>> {
+            template <typename CharT, typename Traits>
+            void operator()(std::basic_ostream<CharT, Traits> & os,
+                            std::enable_if_t<std::is_same<typename T<U>::value_type, U>::value, T<U>> const& container)
+            {
+                for (auto && element : container) {
+                    os << element << std::endl;
+                }
             }
-        }
-    };
+        };
+    }
 }
 
 namespace {
