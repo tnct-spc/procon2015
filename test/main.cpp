@@ -216,17 +216,16 @@ namespace {
 
     BOOST_AUTO_TEST_CASE(constructor_test)
     {
-        BOOST_CHECK_NO_THROW(stone_type(stone_text));
-        decltype(stone_type::raw_data) expected = {
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0
-        };
+        decltype(stone_type::raw_data) expected = {{
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 0, 0, 0, 0, 0, 0}},
+            {{0, 1, 1, 1, 0, 0, 0, 0}},
+            {{0, 0, 0, 0, 0, 0, 0, 0}}
+        }};
         auto result = stone_type(stone_text).raw_data;
         BOOST_CHECK_EQUAL(expected, result);
     }
