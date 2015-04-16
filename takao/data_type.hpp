@@ -143,6 +143,15 @@ class SHARED_EXPORT stone_type
         }
 };
 
+stone_type::stone_type(std::string const & raw_stone_text)
+{
+    auto rows = _split(raw_stone_text, "\r\n");
+    for (std::size_t i = 0; i < raw_data.size(); ++i) {
+        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
+                       [](auto const & c) { return c == '1'; });
+    }
+}
+
 // 敷地に置かれた石の情報
 class SHARED_EXPORT placed_stone_type
 {

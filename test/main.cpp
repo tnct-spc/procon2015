@@ -10,11 +10,32 @@
 
 namespace boost {
     namespace test_tools {
-        template <template <class...> class T, typename U>
-        struct print_log_value<T<U>> {
-            template <typename CharT, typename Traits>
-            void operator()(std::basic_ostream<CharT, Traits> & os,
-                            std::enable_if_t<std::is_same<typename T<U>::value_type, U>::value, T<U>> const& container)
+        template <std::size_t N>
+        struct print_log_value<std::array<std::string, N>> {
+            void operator() (std::ostream & os, std::array<std::string, N> const & container)
+            {
+                for (auto && element : container) {
+                    os << element << std::endl;
+                }
+            }
+        };
+
+        template <typename T, std::size_t N1, std::size_t N2>
+        struct print_log_value<std::array<std::array<T, N1>, N2>> {
+            void operator() (std::ostream & os, std::array<std::array<T, N1>, N2> const & container)
+            {
+                for (auto && row : container) {
+                    for (auto && element : row) {
+                        os << element << " ";
+                    }
+                    os << std::endl;
+                }
+            }
+        };
+
+        template <>
+        struct print_log_value<std::vector<std::string>> {
+            void operator() (std::ostream & os, std::vector<std::string> const & container)
             {
                 for (auto && element : container) {
                     os << element << std::endl;
@@ -24,10 +45,18 @@ namespace boost {
     }
 }
 
+BOOST_AUTO_TEST_CASE(_split_test)
+{
+    auto sample = "123,,456,,789,,12,34,56,78,90,,abc,,def,,ghi,,,,,"s;
+    std::vector<std::string> result = _split(sample, ",,"s);
+    decltype(result) expected = {"123"s,"456"s,"789"s, "12,34,56,78,90"s, "abc"s, "def"s, "ghi"s, ""s, ","s};
+    BOOST_CHECK_EQUAL(expected, result);
+}
+
 namespace {
     BOOST_AUTO_TEST_SUITE(problem_type_tests)
 
-        auto problem_text = "\
+    auto problem_text = "\
 00000000000000001111111111111111\r\n\
 00000000000000001111111111111111\r\n\
 01000000000000001111111111111111\r\n\
@@ -177,11 +206,28 @@ std::vector<std::string>({
         BOOST_CHECK_NO_THROW(problem_type(problem_text));
     }
 
-    BOOST_AUTO_TEST_CASE(_split_test)
+    BOOST_AUTO_TEST_SUITE_END()
+}
+
+namespace {
+    BOOST_AUTO_TEST_SUITE(stone_type_tests)
+
+    std::string stone_text = "01000000\r\n01000000\r\n01000000\r\n01000000\r\n01000000\r\n01000000\r\n01110000\r\n00000000";
+
+    BOOST_AUTO_TEST_CASE(constructor_test)
     {
-        auto sample = "123,,456,,789,,12,34,56,78,90,,abc,,def,,ghi,,,,,"s;
-        std::vector<std::string> result = problem_type::_split(sample, ",,"s);
-        decltype(result) expected = {"123"s,"456"s,"789"s, "12,34,56,78,90"s, "abc"s, "def"s, "ghi"s, ""s, ","s};
+        BOOST_CHECK_NO_THROW(stone_type(stone_text));
+        decltype(stone_type::raw_data) expected = {
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 0, 0, 0, 0, 0,
+            0, 1, 1, 1, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0
+        };
+        auto result = stone_type(stone_text).raw_data;
         BOOST_CHECK_EQUAL(expected, result);
     }
 
