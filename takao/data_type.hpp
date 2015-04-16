@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <algorithm>
 
+typedef std::array<std::array<uint8_t,8>,8> raw_stone_type;
 
 using namespace std::string_literals;
 
@@ -57,7 +58,7 @@ class SHARED_EXPORT point_type
 class SHARED_EXPORT stone_type
 {
     private:
-        std::array<std::array<uint8_t,8>,8> raw_data;
+        raw_stone_type raw_data;
 
     public:
         stone_type() = default;
@@ -72,9 +73,14 @@ class SHARED_EXPORT stone_type
             return raw_data.at(y).at(x);
         }
 
+        uint8_t at(size_t y,size_t x) const
+        {
+            return raw_data.at(y).at(x);
+        }
+
         //石へのアクセサ
         //生配列への参照を返す
-        stone_type const& get_array()
+        raw_stone_type const& get_array()
         {
             return raw_data;
         }
@@ -85,7 +91,7 @@ class SHARED_EXPORT stone_type
         {
             stone_type return_data;
 
-            switch (std::abs(angle/90))
+            switch ((angle + 360)/90)
             {
             case 0:
                break;
@@ -187,13 +193,31 @@ class SHARED_EXPORT field_type
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x)
         {
-
+            for(int i = 0;i < 8;++i)
+            {
+                for(int j = 0;j < 8;++j)
+                {
+                    if(raw_data.at(i+y).at(j+x) == 0) raw_data.at(i+y).at(j+x) = stone.at(i,j);
+                    else if(stone.at(i,j) == 0) continue;
+                    else std::runtime_error("Failed to put the stone.");
+                }
+            }
+            return *this;
         }
 
         //指定された場所に指定された石が置けるかどうかを返す
         bool is_puttable(stone_type const& stone, int y, int x)
         {
-
+            for(int i = 0;i < 8;++i)
+            {
+                for(int j = 0;j < 8;++j)
+                {
+                    if(raw_data.at(i+y).at(j+x) == 0) continue;
+                    else if(stone.at(i,j) == 0)continue;
+                    else return false;
+                }
+            }
+            return true;
         }
 
         //指定された石を取り除く
