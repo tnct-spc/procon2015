@@ -233,7 +233,7 @@ class SHARED_EXPORT field_type
                         placed_stone.at(i+y).at(j+x).stone = stone;
                         placed_stone.at(i+y).at(j+x).p_in_field = point_type{i+y,j+x};
                         placed_stone.at(i+y).at(j+x).p_in_stone = point_type{i,j};
-                        placed_order.at(i+y).at(j+x) = nth;
+                        //placed_order.at(i+y).at(j+x) = nth; //TODO:nthコンストラクタで代入してこれできるようにする
                     }
                     else if(stone.at(i,j) == 0) continue;
                     else std::runtime_error("Failed to put the stone.");
