@@ -63,7 +63,7 @@ class SHARED_EXPORT stone_type
 
     public:
         stone_type() = default;
-        ~stone_type() = default;
+         ~stone_type() = default;
 
         friend inline bool operator== (stone_type const& lhs, stone_type const& rhs)
         {
@@ -183,6 +183,7 @@ class SHARED_EXPORT field_type
         std::array<std::array<uint8_t,40>,40> raw_data;
         std::array<std::array<placed_stone_type,32>,32> placed_stone;
         std::array<std::array<uint8_t,32>,32> placed_order;
+        std::vector<stone_type> placed_stone_list;
 
         //is_removableで必要
         struct pea_type
@@ -194,12 +195,9 @@ class SHARED_EXPORT field_type
         //石が置かれているか否かを返す
         bool is_placed(stone_type const& stone)
         {
-            for(auto const& each_placed_stone : placed_stone)
+            for(auto const& each_placed_stone : placed_stone_list)
             {
-                for(auto block : each_placed_stone)
-                {
-                    if(block.stone.nth == stone.nth) return true;
-                }
+                if(each_placed_stone == stone) return true;
             }
             return false;
         }
@@ -234,6 +232,7 @@ class SHARED_EXPORT field_type
                         placed_stone.at(i+y).at(j+x).p_in_field = point_type{i+y,j+x};
                         placed_stone.at(i+y).at(j+x).p_in_stone = point_type{i,j};
                         //placed_order.at(i+y).at(j+x) = nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                        placed_stone_list.push_back(stone);
                     }
                     else if(stone.at(i,j) == 0) continue;
                     else std::runtime_error("Failed to put the stone.");
@@ -284,6 +283,7 @@ class SHARED_EXPORT field_type
             {
                 if(each_block == stone.nth) each_block = 0;
             }
+            return *this;
          }
 
          //指定された石を取り除けるかどうかを返す
@@ -291,6 +291,9 @@ class SHARED_EXPORT field_type
         {
             std::vector<pea_type> pea_list;
             std::vector<pea_type> remove_list;
+
+            //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
+            //if(is_placed(stone) == false) std::runtime_error("The stone isn't' placed");
 
             //継ぎ目を検出
             for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
@@ -335,7 +338,10 @@ class SHARED_EXPORT field_type
         //置かれた石の一覧を表す配列を返す
         std::vector<stone_type>& list_of_stones() const
         {
-
+            //std::vector<stone_type> const return_vec = {placed_stone_list};
+            //std::copy(placed_stone_list.begin(),placed_stone_list.end(),return_vec.begin());
+            //return placed_stone_list;
+            //return std::move(return_vec);
         }
 };
 //-----------------------------------------------------------
