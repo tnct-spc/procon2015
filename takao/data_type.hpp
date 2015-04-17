@@ -19,8 +19,29 @@ using namespace std::string_literals;
 
 // SHARED_EXPORT って書けば外から見える
 
+// 文字列を文字列のデリミタにより分割する
+std::vector<std::string> _split(std::string const & target, std::string const & delimiter)
+{
+    std::size_t begin = 0, end;
+    auto const delimiter_length = delimiter.size();
+    std::vector<std::string> result;
+
+    while (begin <= target.size()) {
+        end = target.find(delimiter, begin);
+        if (end == std::string::npos) {
+            end = target.size();
+        }
+        result.push_back(target.substr(begin, end - begin));
+        begin = end + delimiter_length;
+    }
+
+    return result;
+}
+
+
 // 敷地のブロックの状態
 enum struct BlockState { BLANK, STONE, OBSTACLE };
+
 
 // 何らかの座標を表すクラス
 class SHARED_EXPORT point_type
@@ -42,13 +63,14 @@ class SHARED_EXPORT stone_type
 
     public:
         stone_type() = default;
-
         ~stone_type() = default;
 
         friend inline bool operator== (stone_type const& lhs, stone_type const& rhs)
         {
             return lhs.raw_data == rhs.raw_data;
         }
+
+        stone_type(std::string const & raw_stone_text);
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
@@ -132,6 +154,15 @@ class SHARED_EXPORT stone_type
             return sum;
         }
 };
+
+stone_type::stone_type(std::string const & raw_stone_text)
+{
+    auto rows = _split(raw_stone_text, "\r\n");
+    for (std::size_t i = 0; i < raw_data.size(); ++i) {
+        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
+                       [](auto const & c) { return c == '1'; });
+    }
+}
 
 // 敷地に置かれた石の情報
 class SHARED_EXPORT placed_stone_type
@@ -322,7 +353,6 @@ class SHARED_EXPORT problem_type
 
     private:
         static std::tuple<std::string, std::vector<std::string>> _split_problem_text(std::string const & problem_text);
-        static std::vector<std::string> _split(std::string const & target, std::string const & delimiter);
 };
 
 problem_type::problem_type(std::string const & problem_text)
@@ -355,30 +385,15 @@ std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_t
     return result;
 }
 
-std::vector<std::string> problem_type::_split(std::string const & target, std::string const & delimiter)
-{
-    std::size_t begin = 0, end;
-    auto const delimiter_length = delimiter.size();
-    std::vector<std::string> result;
-
-    while (begin <= target.size()) {
-        end = target.find(delimiter, begin);
-        if (end == std::string::npos) {
-            end = target.size();
-        }
-        result.push_back(target.substr(begin, end - begin));
-        begin = end + delimiter_length;
-    }
-
-    return result;
-}
-
 // 解答データの手順ひとつ分
 class SHARED_EXPORT process_type
 {
     public:
         process_type() = default;
         ~process_type() = default;
+
+        stone_type stone;
+        point_type position;
 };
 
 // 解答データ
