@@ -264,7 +264,7 @@ problem_type::problem_type(std::string const & problem_text)
 
     // field = field_type(field_text);
     for (auto const & stone_text : stone_texts) {
-        // stones.emplace_back(stone_text);
+        stones.emplace_back(stone_text);
     }
 }
 
