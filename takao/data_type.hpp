@@ -88,47 +88,14 @@ class SHARED_EXPORT stone_type
         //生配列への参照を返す
         raw_stone_type const& get_array()
         {
-            return raw_data;
+            return raw_data_set.at(current_side + current_angle * 4);
         }
 
         //時計回りを正方向として指定された角度だけ回転する
         // 自身への参照を返す
         stone_type& rotate(int angle)
         {
-            stone_type return_data;
-
-            switch ((angle + 360)/90)
-            {
-            case 0:
-               break;
-
-            case 1:
-                for(int i=0;i<8;i++) for(int j=0;j<8;j++)
-                {
-                    return_data.raw_data[i][j] = raw_data[j-3][i];
-                }
-                raw_data = return_data.raw_data;
-                break;
-
-            case 2:
-                for(auto& each_raw_data:raw_data)
-                {
-                    std::reverse(each_raw_data.begin(),each_raw_data.end());
-                }
-                std::reverse(raw_data.begin(),raw_data.end());
-                break;
-
-            case 3:
-                for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
-                {
-                    return_data.raw_data[i][j] = raw_data[j][3-i];
-                }
-                raw_data = return_data.raw_data;
-                break;
-
-            default:
-                break;
-            }
+            current_angle = (current_angle + angle) % 360;
             return *this;
         }
 
@@ -136,10 +103,7 @@ class SHARED_EXPORT stone_type
         //自身への参照を返す
         stone_type& flip()
         {
-            for(auto& each_raw_data:raw_data)
-            {
-                std::reverse(each_raw_data.begin(),each_raw_data.end());
-            }
+            current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
             return *this;
         }
 
