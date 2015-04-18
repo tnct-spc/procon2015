@@ -125,14 +125,14 @@ class SHARED_EXPORT stone_type
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
-        int at(size_t y,size_t x)
+        int const & at(size_t y,size_t x) const
         {
             return raw_data.at(y).at(x);
         }
 
-        int at(size_t y,size_t x) const
+        int & at(size_t y,size_t x)
         {
-            return raw_data.at(y).at(x);
+            return const_cast<int &>(at(y, x));
         }
 
         //石へのアクセサ
