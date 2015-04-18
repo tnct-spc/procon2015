@@ -57,7 +57,8 @@ class SHARED_EXPORT point_type
 // 石
 class SHARED_EXPORT stone_type
 {
-    enum Sides {Head, Tail};
+    public:
+        enum Sides {Head, Tail};
 
     private:
         raw_stone_type raw_data;
@@ -172,6 +173,9 @@ class SHARED_EXPORT stone_type
             }
             return sum;
         }
+
+        stone_type::Sides get_side() const;
+        std::size_t get_angle() const;
 };
 
 stone_type::stone_type(std::string const & raw_stone_text)
@@ -190,6 +194,16 @@ stone_type::stone_type(std::string const & raw_stone_text)
         raw_data_set.at(i) = std::move(_rotate(i*90));
         raw_data_set.at(4+i) = std::move(_flip(raw_data_set.at(i)));
     }
+}
+
+stone_type::Sides stone_type::get_side() const
+{
+    return current_side;
+}
+
+std::size_t stone_type::get_angle() const
+{
+    return current_angle;
 }
 
 // 敷地に置かれた石の情報
@@ -491,7 +505,7 @@ std::string answer_type::get_answer_str() const
                   + " "
                   + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
                   + " "
-                  + std::to_string(process.stone.get_angle());
+                  + std::to_string(process.stone.get_angle() * 90);
         }
 
         result.append(line);
