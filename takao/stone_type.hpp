@@ -16,54 +16,10 @@ class SHARED_EXPORT stone_type
         std::size_t current_angle;
 
         //時計回りを正方向として指定された角度だけ回転する
-        raw_stone_type _rotate(int angle)
-        {
-           raw_stone_type return_data;
-
-            switch ((angle + 360)/90)
-            {
-            case 0:
-                return_data = raw_data;
-               break;
-
-            case 1:
-                for(int i=0;i<8;i++) for(int j=0;j<8;j++)
-                {
-                    return_data[i][j] = raw_data[j-7][i];
-                }
-                break;
-
-            case 2:
-                return_data = raw_data;
-                for(auto& each_return_data:return_data)
-                {
-                    std::reverse(each_return_data.begin(),each_return_data.end());
-                }
-                std::reverse(return_data.begin(),return_data.end());
-                break;
-
-            case 3:
-                for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
-                {
-                    return_data[i][j] = raw_data[j][7-i];
-                }
-                break;
-
-            default:
-                break;
-            }
-            return return_data;
-        }
+        raw_stone_type _rotate(int angle);
 
         //左右に反転する
-        raw_stone_type _flip(raw_stone_type stone)
-        {
-            for(auto& each_stone:stone)
-            {
-                std::reverse(each_stone.begin(),each_stone.end());
-            }
-            return stone;
-        }
+        raw_stone_type _flip(raw_stone_type stone);
 
     public:
         stone_type() = default;
@@ -78,53 +34,112 @@ class SHARED_EXPORT stone_type
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
-        int const & at(size_t y,size_t x) const
-        {
-            return raw_data.at(y).at(x);
-        }
-
-        int & at(size_t y,size_t x)
-        {
-            return const_cast<int &>(at(y, x));
-        }
+        int & at(size_t y,size_t x);
+        int const & at(size_t y,size_t x) const;
 
         //石へのアクセサ
         //生配列への参照を返す
-        raw_stone_type const& get_array()
-        {
-            return raw_data_set.at(current_side + current_angle * 4);
-        }
+        raw_stone_type const& get_array();
 
         //時計回りを正方向として指定された角度だけ回転する
         // 自身への参照を返す
-        stone_type& rotate(int angle)
-        {
-            current_angle = (current_angle + angle) % 360;
-            return *this;
-        }
+        stone_type& rotate(int angle);
 
         //左右に反転する
         //自身への参照を返す
-        stone_type& flip()
-        {
-            current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
-            return *this;
-        }
+        stone_type& flip();
 
         //面積を返す
-        size_t get_area()
-        {
-            size_t sum = 0;
-            for(auto const& each_raw_data:raw_data)
-            {
-                sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
-            }
-            return sum;
-        }
+        size_t get_area();
 
         stone_type::Sides get_side() const;
         std::size_t get_angle() const;
 };
+
+size_t stone_type::get_area();
+{
+    size_t sum = 0;
+    for(auto const& each_raw_data:raw_data)
+    {
+        sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
+    }
+    return sum;
+}
+
+stone_type& stone_type::flip();
+{
+    current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
+    return *this;
+}
+
+stone_type& stone_type::rotate(int angle)
+{
+    current_angle = (current_angle + angle) % 360;
+    return *this;
+}
+
+raw_stone_type const& stone_type::get_array()
+{
+    return raw_data_set.at(current_side + current_angle * 4);
+}
+
+int const & stone_type::at(size_t y,size_t x) const;
+{
+    return raw_data.at(y).at(x);
+}
+
+int & stone_type::at(size_t y,size_t x);
+{
+    return const_cast<int &>(at(y, x));
+}
+
+raw_stone_type stone_type::_flip(raw_stone_type stone)
+{
+    for(auto& each_stone:stone)
+    {
+        std::reverse(each_stone.begin(),each_stone.end());
+    }
+    return stone;
+}
+
+raw_stone_type stone_type::_rotate(int angle)
+{
+    raw_stone_type return_data;
+
+    switch ((angle + 360)/90)
+    {
+        case 0:
+            return_data = raw_data;
+            break;
+
+        case 1:
+            for(int i=0;i<8;i++) for(int j=0;j<8;j++)
+            {
+                return_data[i][j] = raw_data[j-7][i];
+            }
+            break;
+
+        case 2:
+            return_data = raw_data;
+            for(auto& each_return_data:return_data)
+            {
+                std::reverse(each_return_data.begin(),each_return_data.end());
+            }
+            std::reverse(return_data.begin(),return_data.end());
+            break;
+
+        case 3:
+            for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
+            {
+                return_data[i][j] = raw_data[j][7-i];
+            }
+            break;
+
+        default:
+            break;
+    }
+    return return_data;
+}
 
 stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(_nth)
 {
