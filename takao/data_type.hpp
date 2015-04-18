@@ -57,14 +57,17 @@ class SHARED_EXPORT point_type
 // 石
 class SHARED_EXPORT stone_type
 {
+    enum Sides {Head, Tail};
+
     private:
-        enum Sides {HEAD,TAIL};
         raw_stone_type raw_data;
         int nth;
         std::array<raw_stone_type,8>  raw_data_set;
+        Sides current_side;
+        std::size_t current_angle;
 
         //時計回りを正方向として指定された角度だけ回転する
-        raw_stone_type& _rotate(int angle)
+        raw_stone_type _rotate(int angle)
         {
            raw_stone_type return_data;
 
@@ -104,7 +107,7 @@ class SHARED_EXPORT stone_type
         }
 
         //左右に反転する
-        raw_stone_type& _flip(raw_stone_type stone)
+        raw_stone_type _flip(raw_stone_type stone)
         {
             for(auto& each_stone:stone)
             {
