@@ -57,7 +57,7 @@ class SHARED_EXPORT stone_type
 
     private:
         raw_stone_type raw_data;
-        int const nth;
+        int nth;
         std::array<raw_stone_type,8>  raw_data_set;
         Sides current_side;
         std::size_t current_angle;
@@ -431,7 +431,7 @@ problem_type::problem_type(std::string const & problem_text)
     field = field_type(field_text);
     for(std::size_t i = 0; i < stone_texts.size(); ++i)
     {
-         stones.emplace_back(stone_texts, i);
+         stones.emplace_back(stone_texts[i], i);
     }
 }
 

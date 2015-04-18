@@ -226,7 +226,7 @@ namespace {
             {{0, 1, 1, 1, 0, 0, 0, 0}},
             {{0, 0, 0, 0, 0, 0, 0, 0}}
         }};
-        auto result = stone_type(stone_text).raw_data;
+        auto result = stone_type(stone_text, 0).raw_data;
         BOOST_CHECK_EQUAL(expected, result);
     }
 
