@@ -232,3 +232,8 @@ namespace {
 
     BOOST_AUTO_TEST_SUITE_END()
 }
+
+namespace {
+    BOOST_AUTO_TEST_SUITE(field_type_tests)
+    BOOST_AUTO_TEST_SUITE_END()
+}

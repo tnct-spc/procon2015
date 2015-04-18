@@ -331,12 +331,9 @@ class SHARED_EXPORT field_type
         }
 
         //置かれた石の一覧を表す配列を返す
-        std::vector<stone_type>& list_of_stones() const
+        std::vector<stone_type> const & list_of_stones() const
         {
-            //std::vector<stone_type> const return_vec = {placed_stone_list};
-            //std::copy(placed_stone_list.begin(),placed_stone_list.end(),return_vec.begin());
-            //return placed_stone_list;
-            //return std::move(return_vec);
+            return placed_stone_list;
         }
 
         placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
