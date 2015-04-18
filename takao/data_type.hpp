@@ -464,7 +464,43 @@ class SHARED_EXPORT answer_type
     public:
         answer_type() = default;
         ~answer_type() = default;
+
+        answer_type(problem_type const & _problem) : problem(_problem) {}
+
+        std::string get_answer_str() const;
+
+        std::vector<process_type> processes;
+
+    private:
+        problem_type const & problem;
 };
+
+// 解答文字列を返す
+std::string answer_type::get_answer_str() const
+{
+    std::string result;
+    std::size_t prev_nth = 0;
+    for (process_type const & process : processes) {
+        std::string line;
+
+        // 前回の石から順番が飛んでいる場合はパスした場合とみなす
+        if (static_cast<int>(prev_nth + 1) == process.stone.nth) {
+            line += std::to_string(process.position.x)
+                  + " "
+                  + std::to_string(process.position.y)
+                  + " "
+                  + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
+                  + " "
+                  + std::to_string(process.stone.get_angle());
+        }
+
+        result.append(line);
+        result.append("\r\n");
+        prev_nth = process.stone.nth;
+    }
+
+    return result;
+}
 
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
