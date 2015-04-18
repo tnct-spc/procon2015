@@ -14,7 +14,8 @@ DEFINES += TAKAO_LIBRARY
 SOURCES +=
 
 HEADERS += data_type.hpp\
-        takao_global.hpp
+        takao_global.hpp \
+    point_type.hpp
 
 unix {
     target.path = /usr/lib

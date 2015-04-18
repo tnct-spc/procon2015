@@ -8,10 +8,13 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "takao_global.hpp"
 #include <array>
 #include <cstdint>
 #include <algorithm>
+
+#include "takao_global.hpp"
+
+#include "point_type.hpp"
 
 typedef std::array<std::array<int,8>,8> raw_stone_type;
 
@@ -37,17 +40,6 @@ std::vector<std::string> _split(std::string const & target, std::string const & 
 
     return result;
 }
-
-// 何らかの座標を表すクラス
-class SHARED_EXPORT point_type
-{
-    public:
-        point_type() = default;
-        ~point_type() = default;
-
-        int y;
-        int x;
-};
 
 // 石
 class SHARED_EXPORT stone_type
