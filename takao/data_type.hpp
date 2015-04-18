@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <algorithm>
 
-typedef std::array<std::array<uint8_t,8>,8> raw_stone_type;
+typedef std::array<std::array<int,8>,8> raw_stone_type;
 
 using namespace std::string_literals;
 
@@ -74,12 +74,12 @@ class SHARED_EXPORT stone_type
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
-        uint8_t at(size_t y,size_t x)
+        int at(size_t y,size_t x)
         {
             return raw_data.at(y).at(x);
         }
 
-        uint8_t at(size_t y,size_t x) const
+        int at(size_t y,size_t x) const
         {
             return raw_data.at(y).at(x);
         }
@@ -185,9 +185,9 @@ class SHARED_EXPORT placed_stone_type
 class SHARED_EXPORT field_type
 {
     private:
-        std::array<std::array<uint8_t,40>,40> raw_data;
+        std::array<std::array<int,40>,40> raw_data;
         std::array<std::array<placed_stone_type,32>,32> placed_stone;
-        std::array<std::array<uint8_t,32>,32> placed_order;
+        std::array<std::array<int,32>,32> placed_order;
         std::vector<stone_type> placed_stone_list;
 
         //is_removableで必要
