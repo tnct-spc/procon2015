@@ -228,7 +228,7 @@ class SHARED_EXPORT field_type
         std::array<point_type,257> reference_point;
 
         //is_removableで必要
-        struct pea_type
+        struct pair_type
         {
             int a;
             int b;
@@ -320,8 +320,8 @@ class SHARED_EXPORT field_type
          //指定された石を取り除けるかどうかを返す
         bool is_removable(stone_type const& stone)
         {
-            std::vector<pea_type> pea_list;
-            std::vector<pea_type> remove_list;
+            std::vector<pair_type> pea_list;
+            std::vector<pair_type> remove_list;
 
             //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
             //if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
@@ -332,11 +332,11 @@ class SHARED_EXPORT field_type
                 int const c = placed_order.at(i).at(j);
                 int const d = placed_order.at(i+1).at(j);
                 int const r = placed_order.at(i).at(j+1);
-                if(c != d) pea_list.push_back(pea_type{c,d});
-                if(c != r) pea_list.push_back(pea_type{c,r});
+                if(c != d) pea_list.push_back(pair_type{c,d});
+                if(c != r) pea_list.push_back(pair_type{c,r});
             }
             //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
-            for(std::vector<pea_type>::iterator it = pea_list.begin();it != pea_list.end();)
+            for(std::vector<pair_type>::iterator it = pea_list.begin();it != pea_list.end();)
             {
                 if(it->a == stone.nth || it->b == stone.nth)
                 {
