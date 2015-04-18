@@ -275,17 +275,6 @@ class SHARED_EXPORT field_type
             {
                 throw std::runtime_error("The stone can't remove.");
             }
-
-            for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
-            {
-                if (placed_stone.at(i).at(j).stone == stone)
-                {
-                   // placed_stone.at(i).at(j) = placed_stone_type{};
-                    placed_stone.at(i).at(j).stone = stone_type{};
-                    placed_stone.at(i).at(j).p_in_field = point_type{};
-                    placed_stone.at(i).at(j).p_in_stone = point_type{};
-                }
-            }
             for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
             {
                 if(each_block == stone.nth) each_block = 0;
