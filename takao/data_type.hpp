@@ -387,7 +387,11 @@ class SHARED_EXPORT process_type
         process_type() = default;
         ~process_type() = default;
 
-        stone_type stone;
+        process_type(stone_type const & _stone,
+                     point_type const & _position)
+        : stone(_stone), position(_position) {}
+
+        stone_type const & stone;
         point_type position;
 };
 
