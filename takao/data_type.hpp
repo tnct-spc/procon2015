@@ -320,7 +320,7 @@ class SHARED_EXPORT field_type
          //指定された石を取り除けるかどうかを返す
         bool is_removable(stone_type const& stone)
         {
-            std::vector<pair_type> pea_list;
+            std::vector<pair_type> pair_list;
             std::vector<pair_type> remove_list;
 
             //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
@@ -332,16 +332,16 @@ class SHARED_EXPORT field_type
                 int const c = placed_order.at(i).at(j);
                 int const d = placed_order.at(i+1).at(j);
                 int const r = placed_order.at(i).at(j+1);
-                if(c != d) pea_list.push_back(pair_type{c,d});
-                if(c != r) pea_list.push_back(pair_type{c,r});
+                if(c != d) pair_list.push_back(pair_type{c,d});
+                if(c != r) pair_list.push_back(pair_type{c,r});
             }
             //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
-            for(std::vector<pair_type>::iterator it = pea_list.begin();it != pea_list.end();)
+            for(std::vector<pair_type>::iterator it = pair_list.begin();it != pair_list.end();)
             {
                 if(it->a == stone.nth || it->b == stone.nth)
                 {
                     remove_list.push_back(*it);
-                    it = pea_list.erase(it);
+                    it = pair_list.erase(it);
                 }
                 else ++it;
             }
@@ -350,7 +350,7 @@ class SHARED_EXPORT field_type
             for(auto const& each_remove_list : remove_list)
             {
                 int const target_stone_num = (each_remove_list.a == stone.nth)?each_remove_list.b:each_remove_list.a;
-                for(auto const& each_pea_list : pea_list)
+                for(auto const& each_pea_list : pair_list)
                 {
                     if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b) ||
                        (each_pea_list.b == target_stone_num && each_pea_list.b > each_pea_list.a))
