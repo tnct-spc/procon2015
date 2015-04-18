@@ -58,8 +58,60 @@ class SHARED_EXPORT point_type
 class SHARED_EXPORT stone_type
 {
     private:
+        enum Sides {HEAD,TAIL};
         raw_stone_type raw_data;
         int nth;
+        std::array<raw_stone_type,8>  raw_data_set;
+
+        //時計回りを正方向として指定された角度だけ回転する
+        raw_stone_type& _rotate(int angle)
+        {
+           raw_stone_type return_data;
+
+            switch ((angle + 360)/90)
+            {
+            case 0:
+                return_data = raw_data;
+               break;
+
+            case 1:
+                for(int i=0;i<8;i++) for(int j=0;j<8;j++)
+                {
+                    return_data[i][j] = raw_data[j-7][i];
+                }
+                break;
+
+            case 2:
+                return_data = raw_data;
+                for(auto& each_return_data:return_data)
+                {
+                    std::reverse(each_return_data.begin(),each_return_data.end());
+                }
+                std::reverse(return_data.begin(),return_data.end());
+                break;
+
+            case 3:
+                for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
+                {
+                    return_data[i][j] = raw_data[j][7-i];
+                }
+                break;
+
+            default:
+                break;
+            }
+            return return_data;
+        }
+
+        //左右に反転する
+        raw_stone_type& _flip(raw_stone_type stone)
+        {
+            for(auto& each_stone:stone)
+            {
+                std::reverse(each_stone.begin(),each_stone.end());
+            }
+            return stone;
+        }
 
     public:
         stone_type() = default;
@@ -161,6 +213,15 @@ stone_type::stone_type(std::string const & raw_stone_text)
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1'; });
+    }
+
+    //rotate用のarrayを準備する
+    raw_data_set.at(0)  =  raw_data;
+    raw_data_set.at(4) = std::move(_flip(raw_data));
+    for(size_t i = 1; i < 4; ++i)
+    {
+        raw_data_set.at(i) = std::move(_rotate(i*90));
+        raw_data_set.at(4+i) = std::move(_flip(raw_data_set.at(i)));
     }
 }
 
