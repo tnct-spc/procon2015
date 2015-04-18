@@ -222,7 +222,7 @@ class SHARED_EXPORT placed_stone_type
 class SHARED_EXPORT field_type
 {
     private:
-        std::array<std::array<int,40>,40> raw_data;
+        std::array<std::array<int,32>,32> raw_data;
         std::array<std::array<int,32>,32> placed_order;
         std::vector<stone_type> placed_stone_list;
         std::array<point_type,257> reference_point;
@@ -254,9 +254,9 @@ class SHARED_EXPORT field_type
         size_t get_score()
         {
             size_t sum = 0;
-            for(size_t i = 8; i < 40; ++i)
+            for (auto const & row : raw_data)
             {
-                sum += std::count(raw_data.at(i).begin()+8,raw_data.at(i).end(),0);
+                sum += std::count(row.begin(), row.end(), 0);
             }
             return sum;
         }
