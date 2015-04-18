@@ -275,7 +275,7 @@ class SHARED_EXPORT field_type
                 if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
                 {
                     raw_data.at(i+y).at(j+x) = stone.at(i,j);
-                    placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                    placed_order.at(i+y).at(j+x) = stone.nth;
                     placed_stone_list.push_back(stone);
                 }
             }
