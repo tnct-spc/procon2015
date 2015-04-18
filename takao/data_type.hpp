@@ -63,7 +63,7 @@ class SHARED_EXPORT stone_type
 
     public:
         stone_type() = default;
-         ~stone_type() = default;
+        ~stone_type() = default;
 
         friend inline bool operator== (stone_type const& lhs, stone_type const& rhs)
         {
@@ -171,7 +171,12 @@ class SHARED_EXPORT placed_stone_type
         placed_stone_type() = default;
         ~placed_stone_type() = default;
 
-        stone_type& stone;
+        placed_stone_type(stone_type const & _stone,
+                          point_type const & pf,
+                          point_type const & ps)
+        : stone(_stone), p_in_field(pf), p_in_stone(ps) {}
+
+        stone_type const & stone;
         point_type p_in_field;
         point_type p_in_stone;
 };
@@ -215,14 +220,14 @@ class SHARED_EXPORT field_type
             for(size_t i = 8; i < 40; ++i)
             {
                 sum += std::count(raw_data.at(i).begin()+8,raw_data.at(i).end(),0);
-           }
+            }
             return sum;
         }
 
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x)
         {
-             for(int i = 0; i < 8; ++i)
+            for(int i = 0; i < 8; ++i)
             {
                 for(int j = 0; j < 8; ++j)
                 {
