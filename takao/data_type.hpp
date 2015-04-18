@@ -186,7 +186,6 @@ class SHARED_EXPORT field_type
 {
     private:
         std::array<std::array<int,40>,40> raw_data;
-        //std::array<std::array<placed_stone_type,32>,32> placed_stone;
         std::array<std::array<int,32>,32> placed_order;
         std::vector<stone_type> placed_stone_list;
         std::array<point_type,257> reference_point;
