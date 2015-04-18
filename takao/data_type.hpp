@@ -59,10 +59,16 @@ class SHARED_EXPORT stone_type
 {
     private:
         raw_stone_type raw_data;
+        int nth;
 
     public:
         stone_type() = default;
-        ~stone_type() = default;
+         ~stone_type() = default;
+
+        friend inline bool operator== (stone_type const& lhs, stone_type const& rhs)
+        {
+            return lhs.raw_data == rhs.raw_data;
+        }
 
         stone_type(std::string const & raw_stone_text);
 
@@ -168,13 +174,34 @@ class SHARED_EXPORT placed_stone_type
         stone_type& stone;
         point_type p_in_field;
         point_type p_in_stone;
-
 };
 
 // 敷地
 class SHARED_EXPORT field_type
 {
-    std::array<std::array<uint8_t,40>,40> raw_data;
+    private:
+        std::array<std::array<uint8_t,40>,40> raw_data;
+        std::array<std::array<placed_stone_type,32>,32> placed_stone;
+        std::array<std::array<uint8_t,32>,32> placed_order;
+        std::vector<stone_type> placed_stone_list;
+
+        //is_removableで必要
+        struct pea_type
+        {
+            int a;
+            int b;
+        };
+
+        //石が置かれているか否かを返す
+        bool is_placed(stone_type const& stone)
+        {
+            for(auto const& each_placed_stone : placed_stone_list)
+            {
+                if(each_placed_stone == stone) return true;
+            }
+            return false;
+        }
+
     public:
         field_type() = default;
         ~field_type() = default;
@@ -185,21 +212,30 @@ class SHARED_EXPORT field_type
         size_t get_score()
         {
             size_t sum = 0;
-            for(size_t i = 8;i < 40;++i)
+            for(size_t i = 8; i < 40; ++i)
             {
                 sum += std::count(raw_data.at(i).begin()+8,raw_data.at(i).end(),0);
-            }
+           }
             return sum;
         }
 
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x)
         {
-            for(int i = 0;i < 8;++i)
+             for(int i = 0; i < 8; ++i)
             {
-                for(int j = 0;j < 8;++j)
+                for(int j = 0; j < 8; ++j)
                 {
-                    if(raw_data.at(i+y).at(j+x) == 0) raw_data.at(i+y).at(j+x) = stone.at(i,j);
+                    if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
+                    {
+                        raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
+                        //placed_stone.at(i+y).at(j+x) =placed_stone_type{stone,point_type{i+y,j+x},point_type{i,j}};
+                        placed_stone.at(i+y).at(j+x).stone = stone;
+                        placed_stone.at(i+y).at(j+x).p_in_field = point_type{i+y,j+x};
+                        placed_stone.at(i+y).at(j+x).p_in_stone = point_type{i,j};
+                        //placed_order.at(i+y).at(j+x) = nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                        placed_stone_list.push_back(stone);
+                    }
                     else if(stone.at(i,j) == 0) continue;
                     else std::runtime_error("Failed to put the stone.");
                 }
@@ -210,11 +246,11 @@ class SHARED_EXPORT field_type
         //指定された場所に指定された石が置けるかどうかを返す
         bool is_puttable(stone_type const& stone, int y, int x)
         {
-            for(int i = 0;i < 8;++i)
+            for(size_t i = 0;i < 8;++i)
             {
-                for(int j = 0;j < 8;++j)
+                for(size_t j = 0;j < 8;++j)
                 {
-                    if(raw_data.at(i+y).at(j+x) == 0) continue;
+                    if(raw_data.at(i+y+8).at(j+x+8) == 0) continue;
                     else if(stone.at(i,j) == 0)continue;
                     else return false;
                 }
@@ -226,19 +262,88 @@ class SHARED_EXPORT field_type
         //その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
         field_type& remove_stone(stone_type const& stone)
         {
+            if (is_placed(stone) == false)
+            {
+                std::runtime_error("The stone isn't placed.");
+            }
+            else if(is_removable(stone) == false)
+            {
+                std::runtime_error("The stone can't remove.");
+            }
 
-        }
+            for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
+            {
+                if (placed_stone.at(i).at(j).stone == stone)
+                {
+                   // placed_stone.at(i).at(j) = placed_stone_type{};
+                    placed_stone.at(i).at(j).stone = stone_type{};
+                    placed_stone.at(i).at(j).p_in_field = point_type{};
+                    placed_stone.at(i).at(j).p_in_stone = point_type{};
+                }
+            }
+            for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
+            {
+                if(each_block == stone.nth) each_block = 0;
+            }
+            return *this;
+         }
 
          //指定された石を取り除けるかどうかを返す
         bool is_removable(stone_type const& stone)
         {
+            std::vector<pea_type> pea_list;
+            std::vector<pea_type> remove_list;
 
+            //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
+            //if(is_placed(stone) == false) std::runtime_error("The stone isn't' placed");
+
+            //継ぎ目を検出
+            for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
+            {
+                int const c = placed_order.at(i).at(j);
+                int const d = placed_order.at(i+1).at(j);
+                int const r = placed_order.at(i).at(j+1);
+                if(c != d) pea_list.push_back(pea_type{c,d});
+                if(c != r) pea_list.push_back(pea_type{c,r});
+            }
+            //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
+            for(std::vector<pea_type>::iterator it = pea_list.begin();it != pea_list.end();)
+            {
+                if(it->a == stone.nth || it->b == stone.nth)
+                {
+                    remove_list.push_back(*it);
+                    it = pea_list.erase(it);
+                }
+                else ++it;
+            }
+            //取り除きたい石に隣接している石リストに含まれる石それぞれに、不整合が生じていないか見ていく
+            bool ans = false;
+            for(auto const& each_remove_list : remove_list)
+            {
+                int const target_stone_num = (each_remove_list.a == stone.nth)?each_remove_list.b:each_remove_list.a;
+                for(auto const& each_pea_list : pea_list)
+                {
+                    if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b) ||
+                       (each_pea_list.b == target_stone_num && each_pea_list.b > each_pea_list.a))
+                    {
+                        ans = true;
+                        break;
+                    }
+                    else continue;
+                }
+                if(ans == false) return false;
+                else continue;
+            }
+            return true;
         }
 
         //置かれた石の一覧を表す配列を返す
         std::vector<stone_type>& list_of_stones() const
         {
-
+            //std::vector<stone_type> const return_vec = {placed_stone_list};
+            //std::copy(placed_stone_list.begin(),placed_stone_list.end(),return_vec.begin());
+            //return placed_stone_list;
+            //return std::move(return_vec);
         }
 };
 
