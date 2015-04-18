@@ -38,11 +38,6 @@ std::vector<std::string> _split(std::string const & target, std::string const & 
     return result;
 }
 
-
-// 敷地のブロックの状態
-enum struct BlockState { BLANK, STONE, OBSTACLE };
-
-
 // 何らかの座標を表すクラス
 class SHARED_EXPORT point_type
 {
