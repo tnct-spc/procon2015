@@ -17,7 +17,8 @@ HEADERS += data_type.hpp\
         takao_global.hpp \
     point_type.hpp \
     stone_type.hpp \
-    placed_stone_type.hpp
+    placed_stone_type.hpp \
+    field_type.hpp
 
 unix {
     target.path = /usr/lib
