@@ -323,8 +323,7 @@ class SHARED_EXPORT field_type
             std::vector<pair_type> pair_list;
             std::vector<pair_type> remove_list;
 
-            //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
-            //if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
+            if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
 
             //継ぎ目を検出
             for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
