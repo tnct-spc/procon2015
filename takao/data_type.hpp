@@ -242,7 +242,7 @@ class SHARED_EXPORT field_type
                         placed_stone_list.push_back(stone);
                     }
                     else if(stone.at(i,j) == 0) continue;
-                    else std::runtime_error("Failed to put the stone.");
+                    else throw std::runtime_error("Failed to put the stone.");
                 }
             }
             return *this;
@@ -269,11 +269,11 @@ class SHARED_EXPORT field_type
         {
             if (is_placed(stone) == false)
             {
-                std::runtime_error("The stone isn't placed.");
+                throw std::runtime_error("The stone isn't placed.");
             }
             else if(is_removable(stone) == false)
             {
-                std::runtime_error("The stone can't remove.");
+                throw std::runtime_error("The stone can't remove.");
             }
 
             for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
@@ -300,7 +300,7 @@ class SHARED_EXPORT field_type
             std::vector<pea_type> remove_list;
 
             //NOTE:仕様にはないからコメントアウトしとくけど、あった方が良いと思う
-            //if(is_placed(stone) == false) std::runtime_error("The stone isn't' placed");
+            //if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
 
             //継ぎ目を検出
             for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
