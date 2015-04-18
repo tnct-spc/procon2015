@@ -1,5 +1,5 @@
-#ifndef TAKAO_HPP
-#define TAKAO_HPP
+#ifndef DATA_TYPE_HPP
+#define DATA_TYPE_HPP
 
 #include <cassert>
 #include <cstddef>
@@ -13,16 +13,6 @@
 #include <algorithm>
 
 #include "takao_global.hpp"
-
-#include "point_type.hpp"
-#include "stone_type.hpp"
-#include "placed_stone_type.hpp"
-#include "field_type.hpp"
-
-
-using namespace std::string_literals;
-
-// SHARED_EXPORT って書けば外から見える
 
 // 文字列を文字列のデリミタにより分割する
 std::vector<std::string> _split(std::string const & target, std::string const & delimiter)
@@ -43,6 +33,10 @@ std::vector<std::string> _split(std::string const & target, std::string const & 
     return result;
 }
 
+#include "point_type.hpp"
+#include "stone_type.hpp"
+#include "placed_stone_type.hpp"
+#include "field_type.hpp"
 
 //-----------------------------------------------------------
 // 問題データ
@@ -80,7 +74,7 @@ std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_t
     auto & field = std::get<0>(result);
     auto & stones = std::get<1>(result);
 
-    auto split = _split(problem_text, "\r\n\r\n"s);
+    auto split = _split(problem_text, "\r\n\r\n");
 
     field = split.front();
 
@@ -160,4 +154,4 @@ class SHARED_EXPORT algorithm_type
         virtual ~algorithm_type() = 0;
 };
 
-#endif // TAKAO_HPP
+#endif // DATA_TYPE_HPP
