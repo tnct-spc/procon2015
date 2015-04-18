@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <algorithm>
 
-typedef std::array<std::array<uint8_t,8>,8> raw_stone_type;
+typedef std::array<std::array<int,8>,8> raw_stone_type;
 
 using namespace std::string_literals;
 
@@ -74,12 +74,12 @@ class SHARED_EXPORT stone_type
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
-        uint8_t at(size_t y,size_t x)
+        int at(size_t y,size_t x)
         {
             return raw_data.at(y).at(x);
         }
 
-        uint8_t at(size_t y,size_t x) const
+        int at(size_t y,size_t x) const
         {
             return raw_data.at(y).at(x);
         }
@@ -185,10 +185,11 @@ class SHARED_EXPORT placed_stone_type
 class SHARED_EXPORT field_type
 {
     private:
-        std::array<std::array<uint8_t,40>,40> raw_data;
-        std::array<std::array<placed_stone_type,32>,32> placed_stone;
-        std::array<std::array<uint8_t,32>,32> placed_order;
+        std::array<std::array<int,40>,40> raw_data;
+        //std::array<std::array<placed_stone_type,32>,32> placed_stone;
+        std::array<std::array<int,32>,32> placed_order;
         std::vector<stone_type> placed_stone_list;
+        std::array<point_type,257> reference_point;
 
         //is_removableで必要
         struct pea_type
@@ -227,24 +228,22 @@ class SHARED_EXPORT field_type
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x)
         {
-            for(int i = 0; i < 8; ++i)
+            //さきに置けるか確かめる
+            for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
-                for(int j = 0; j < 8; ++j)
+                if(raw_data.at(i+y+8).at(j+x+8) == 1 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+            }
+            //置く
+            for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
+            {
+                if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
                 {
-                    if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
-                    {
-                        raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
-                        //placed_stone.at(i+y).at(j+x) =placed_stone_type{stone,point_type{i+y,j+x},point_type{i,j}};
-                        placed_stone.at(i+y).at(j+x).stone = stone;
-                        placed_stone.at(i+y).at(j+x).p_in_field = point_type{i+y,j+x};
-                        placed_stone.at(i+y).at(j+x).p_in_stone = point_type{i,j};
-                        //placed_order.at(i+y).at(j+x) = nth; //TODO:nthコンストラクタで代入してこれできるようにする
-                        placed_stone_list.push_back(stone);
-                    }
-                    else if(stone.at(i,j) == 0) continue;
-                    else throw std::runtime_error("Failed to put the stone.");
+                    raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
+                    placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                    placed_stone_list.push_back(stone);
                 }
             }
+            reference_point.at(stone.nth) = point_type{y,x};
             return *this;
         }
 
@@ -274,17 +273,6 @@ class SHARED_EXPORT field_type
             else if(is_removable(stone) == false)
             {
                 throw std::runtime_error("The stone can't remove.");
-            }
-
-            for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
-            {
-                if (placed_stone.at(i).at(j).stone == stone)
-                {
-                   // placed_stone.at(i).at(j) = placed_stone_type{};
-                    placed_stone.at(i).at(j).stone = stone_type{};
-                    placed_stone.at(i).at(j).p_in_field = point_type{};
-                    placed_stone.at(i).at(j).p_in_stone = point_type{};
-                }
             }
             for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
             {
