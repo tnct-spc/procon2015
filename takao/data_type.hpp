@@ -350,7 +350,30 @@ class SHARED_EXPORT field_type
             //return placed_stone_list;
             //return std::move(return_vec);
         }
+
+        placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
 };
+
+placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
+{
+    auto nth = raw_data.at(y).at(x);
+    if (nth == 0 || nth == -1) {
+        throw std::runtime_error("There is no stone.");
+    }
+
+    point_type = reference_point[nth];
+    point_type ps = {pf.y - y, pf.x - x};
+    stone_type * stone;
+
+    for (auto & placed_stone : placed_stone_list) {
+        if (placed_stone.nth == nth) {
+            stone = &placed_stone;
+            break;
+        }
+    }
+
+    return placed_stone_type(stone, pf, ps);
+}
 
 field_type::field_type(std::string const & raw_field_text)
 {
