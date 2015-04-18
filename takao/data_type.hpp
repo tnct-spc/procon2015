@@ -186,9 +186,10 @@ class SHARED_EXPORT field_type
 {
     private:
         std::array<std::array<int,40>,40> raw_data;
-        std::array<std::array<placed_stone_type,32>,32> placed_stone;
+        //std::array<std::array<placed_stone_type,32>,32> placed_stone;
         std::array<std::array<int,32>,32> placed_order;
         std::vector<stone_type> placed_stone_list;
+        std::array<point_type,257> reference_point;
 
         //is_removableで必要
         struct pea_type
@@ -227,20 +228,22 @@ class SHARED_EXPORT field_type
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x)
         {
-            for(int i = 0; i < 8; ++i)
+            //さきに置けるか確かめる
+            for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
-                for(int j = 0; j < 8; ++j)
+                if(raw_data.at(i+y+8).at(j+x+8) == 1 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+            }
+            //置く
+            for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
+            {
+                if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
                 {
-                    if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
-                    {
-                        raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
-                        placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
-                        placed_stone_list.push_back(stone);
-                    }
-                    else if(stone.at(i,j) == 0) continue;
-                    else throw std::runtime_error("Failed to put the stone.");
+                    raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
+                    placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                    placed_stone_list.push_back(stone);
                 }
             }
+            reference_point.at(stone.nth) = point_type{y,x};
             return *this;
         }
 
