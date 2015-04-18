@@ -234,11 +234,7 @@ class SHARED_EXPORT field_type
                     if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
                     {
                         raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
-                        //placed_stone.at(i+y).at(j+x) =placed_stone_type{stone,point_type{i+y,j+x},point_type{i,j}};
-                        placed_stone.at(i+y).at(j+x).stone = stone;
-                        placed_stone.at(i+y).at(j+x).p_in_field = point_type{i+y,j+x};
-                        placed_stone.at(i+y).at(j+x).p_in_stone = point_type{i,j};
-                        //placed_order.at(i+y).at(j+x) = nth; //TODO:nthコンストラクタで代入してこれできるようにする
+                        placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
                         placed_stone_list.push_back(stone);
                     }
                     else if(stone.at(i,j) == 0) continue;
