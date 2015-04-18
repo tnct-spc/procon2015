@@ -179,6 +179,8 @@ class SHARED_EXPORT field_type
         field_type() = default;
         ~field_type() = default;
 
+        field_type(std::string const & raw_field_text);
+
         //現在の状態における得点を返す
         size_t get_score()
         {
@@ -239,6 +241,16 @@ class SHARED_EXPORT field_type
 
         }
 };
+
+field_type::field_type(std::string const & raw_field_text)
+{
+    auto rows = _split(raw_field_text, "\r\n");
+    for (std::size_t i = 0; i < raw_data.size(); ++i) {
+        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
+                       [](auto const & c) { return c == '1'; });
+    }
+}
+
 //-----------------------------------------------------------
 // 問題データ
 class SHARED_EXPORT problem_type
@@ -262,7 +274,7 @@ problem_type::problem_type(std::string const & problem_text)
     auto & field_text = std::get<0>(split);
     auto & stone_texts = std::get<1>(split);
 
-    // field = field_type(field_text);
+    field = field_type(field_text);
     for (auto const & stone_text : stone_texts) {
         stones.emplace_back(stone_text);
     }
