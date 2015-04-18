@@ -57,7 +57,7 @@ class SHARED_EXPORT stone_type
 
     private:
         raw_stone_type raw_data;
-        int nth;
+        int const nth;
         std::array<raw_stone_type,8>  raw_data_set;
         Sides current_side;
         std::size_t current_angle;
@@ -121,7 +121,7 @@ class SHARED_EXPORT stone_type
             return lhs.raw_data == rhs.raw_data;
         }
 
-        stone_type(std::string const & raw_stone_text);
+        stone_type(std::string const & raw_stone_text, int const _nth);
 
         //生配列へのアクセサ
         //座標を受け取ってそこの値を返す
@@ -173,7 +173,7 @@ class SHARED_EXPORT stone_type
         std::size_t get_angle() const;
 };
 
-stone_type::stone_type(std::string const & raw_stone_text)
+stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(_nth)
 {
     auto rows = _split(raw_stone_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
@@ -429,8 +429,9 @@ problem_type::problem_type(std::string const & problem_text)
     auto & stone_texts = std::get<1>(split);
 
     field = field_type(field_text);
-    for (auto const & stone_text : stone_texts) {
-        stones.emplace_back(stone_text);
+    for(std::size_t i = 0; i < stone_texts.size(); ++i)
+    {
+         stones.emplace_back(stone_texts, i);
     }
 }
 
