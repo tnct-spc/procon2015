@@ -267,14 +267,14 @@ class SHARED_EXPORT field_type
             //さきに置けるか確かめる
             for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
-                if(raw_data.at(i+y+8).at(j+x+8) == 1 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+                if(raw_data.at(i+y).at(j+x) == 1 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
             }
             //置く
             for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
-                if(raw_data.at(i+y+8).at(j+x+8) == 0 && stone.at(i,j) == 1)
+                if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
                 {
-                    raw_data.at(i+y+8).at(j+x+8) = stone.at(i,j);
+                    raw_data.at(i+y).at(j+x) = stone.at(i,j);
                     placed_order.at(i+y).at(j+x) = stone.nth; //TODO:nthコンストラクタで代入してこれできるようにする
                     placed_stone_list.push_back(stone);
                 }
@@ -290,7 +290,7 @@ class SHARED_EXPORT field_type
             {
                 for(size_t j = 0;j < 8;++j)
                 {
-                    if(raw_data.at(i+y+8).at(j+x+8) == 0) continue;
+                    if(raw_data.at(i+y).at(j+x) == 0) continue;
                     else if(stone.at(i,j) == 0)continue;
                     else return false;
                 }
