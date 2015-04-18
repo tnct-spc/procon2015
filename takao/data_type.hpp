@@ -349,8 +349,8 @@ placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const
         throw std::runtime_error("There is no stone.");
     }
 
-    point_type = reference_point[nth];
-    point_type ps = {pf.y - y, pf.x - x};
+    point_type pf = reference_point[nth];
+    point_type ps = {pf.y - static_cast<int>(y), pf.x - static_cast<int>(x)};
     stone_type * stone;
 
     for (auto & placed_stone : placed_stone_list) {
@@ -360,7 +360,7 @@ placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const
         }
     }
 
-    return placed_stone_type(stone, pf, ps);
+    return placed_stone_type(*stone, pf, ps);
 }
 
 field_type::field_type(std::string const & raw_field_text)
