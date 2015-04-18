@@ -267,14 +267,14 @@ class SHARED_EXPORT field_type
             //さきに置けるか確かめる
             for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
-                if(raw_data.at(i+y).at(j+x) == 1 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+                if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
             }
             //置く
             for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
             {
                 if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
                 {
-                    raw_data.at(i+y).at(j+x) = stone.at(i,j);
+                    raw_data.at(i+y).at(j+x) = stone.nth;
                     placed_order.at(i+y).at(j+x) = stone.nth;
                     placed_stone_list.push_back(stone);
                 }
