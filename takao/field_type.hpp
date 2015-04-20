@@ -40,15 +40,17 @@ class SHARED_EXPORT field_type
         field_type& remove_stone(stone_type const& stone);
 
         //指定された石を取り除けるかどうかを返す
-       bool is_removable(stone_type const& stone);
+        bool is_removable(stone_type const& stone);
 
-       //置かれた石の一覧を表す配列を返す
-       std::vector<stone_type> const & list_of_stones() const;
+        //置かれた石の一覧を表す配列を返す
+        std::vector<stone_type> const & list_of_stones() const;
 
+        //
+        placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
 };
 
 //石が置かれているか否かを返す
-bool is_placed(stone_type const& stone)
+bool field_type::is_placed(stone_type const& stone)
 {
     for(auto const& each_placed_stone : placed_stone_list)
     {
@@ -58,7 +60,7 @@ bool is_placed(stone_type const& stone)
 }
 
 //現在の状態における得点を返す
-size_t get_score()
+size_t field_type::get_score()
 {
     size_t sum = 0;
     for (auto const & row : raw_data)
@@ -69,7 +71,7 @@ size_t get_score()
 }
 
 //石を置く  自身への参照を返す   失敗したら例外を出す
-field_type& put_stone(stone_type const& stone, int y, int x)
+field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
     //さきに置けるか確かめる
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
@@ -91,7 +93,7 @@ field_type& put_stone(stone_type const& stone, int y, int x)
 }
 
 //指定された場所に指定された石が置けるかどうかを返す
-bool is_puttable(stone_type const& stone, int y, int x)
+bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
     for(size_t i = 0;i < 8;++i)
     {
@@ -106,7 +108,7 @@ bool is_puttable(stone_type const& stone, int y, int x)
 }
 
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
-field_type& remove_stone(stone_type const& stone)
+field_type& field_type::remove_stone(stone_type const& stone)
 {
     if (is_placed(stone) == false)
     {
@@ -124,7 +126,7 @@ field_type& remove_stone(stone_type const& stone)
  }
 
 //指定された石を取り除けるかどうかを返す
-bool is_removable(stone_type const& stone)
+bool field_type::is_removable(stone_type const& stone)
  {
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
@@ -172,7 +174,7 @@ bool is_removable(stone_type const& stone)
  }
 
  //置かれた石の一覧を表す配列を返す
- std::vector<stone_type> const & list_of_stones() const
+ std::vector<stone_type> const & field_type::list_of_stones() const
  {
      return placed_stone_list;
  }

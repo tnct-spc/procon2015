@@ -56,7 +56,7 @@ class SHARED_EXPORT stone_type
         std::size_t get_angle() const;
 };
 
-size_t stone_type::get_area();
+size_t stone_type::get_area()
 {
     size_t sum = 0;
     for(auto const& each_raw_data:raw_data)
@@ -66,7 +66,7 @@ size_t stone_type::get_area();
     return sum;
 }
 
-stone_type& stone_type::flip();
+stone_type& stone_type::flip()
 {
     current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
     return *this;
@@ -78,22 +78,22 @@ stone_type& stone_type::rotate(int angle)
     return *this;
 }
 
-raw_stone_type const& stone_type::get_array()
+stone_type::raw_stone_type const& stone_type::get_array()
 {
     return raw_data_set.at(current_side + current_angle * 4);
 }
 
-int const & stone_type::at(size_t y,size_t x) const;
+int const & stone_type::at(size_t y,size_t x) const
 {
     return raw_data.at(y).at(x);
 }
 
-int & stone_type::at(size_t y,size_t x);
+int & stone_type::at(size_t y,size_t x)
 {
     return const_cast<int &>(at(y, x));
 }
 
-raw_stone_type stone_type::_flip(raw_stone_type stone)
+stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
 {
     for(auto& each_stone:stone)
     {
@@ -102,7 +102,7 @@ raw_stone_type stone_type::_flip(raw_stone_type stone)
     return stone;
 }
 
-raw_stone_type stone_type::_rotate(int angle)
+stone_type::raw_stone_type stone_type::_rotate(int angle)
 {
     raw_stone_type return_data;
 
