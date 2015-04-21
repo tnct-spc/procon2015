@@ -4,4 +4,4 @@ SUBDIRS += \
     procon \
     takao \
     test-old \
-    takao-test
+    test
