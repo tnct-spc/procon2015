@@ -25,8 +25,8 @@ stone_type_test::stone_type_test()
 void stone_type_test::construct_test_data()
 {
     using namespace std::string_literals;
-    QTest::addColumn<std::string>("raw_stone");
-    QTest::addColumn<stone_type::raw_stone_type>("result");
+    QTest::addColumn<std::string>("stone_text");
+    QTest::addColumn<stone_type::raw_stone_type>("raw_stone");
 
     QTest::newRow("1")
         << "01000000\r\n"
@@ -46,68 +46,14 @@ void stone_type_test::construct_test_data()
            {{0, 1, 0, 0, 0, 0, 0, 0}},
            {{0, 1, 1, 1, 0, 0, 0, 0}},
            {{0, 0, 0, 0, 0, 0, 0, 0}}}};
-    QTest::newRow("2")
-        << "00000000\r\n"
-           "01100000\r\n"
-           "01100000\r\n"
-           "01100000\r\n"
-           "01100000\r\n"
-           "00000000\r\n"
-           "00000000\r\n"
-           "00000000"s
-        << stone_type::raw_stone_type{{
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 1, 1, 0, 0, 0, 0, 0}},
-           {{0, 1, 1, 0, 0, 0, 0, 0}},
-           {{0, 1, 1, 0, 0, 0, 0, 0}},
-           {{0, 1, 1, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}}}};
-    QTest::newRow("3")
-        << "00000000\r\n"
-           "00010000\r\n"
-           "00010000\r\n"
-           "01111000\r\n"
-           "00000000\r\n"
-           "00000000\r\n"
-           "00000000\r\n"
-           "00000000"s
-        << stone_type::raw_stone_type{{
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 1, 0, 0, 0, 0}},
-           {{0, 0, 0, 1, 0, 0, 0, 0}},
-           {{0, 1, 1, 1, 1, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}},
-           {{0, 0, 0, 0, 0, 0, 0, 0}}}};
-    QTest::newRow("4")
-        << "10000000\r\n"
-           "11000000\r\n"
-           "01100000\r\n"
-           "00110000\r\n"
-           "00011000\r\n"
-           "00001100\r\n"
-           "00000110\r\n"
-           "00000011"s
-        << stone_type::raw_stone_type{{
-           {{1, 0, 0, 0, 0, 0, 0, 0}},
-           {{1, 1, 0, 0, 0, 0, 0, 0}},
-           {{0, 1, 1, 0, 0, 0, 0, 0}},
-           {{0, 0, 1, 1, 0, 0, 0, 0}},
-           {{0, 0, 0, 1, 1, 0, 0, 0}},
-           {{0, 0, 0, 0, 1, 1, 0, 0}},
-           {{0, 0, 0, 0, 0, 1, 1, 0}},
-           {{0, 0, 0, 0, 0, 0, 1, 1}}}};
 }
 
 void stone_type_test::construct_test()
 {
-    QFETCH(std::string, raw_stone);
-    QFETCH(stone_type::raw_stone_type, result);
+    QFETCH(std::string, stone_text);
+    QFETCH(stone_type::raw_stone_type, raw_stone);
 
-    QCOMPARE(stone_type(raw_stone, 0).get_array(), result);
+    QCOMPARE(stone_type(stone_text, 0).get_array(), raw_stone);
 }
 
 QTEST_APPLESS_MAIN(stone_type_test)
