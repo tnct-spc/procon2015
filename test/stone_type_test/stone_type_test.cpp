@@ -107,7 +107,7 @@ void stone_type_test::construct_test()
     QFETCH(std::string, raw_stone);
     QFETCH(stone_type::raw_stone_type, result);
 
-    QCOMPARE(stone_type(raw_stone, 0).raw_data, result);
+    QCOMPARE(stone_type(raw_stone, 0).get_array(), result);
 }
 
 QTEST_APPLESS_MAIN(stone_type_test)
