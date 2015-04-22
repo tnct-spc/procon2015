@@ -23,6 +23,9 @@ class stone_type_test : public QObject
 
         void flip_test_data();
         void flip_test();
+
+        void get_area_test_data();
+        void get_area_test();
 };
 
 stone_type_test::stone_type_test()
@@ -162,6 +165,33 @@ void stone_type_test::flip_test()
     QFETCH(stone_type, flipped);
 
     QCOMPARE(stone.flip(), flipped);
+}
+
+void stone_type_test::get_area_test_data()
+{
+    using namespace std::string_literals;
+    QTest::addColumn<stone_type>("stone");
+    QTest::addColumn<std::size_t>("size");
+
+    QTest::newRow("1")
+        << stone_type(
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01110000\r\n"
+           "00000000"s, 0)
+        << 9;
+}
+
+void stone_type_test::get_area_test()
+{
+    QFETCH(stone_type, stone);
+    QFETCH(std::size_t, size);
+
+    QCOMPARE(stone.get_area(), size);
 }
 
 QTEST_APPLESS_MAIN(stone_type_test)
