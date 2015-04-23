@@ -49,12 +49,12 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
     }
 
     //rotate用のarrayを準備する
-    raw_data_set.at(0)  =  raw_data;
-    raw_data_set.at(4) = std::move(_flip(raw_data));
+    raw_data_set.at(0) = raw_data;
+    raw_data_set.at(4) = _flip(raw_data);
     for(size_t i = 1; i < 4; ++i)
     {
-        raw_data_set.at(i) = std::move(_rotate(i*90));
-        raw_data_set.at(4+i) = std::move(_flip(raw_data_set.at(i)));
+        raw_data_set.at(i) = _rotate(i*90);
+        raw_data_set.at(4+i) = _flip(raw_data_set.at(i));
     }
 }
 
@@ -121,20 +121,20 @@ stone_type::raw_stone_type stone_type::_rotate(int angle)
 {
     raw_stone_type return_data;
 
-    switch ((angle + 360)/90)
+    switch ((angle + 360) % 90)
     {
         case 0:
             return_data = raw_data;
             break;
 
-        case 1:
+        case 90:
             for(int i=0;i<8;i++) for(int j=0;j<8;j++)
             {
                 return_data[i][j] = raw_data[j-7][i];
             }
             break;
 
-        case 2:
+        case 180:
             return_data = raw_data;
             for(auto& each_return_data:return_data)
             {
@@ -143,7 +143,7 @@ stone_type::raw_stone_type stone_type::_rotate(int angle)
             std::reverse(return_data.begin(),return_data.end());
             break;
 
-        case 3:
+        case 270:
             for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
             {
                 return_data[i][j] = raw_data[j][7-i];
