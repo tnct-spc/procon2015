@@ -25,6 +25,7 @@ class field_type_test : public QObject
 
 field_type_test::field_type_test()
 {
+    using namespace std::string_literals;
     default_field_text =
         "00000000000000001111111111111111\r\n"
         "00000000000000001111111111111111\r\n"
