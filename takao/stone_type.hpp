@@ -5,7 +5,7 @@
 class SHARED_EXPORT stone_type
 {
     public:
-        enum Sides {Head, Tail};
+        enum struct Sides {Head = 0, Tail = 1};
         typedef std::array<std::array<int,8>,8> raw_stone_type;
 
         stone_type() = default;
@@ -17,7 +17,7 @@ class SHARED_EXPORT stone_type
 
         int & at(size_t y,size_t x);
         int const & at(size_t y,size_t x) const;
-        raw_stone_type const& get_array();
+        raw_stone_type const & get_raw_data() const;
         stone_type& rotate(int angle);
         stone_type& flip();
         size_t get_area() const;
@@ -28,8 +28,8 @@ class SHARED_EXPORT stone_type
         raw_stone_type raw_data;
         int nth;
         std::array<raw_stone_type,8>  raw_data_set;
-        Sides current_side;
-        std::size_t current_angle;
+        Sides current_side = Sides::Head;
+        std::size_t current_angle = 0;
 
         raw_stone_type _rotate(int angle);
         raw_stone_type _flip(raw_stone_type stone);
@@ -72,9 +72,9 @@ int & stone_type::at(size_t y,size_t x)
 
 //石へのアクセサ
 //生配列への参照を返す
-stone_type::raw_stone_type const& stone_type::get_array()
+stone_type::raw_stone_type const& stone_type::get_raw_data() const
 {
-    return raw_data_set.at(current_side + current_angle * 4);
+    return raw_data_set.at(static_cast<unsigned>(current_side) + current_angle / 90);
 }
 
 //時計回りを正方向として指定された角度だけ回転する

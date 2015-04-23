@@ -4,23 +4,9 @@
 // 敷地
 class SHARED_EXPORT field_type
 {
-    private:
-        std::array<std::array<int,32>,32> raw_data;
-        std::array<std::array<int,32>,32> placed_order;
-        std::vector<stone_type> placed_stone_list;
-        std::array<point_type,257> reference_point;
-
-        //is_removableで必要
-        struct pair_type
-        {
-            int a;
-            int b;
-        };
-
-        //石が置かれているか否かを返す
-        bool is_placed(stone_type const& stone);
-
     public:
+        typedef std::array<std::array<int, 32>, 32> raw_field_type;
+
         field_type() = default;
         ~field_type() = default;
 
@@ -47,6 +33,24 @@ class SHARED_EXPORT field_type
 
         //
         placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
+
+        raw_field_type const & get_raw_data() const;
+
+    private:
+        raw_field_type raw_data;
+        std::array<std::array<int, 32>, 32> placed_order;
+        std::vector<stone_type> placed_stone_list;
+        std::array<point_type, 257> reference_point;
+
+        //is_removableで必要
+        struct pair_type
+        {
+            int a;
+            int b;
+        };
+
+        //石が置かれているか否かを返す
+        bool is_placed(stone_type const& stone);
 };
 
 //石が置かれているか否かを返す
@@ -209,6 +213,11 @@ field_type::field_type(std::string const & raw_field_text)
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1'; });
     }
+}
+
+field_type::raw_field_type const & field_type::get_raw_data() const
+{
+    return raw_data;
 }
 
 #endif // FIELD_TYPE
