@@ -119,17 +119,19 @@ void stone_type_test::rotate_test()
     QFETCH(stone_type::raw_stone_type, rotated90);
     QFETCH(stone_type::raw_stone_type, rotated180);
     QFETCH(stone_type::raw_stone_type, rotated270);
+    auto rotated0 = stone.get_raw_data();
 
+    QCOMPARE(stone.rotate(   0).get_raw_data(), rotated0);
     QCOMPARE(stone.rotate(  90).get_raw_data(), rotated90);
-    QCOMPARE(stone.rotate( 180).get_raw_data(), rotated180);
-    QCOMPARE(stone.rotate( 270).get_raw_data(), rotated270);
-    QCOMPARE(stone.rotate( 360).get_raw_data(), stone.get_raw_data());
-    QCOMPARE(stone.rotate( 450).get_raw_data(), rotated90);
+    QCOMPARE(stone.rotate(  90).get_raw_data(), rotated180);
+    QCOMPARE(stone.rotate(  90).get_raw_data(), rotated270);
+    QCOMPARE(stone.rotate(  90).get_raw_data(), rotated0);
     QCOMPARE(stone.rotate(- 90).get_raw_data(), rotated270);
-    QCOMPARE(stone.rotate(-180).get_raw_data(), rotated180);
-    QCOMPARE(stone.rotate(-270).get_raw_data(), rotated90);
-    QCOMPARE(stone.rotate(-360).get_raw_data(), stone.get_raw_data());
-    QCOMPARE(stone.rotate(-450).get_raw_data(), rotated270);
+    QCOMPARE(stone.rotate(- 90).get_raw_data(), rotated180);
+    QCOMPARE(stone.rotate(- 90).get_raw_data(), rotated90);
+    QCOMPARE(stone.rotate(- 90).get_raw_data(), rotated0);
+    QCOMPARE(stone.rotate( 180).get_raw_data(), rotated180);
+    QCOMPARE(stone.rotate( 540).get_raw_data(), rotated0);
 }
 
 void stone_type_test::flip_test_data()
