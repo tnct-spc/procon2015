@@ -70,9 +70,9 @@ void stone_type_test::rotate_test_data()
 {
     using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
-    QTest::addColumn<stone_type>("rotated90");
-    QTest::addColumn<stone_type>("rotated180");
-    QTest::addColumn<stone_type>("rotated270");
+    QTest::addColumn<stone_type::raw_stone_type>("rotated90");
+    QTest::addColumn<stone_type::raw_stone_type>("rotated180");
+    QTest::addColumn<stone_type::raw_stone_type>("rotated270");
 
     QTest::newRow("1")
         << stone_type(
@@ -92,7 +92,7 @@ void stone_type_test::rotate_test_data()
            "00000000\r\n"
            "00000000\r\n"
            "00000000\r\n"
-           "00000000"s, 0)
+           "00000000"s, 0).get_raw_data()
         << stone_type(
            "00000000\r\n"
            "00001110\r\n"
@@ -101,7 +101,7 @@ void stone_type_test::rotate_test_data()
            "00000010\r\n"
            "00000010\r\n"
            "00000010\r\n"
-           "00000010"s, 0)
+           "00000010"s, 0).get_raw_data()
         << stone_type(
            "00000000\r\n"
            "00000000\r\n"
@@ -110,33 +110,33 @@ void stone_type_test::rotate_test_data()
            "00000010\r\n"
            "00000010\r\n"
            "11111110\r\n"
-           "00000000"s, 0);
+           "00000000"s, 0).get_raw_data();
 }
 
 void stone_type_test::rotate_test()
 {
     QFETCH(stone_type, stone);
-    QFETCH(stone_type, rotated90);
-    QFETCH(stone_type, rotated180);
-    QFETCH(stone_type, rotated270);
+    QFETCH(stone_type::raw_stone_type, rotated90);
+    QFETCH(stone_type::raw_stone_type, rotated180);
+    QFETCH(stone_type::raw_stone_type, rotated270);
 
-    QCOMPARE(stone.rotate(90), rotated90);
-    QCOMPARE(stone.rotate(180), rotated180);
-    QCOMPARE(stone.rotate(270), rotated270);
-    QCOMPARE(stone.rotate(360), stone);
-    QCOMPARE(stone.rotate(450), rotated90);
-    QCOMPARE(stone.rotate(-90), rotated270);
-    QCOMPARE(stone.rotate(-180), rotated180);
-    QCOMPARE(stone.rotate(-270), rotated90);
-    QCOMPARE(stone.rotate(-360), stone);
-    QCOMPARE(stone.rotate(-450), rotated270);
+    QCOMPARE(stone.rotate(  90).get_raw_data(), rotated90);
+    QCOMPARE(stone.rotate( 180).get_raw_data(), rotated180);
+    QCOMPARE(stone.rotate( 270).get_raw_data(), rotated270);
+    QCOMPARE(stone.rotate( 360).get_raw_data(), stone.get_raw_data());
+    QCOMPARE(stone.rotate( 450).get_raw_data(), rotated90);
+    QCOMPARE(stone.rotate(- 90).get_raw_data(), rotated270);
+    QCOMPARE(stone.rotate(-180).get_raw_data(), rotated180);
+    QCOMPARE(stone.rotate(-270).get_raw_data(), rotated90);
+    QCOMPARE(stone.rotate(-360).get_raw_data(), stone.get_raw_data());
+    QCOMPARE(stone.rotate(-450).get_raw_data(), rotated270);
 }
 
 void stone_type_test::flip_test_data()
 {
     using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
-    QTest::addColumn<stone_type>("flipped");
+    QTest::addColumn<stone_type::raw_stone_type>("flipped");
 
     QTest::newRow("1")
         << stone_type(
@@ -156,15 +156,15 @@ void stone_type_test::flip_test_data()
            "00000010\r\n"
            "00000010\r\n"
            "00001110\r\n"
-           "00000000"s, 0);
+           "00000000"s, 0).get_raw_data();
 }
 
 void stone_type_test::flip_test()
 {
     QFETCH(stone_type, stone);
-    QFETCH(stone_type, flipped);
+    QFETCH(stone_type::raw_stone_type, flipped);
 
-    QCOMPARE(stone.flip(), flipped);
+    QCOMPARE(stone.flip().get_raw_data(), flipped);
 }
 
 void stone_type_test::get_area_test_data()
