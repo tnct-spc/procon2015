@@ -110,7 +110,7 @@ void field_type_test::construct_test()
     QFETCH(std::string, field_text);
     QFETCH(field_type::raw_field_type, raw_field);
 
-    QCOMPARE(field_type(field_text).get_raw_data(), raw_stone);
+    QCOMPARE(field_type(field_text).get_raw_data(), raw_field);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
