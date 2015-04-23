@@ -6,7 +6,7 @@
 
 // こうするとプライベートメンバ関数のテストができるぞい
 #define private public
-#include "data_type.hpp"
+#include "takao.hpp"
 
 namespace boost {
     namespace test_tools {

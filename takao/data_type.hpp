@@ -1,43 +1,6 @@
 #ifndef DATA_TYPE_HPP
 #define DATA_TYPE_HPP
 
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <algorithm>
-#include <string>
-#include <tuple>
-#include <vector>
-#include <array>
-#include <cstdint>
-#include <algorithm>
-
-#include "takao_global.hpp"
-
-// 文字列を文字列のデリミタにより分割する
-std::vector<std::string> _split(std::string const & target, std::string const & delimiter)
-{
-    std::size_t begin = 0, end;
-    auto const delimiter_length = delimiter.size();
-    std::vector<std::string> result;
-
-    while (begin <= target.size()) {
-        end = target.find(delimiter, begin);
-        if (end == std::string::npos) {
-            end = target.size();
-        }
-        result.push_back(target.substr(begin, end - begin));
-        begin = end + delimiter_length;
-    }
-
-    return result;
-}
-
-#include "point_type.hpp"
-#include "stone_type.hpp"
-#include "placed_stone_type.hpp"
-#include "field_type.hpp"
-
 //-----------------------------------------------------------
 // 問題データ
 class SHARED_EXPORT problem_type
