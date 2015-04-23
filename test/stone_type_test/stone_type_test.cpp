@@ -1,7 +1,7 @@
 #include <QString>
 #include <QtTest>
 #define private public
-#include "data_type.hpp"
+#include "takao.hpp"
 #undef private
 Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(stone_type)

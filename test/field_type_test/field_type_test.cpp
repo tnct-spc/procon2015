@@ -1,7 +1,7 @@
 #include <QString>
 #include <QtTest>
 #define private public
-#include "data_type.hpp"
+#include "takao.hpp"
 #undef private
 
 class field_type_test : public QObject
