@@ -63,7 +63,7 @@ void stone_type_test::construct_test()
     QFETCH(std::string, stone_text);
     QFETCH(stone_type::raw_stone_type, raw_stone);
 
-    QCOMPARE(stone_type(stone_text, 0).get_array(), raw_stone);
+    QCOMPARE(stone_type(stone_text, 0).get_raw_data(), raw_stone);
 }
 
 void stone_type_test::rotate_test_data()
