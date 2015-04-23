@@ -25,35 +25,33 @@ class SHARED_EXPORT stone_type
         std::size_t get_angle() const;
 
     private:
-        raw_stone_type raw_data;
         int nth;
         std::array<raw_stone_type,8>  raw_data_set;
         Sides current_side = Sides::Head;
         std::size_t current_angle = 0;
 
-        raw_stone_type _rotate(int angle);
+        raw_stone_type _rotate(raw_stone_type const & raw_data, int angle);
         raw_stone_type _flip(raw_stone_type stone);
 };
 
 bool operator== (stone_type const& lhs, stone_type const& rhs)
 {
-    return lhs.raw_data == rhs.raw_data;
+    return lhs.get_raw_data() == rhs.get_raw_data();
 }
 
 stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(_nth)
 {
     auto rows = _split(raw_stone_text, "\r\n");
-    for (std::size_t i = 0; i < raw_data.size(); ++i) {
-        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
+    for (std::size_t i = 0; i < raw_data_set.at(0).size(); ++i) {
+        std::transform(rows[i].begin(), rows[i].end(), raw_data_set.at(0)[i].begin(),
                        [](auto const & c) { return c == '1'; });
     }
 
     //rotate用のarrayを準備する
-    raw_data_set.at(0) = raw_data;
-    raw_data_set.at(4) = _flip(raw_data);
+    raw_data_set.at(4) = _flip(raw_data_set.at(0));
     for(size_t i = 1; i < 4; ++i)
     {
-        raw_data_set.at(i) = _rotate(i*90);
+        raw_data_set.at(i) = _rotate(raw_data_set.at(0), i*90);
         raw_data_set.at(4+i) = _flip(raw_data_set.at(i));
     }
 }
@@ -62,7 +60,7 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
 //座標を受け取ってそこの値を返す
 int const & stone_type::at(size_t y,size_t x) const
 {
-    return raw_data.at(y).at(x);
+    return get_raw_data().at(y).at(x);
 }
 
 int & stone_type::at(size_t y,size_t x)
@@ -97,7 +95,7 @@ stone_type& stone_type::flip()
 size_t stone_type::get_area() const
 {
     size_t sum = 0;
-    for(auto const& each_raw_data:raw_data)
+    for(auto const& each_raw_data:get_raw_data())
     {
         sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
     }
@@ -117,7 +115,7 @@ std::size_t stone_type::get_angle() const
 }
 
 //時計回りを正方向として指定された角度だけ回転する
-stone_type::raw_stone_type stone_type::_rotate(int angle)
+stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, int angle)
 {
     raw_stone_type return_data;
 
