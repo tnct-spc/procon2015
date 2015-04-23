@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    stone_type_test
+    stone_type_test \
+    field_type_test
