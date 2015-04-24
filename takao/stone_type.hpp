@@ -72,7 +72,7 @@ int & stone_type::at(size_t y,size_t x)
 //生配列への参照を返す
 stone_type::raw_stone_type const& stone_type::get_raw_data() const
 {
-    return raw_data_set.at(static_cast<unsigned>(current_side) + current_angle / 90);
+    return raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90);
 }
 
 //時計回りを正方向として指定された角度だけ回転する
