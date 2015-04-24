@@ -1,6 +1,6 @@
 #ifndef STONE_TYPE
 #define STONE_TYPE
-
+#include <iostream>
 // 石
 class SHARED_EXPORT stone_type
 {
@@ -118,21 +118,20 @@ std::size_t stone_type::get_angle() const
 stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, int angle)
 {
     raw_stone_type return_data;
-
-    switch ((angle + 360) % 90)
+    switch ((angle + 360) / 90 % 4)
     {
         case 0:
             return_data = raw_data;
             break;
 
-        case 90:
+        case 1:
             for(int i=0;i<8;i++) for(int j=0;j<8;j++)
             {
-                return_data[i][j] = raw_data[j-7][i];
+                return_data[i][j] = raw_data[7-j][i];
             }
             break;
 
-        case 180:
+        case 2:
             return_data = raw_data;
             for(auto& each_return_data:return_data)
             {
@@ -141,7 +140,7 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
             std::reverse(return_data.begin(),return_data.end());
             break;
 
-        case 270:
+        case 3:
             for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
             {
                 return_data[i][j] = raw_data[j][7-i];
