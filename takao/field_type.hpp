@@ -211,7 +211,7 @@ field_type::field_type(std::string const & raw_field_text)
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
-                       [](auto const & c) { return c == '1'; });
+                       [](auto const & c) { return c == '1' ? -1 : 0; });
     }
 }
 
