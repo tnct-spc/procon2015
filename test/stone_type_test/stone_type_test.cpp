@@ -185,7 +185,7 @@ void stone_type_test::get_area_test_data()
            "01000000\r\n"
            "01110000\r\n"
            "00000000"s, 0)
-        << 9;
+        << 9lu;
 }
 
 void stone_type_test::get_area_test()
