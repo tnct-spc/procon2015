@@ -18,11 +18,14 @@ class field_type_test : public QObject
     private Q_SLOTS:
         void construct_test_data();
         void construct_test();
+        void get_score_test_data();
+        void get_score_test();
         void put_stone_test_data();
         void put_stone_test();
 
     private:
         std::string default_field_text;
+        field_type default_field;
         field_type::raw_field_type default_raw_field;
 };
 
@@ -62,6 +65,7 @@ field_type_test::field_type_test()
         "11111111111111111111111111111111\r\n"
         "11111111111111111111111111111111\r\n"
         "11111111111111111111111111111111"s;
+    default_field = field_type(default_field_text);
     default_raw_field = {{
         {{ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
         {{ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
@@ -114,6 +118,25 @@ void field_type_test::construct_test()
     QFETCH(field_type::raw_field_type, raw_field);
 
     QCOMPARE(field_type(field_text).get_raw_data(), raw_field);
+}
+
+void field_type_test::get_score_test_data()
+{
+    using namespace std::string_literals;
+    QTest::addColumn<field_type>("field");
+    QTest::addColumn<std::size_t>("score");
+
+    QTest::newRow("1")
+        << default_field
+        << 189ul;
+}
+
+void field_type_test::get_score_test()
+{
+    QFETCH(field_type, field);
+    QFETCH(std::size_t, score);
+
+    QCOMPARE(field.get_score(), score);
 }
 
 void field_type_test::put_stone_test_data()
