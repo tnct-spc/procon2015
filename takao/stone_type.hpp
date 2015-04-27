@@ -23,9 +23,10 @@ class SHARED_EXPORT stone_type
         size_t get_area() const;
         stone_type::Sides get_side() const;
         std::size_t get_angle() const;
+        int get_nth()const;
 
     private:
-        int nth;
+        int  nth;
         std::array<raw_stone_type,8>  raw_data_set;
         Sides current_side = Sides::Head;
         std::size_t current_angle = 0;
@@ -161,6 +162,11 @@ stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
         std::reverse(each_stone.begin(),each_stone.end());
     }
     return stone;
+}
+
+int stone_type::get_nth()const
+{
+    return nth;
 }
 
 #endif // STONE_TYPE
