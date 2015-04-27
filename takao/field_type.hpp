@@ -87,12 +87,12 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     {
         if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.nth;
-            placed_order.at(i+y).at(j+x) = stone.nth;
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
+            placed_order.at(i+y).at(j+x) = stone.get_nth();
             placed_stone_list.push_back(stone);
         }
     }
-    reference_point.at(stone.nth) = point_type{y,x};
+    reference_point.at(stone.get_nth()) = point_type{y,x};
     return *this;
 }
 
@@ -124,7 +124,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     }
     for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
     {
-        if(each_block == stone.nth) each_block = 0;
+        if(each_block == stone.get_nth()) each_block = 0;
     }
     return *this;
  }
@@ -149,7 +149,7 @@ bool field_type::is_removable(stone_type const& stone)
      //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
      for(std::vector<pair_type>::iterator it = pair_list.begin();it != pair_list.end();)
      {
-         if(it->a == stone.nth || it->b == stone.nth)
+         if(it->a == stone.get_nth() || it->b == stone.get_nth())
          {
              remove_list.push_back(*it);
              it = pair_list.erase(it);
@@ -160,7 +160,7 @@ bool field_type::is_removable(stone_type const& stone)
      bool ans = false;
      for(auto const& each_remove_list : remove_list)
      {
-         int const target_stone_num = (each_remove_list.a == stone.nth)?each_remove_list.b:each_remove_list.a;
+         int const target_stone_num = (each_remove_list.a == stone.get_nth())?each_remove_list.b:each_remove_list.a;
          for(auto const& each_pea_list : pair_list)
          {
              if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b) ||
@@ -196,7 +196,7 @@ bool field_type::is_removable(stone_type const& stone)
     stone_type * stone;
 
     for (auto & placed_stone : placed_stone_list) {
-        if (placed_stone.nth == nth) {
+        if (placed_stone.get_nth() == nth) {
             stone = &placed_stone;
             break;
         }

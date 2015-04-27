@@ -90,7 +90,7 @@ std::string answer_type::get_answer_str() const
         std::string line;
 
         // 前回の石から順番が飛んでいる場合はパスした場合とみなす
-        if (static_cast<int>(prev_nth + 1) == process.stone.nth) {
+        if (static_cast<int>(prev_nth + 1) == process.stone.get_nth()) {
             line += std::to_string(process.position.x)
                   + " "
                   + std::to_string(process.position.y)
@@ -102,7 +102,7 @@ std::string answer_type::get_answer_str() const
 
         result.append(line);
         result.append("\r\n");
-        prev_nth = process.stone.nth;
+        prev_nth = process.stone.get_nth();
     }
 
     return result;
