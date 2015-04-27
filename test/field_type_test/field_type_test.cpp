@@ -8,6 +8,8 @@ Q_DECLARE_METATYPE(field_type)
 Q_DECLARE_METATYPE(field_type::raw_field_type)
 Q_DECLARE_METATYPE(stone_type)
 
+using namespace std::string_literals;
+
 class field_type_test : public QObject
 {
         Q_OBJECT
@@ -31,7 +33,6 @@ class field_type_test : public QObject
 
 field_type_test::field_type_test()
 {
-    using namespace std::string_literals;
     default_field_text =
         "00000000000000001111111111111111\r\n"
         "00000000000000001111111111111111\r\n"
@@ -103,7 +104,6 @@ field_type_test::field_type_test()
 
 void field_type_test::construct_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<std::string>("field_text");
     QTest::addColumn<field_type::raw_field_type>("raw_field");
 
@@ -122,7 +122,6 @@ void field_type_test::construct_test()
 
 void field_type_test::get_score_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<field_type>("field");
     QTest::addColumn<std::size_t>("score");
 
@@ -141,7 +140,6 @@ void field_type_test::get_score_test()
 
 void field_type_test::put_stone_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<field_type>("field");
     QTest::addColumn<int>("y");

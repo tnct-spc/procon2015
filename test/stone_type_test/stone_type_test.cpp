@@ -7,6 +7,8 @@ Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(stone_type)
 Q_DECLARE_METATYPE(stone_type::raw_stone_type)
 
+using namespace std::string_literals;
+
 class stone_type_test : public QObject
 {
         Q_OBJECT
@@ -34,7 +36,6 @@ stone_type_test::stone_type_test()
 
 void stone_type_test::construct_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<std::string>("stone_text");
     QTest::addColumn<stone_type::raw_stone_type>("raw_stone");
 
@@ -68,7 +69,6 @@ void stone_type_test::construct_test()
 
 void stone_type_test::rotate_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<stone_type::raw_stone_type>("rotated90");
     QTest::addColumn<stone_type::raw_stone_type>("rotated180");
@@ -136,7 +136,6 @@ void stone_type_test::rotate_test()
 
 void stone_type_test::flip_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<stone_type::raw_stone_type>("flipped");
 
@@ -171,7 +170,6 @@ void stone_type_test::flip_test()
 
 void stone_type_test::get_area_test_data()
 {
-    using namespace std::string_literals;
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<std::size_t>("size");
 
