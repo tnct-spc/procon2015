@@ -24,6 +24,8 @@ class field_type_test : public QObject
         void get_score_test();
         void put_stone_test_data();
         void put_stone_test();
+        void is_puttable_test_data();
+        void is_puttable_test();
 
     private:
         std::string default_field_text;
@@ -203,6 +205,56 @@ void field_type_test::put_stone_test()
     QFETCH(field_type::raw_field_type, result);
 
     QCOMPARE(field.put_stone(stone, y, x).get_raw_data(), result);
+}
+
+void field_type_test::is_puttable_test_data()
+{
+    QTest::addColumn<field_type>("field");
+    QTest::addColumn<stone_type>("stone");
+    QTest::addColumn<int>("y");
+    QTest::addColumn<int>("x");
+    QTest::addColumn<bool>("puttable");
+
+    QTest::newRow("puttable")
+        << default_field
+        << stone_type(
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01110000\r\n"
+           "00000000"s, 0)
+        << 0
+        << -1
+        << true;
+
+    QTest::newRow("not_puttable")
+        << default_field
+        << stone_type(
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01110000\r\n"
+           "00000000"s, 0)
+        << 0
+        << 0
+        << false;
+}
+
+void field_type_test::is_puttable_test()
+{
+    QFETCH(field_type, field);
+    QFETCH(stone_type, stone);
+    QFETCH(int, y);
+    QFETCH(int, x);
+    QFETCH(bool, puttable);
+
+    QCOMPARE(field.is_puttable(stone, y, x), puttable);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
