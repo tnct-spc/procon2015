@@ -1,6 +1,6 @@
 #ifndef STONE_TYPE
 #define STONE_TYPE
-#include <iostream>
+
 // 石
 class SHARED_EXPORT stone_type
 {
