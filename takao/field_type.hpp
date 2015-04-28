@@ -1,6 +1,6 @@
 #ifndef FIELD_TYPE
 #define FIELD_TYPE
-
+#include <iostream>
 // 敷地
 class SHARED_EXPORT field_type
 {
@@ -80,18 +80,35 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     //さきに置けるか確かめる
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
-        if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+        if(stone.at(i,j) == 0)//置かないならどうでも良い
+        {
+            continue;
+        }
+        else if(i+y < 0 || j+x < 0)//敷地外に石を置こうとした
+        {
+            throw std::runtime_error("Puted the stone out of rang.");
+         }
+        else if(raw_data.at(i+y).at(x+j) == 0)//敷地が0ならいいよ！
+        {
+            continue;
+        }
+        else if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1)
+        {
+            throw std::runtime_error("Failed to put the stone.");
+        }
     }
     //置く
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
-        if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
+        if(i+y < 0 || j+x < 0) continue;
+        else if(stone.at(i,j) == 1)
         {
             raw_data.at(i+y).at(j+x) = stone.get_nth();
             placed_order.at(i+y).at(j+x) = stone.get_nth();
             placed_stone_list.push_back(stone);
         }
     }
+
     reference_point.at(stone.get_nth()) = point_type{y,x};
     return *this;
 }
