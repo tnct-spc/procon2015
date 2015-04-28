@@ -31,6 +31,7 @@ class field_type_test : public QObject
         std::string default_field_text;
         field_type default_field;
         field_type::raw_field_type default_raw_field;
+        stone_type default_stone;
 };
 
 field_type_test::field_type_test()
@@ -102,6 +103,15 @@ field_type_test::field_type_test()
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}}}};
+    default_stone = stone_type(
+        "01000000\r\n"
+        "01000000\r\n"
+        "01000000\r\n"
+        "01000000\r\n"
+        "01000000\r\n"
+        "01000000\r\n"
+        "01110000\r\n"
+        "00000000"s, 0);
 }
 
 void field_type_test::construct_test_data()
@@ -149,15 +159,7 @@ void field_type_test::put_stone_test_data()
     QTest::addColumn<field_type::raw_field_type>("result");
 
     QTest::newRow("1")
-        << stone_type(
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01110000\r\n"
-           "00000000"s, 0)
+        << default_stone
         << field_type(default_field_text)
         << 0
         << -1
@@ -217,30 +219,14 @@ void field_type_test::is_puttable_test_data()
 
     QTest::newRow("puttable")
         << default_field
-        << stone_type(
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01110000\r\n"
-           "00000000"s, 0)
+        << default_stone
         << 0
         << -1
         << true;
 
     QTest::newRow("not_puttable")
         << default_field
-        << stone_type(
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01000000\r\n"
-           "01110000\r\n"
-           "00000000"s, 0)
+        << default_stone
         << 0
         << 0
         << false;
