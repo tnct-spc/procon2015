@@ -111,7 +111,7 @@ field_type_test::field_type_test()
         "01000000\r\n"
         "01000000\r\n"
         "01110000\r\n"
-        "00000000"s, 0);
+        "00000000"s, 1);
 }
 
 void field_type_test::construct_test_data()
