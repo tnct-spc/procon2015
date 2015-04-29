@@ -33,7 +33,7 @@ class field_type_test : public QObject
         std::string default_field_text;
         field_type default_field;
         field_type::raw_field_type default_raw_field;
-        stone_type default_stone;
+        std::vector<stone_type> default_stones;
 };
 
 field_type_test::field_type_test()
@@ -105,7 +105,8 @@ field_type_test::field_type_test()
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
         {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}}}};
-    default_stone = stone_type(
+
+    default_stones.emplace_back(
         "01000000\r\n"
         "01000000\r\n"
         "01000000\r\n"
@@ -114,6 +115,15 @@ field_type_test::field_type_test()
         "01000000\r\n"
         "01110000\r\n"
         "00000000"s, 1);
+    default_stones.emplace_back(
+        "00000000\r\n"
+        "00010000\r\n"
+        "00010000\r\n"
+        "01111000\r\n"
+        "00000000\r\n"
+        "00000000\r\n"
+        "00000000\r\n"
+        "00000000"s, 2);
 }
 
 void field_type_test::construct_test_data()
@@ -161,7 +171,7 @@ void field_type_test::put_and_remove_stone_test_data()
     QTest::addColumn<field_type::raw_field_type>("result");
 
     QTest::newRow("1")
-        << default_stone
+        << default_stones[0]
         << field_type(default_field_text)
         << 0
         << -1
@@ -222,14 +232,14 @@ void field_type_test::is_puttable_test_data()
 
     QTest::newRow("puttable")
         << default_field
-        << default_stone
+        << default_stones[0]
         << 0
         << -1
         << true;
 
     QTest::newRow("not_puttable")
         << default_field
-        << default_stone
+        << default_stones[0]
         << 0
         << 0
         << false;
@@ -252,29 +262,19 @@ void field_type_test::is_removable_test_data()
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<bool>("result");
 
-    auto stone2 = stone_type(
-        "00000000\r\n"
-        "00010000\r\n"
-        "00010000\r\n"
-        "01111000\r\n"
-        "00000000\r\n"
-        "00000000\r\n"
-        "00000000\r\n"
-        "00000000"s, 2);
-
     QTest::newRow("removable")
-        << default_field.put_stone(default_stone, 0, -1)
-        << default_stone
+        << default_field.put_stone(default_stones[0], 0, -1)
+        << default_stones[0]
         << true;
 
     QTest::newRow("not_removable_1")
         << default_field
-        << default_stone
+        << default_stones[0]
         << false;
 
     QTest::newRow("not_removable_2")
-        << default_field.put_stone(default_stone, 0, -1).put_stone(stone2, 1, 3)
-        << default_stone
+        << default_field.put_stone(default_stones[0], 0, -1).put_stone(default_stones[1], 1, 3)
+        << default_stones[0]
         << false;
 }
 
