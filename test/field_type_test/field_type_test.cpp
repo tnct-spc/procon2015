@@ -22,8 +22,8 @@ class field_type_test : public QObject
         void construct_test();
         void get_score_test_data();
         void get_score_test();
-        void put_stone_test_data();
-        void put_stone_test();
+        void put_and_remove_stone_test_data();
+        void put_and_remove_stone_test();
         void is_puttable_test_data();
         void is_puttable_test();
 
@@ -150,7 +150,7 @@ void field_type_test::get_score_test()
     QCOMPARE(field.get_score(), score);
 }
 
-void field_type_test::put_stone_test_data()
+void field_type_test::put_and_remove_stone_test_data()
 {
     QTest::addColumn<stone_type>("stone");
     QTest::addColumn<field_type>("field");
@@ -198,7 +198,7 @@ void field_type_test::put_stone_test_data()
            {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}}}};
 }
 
-void field_type_test::put_stone_test()
+void field_type_test::put_and_remove_stone_test()
 {
     QFETCH(stone_type, stone);
     QFETCH(field_type, field);
@@ -207,6 +207,7 @@ void field_type_test::put_stone_test()
     QFETCH(field_type::raw_field_type, result);
 
     QCOMPARE(field.put_stone(stone, y, x).get_raw_data(), result);
+    QCOMPARE(field.remove_stone(stone).get_raw_data(), field.get_raw_data());
 }
 
 void field_type_test::is_puttable_test_data()
