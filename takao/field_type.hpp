@@ -38,9 +38,9 @@ class SHARED_EXPORT field_type
 
     private:
         raw_field_type raw_data;
-        std::array<std::array<int, 32>, 32> placed_order;
         std::vector<stone_type> placed_stone_list;
         std::array<point_type, 257> reference_point;
+        //point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
         struct pair_type
@@ -56,11 +56,7 @@ class SHARED_EXPORT field_type
 //石が置かれているか否かを返す
 bool field_type::is_placed(stone_type const& stone)
 {
-    for(auto const& each_placed_stone : placed_stone_list)
-    {
-        if(each_placed_stone == stone) return true;
-    }
-    return false;
+    return reference_point.at(stone.get_nth()) == point_type{32,32} ? true : false;
 }
 
 //現在の状態における得点を返す
@@ -104,8 +100,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         else if(stone.at(i,j) == 1)
         {
             raw_data.at(i+y).at(j+x) = stone.get_nth();
-            placed_order.at(i+y).at(j+x) = stone.get_nth();
-            placed_stone_list.push_back(stone);
+             placed_stone_list.push_back(stone);
         }
     }
 
@@ -139,10 +134,14 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         throw std::runtime_error("The stone can't remove.");
     }
-    for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
+    for(auto const& each_raw_data : raw_data) for(int each_block:each_raw_data)
     {
         if(each_block == stone.get_nth()) each_block = 0;
     }
+    reference_point.at(stone.get_nth()) = point_type{32,32};
+    auto result = std::remove_if(placed_stone_list.begin(), placed_stone_list.end(),[stone](stone_type const& list_stone) { return list_stone == stone; });
+    placed_stone_list.erase(result, placed_stone_list.end());
+
     return *this;
  }
 
@@ -157,9 +156,9 @@ bool field_type::is_removable(stone_type const& stone)
      //継ぎ目を検出
      for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
      {
-         int const c = placed_order.at(i).at(j);
-         int const d = placed_order.at(i+1).at(j);
-         int const r = placed_order.at(i).at(j+1);
+         int const c = raw_data.at(i).at(j);
+         int const d = raw_data.at(i+1).at(j);
+         int const r = raw_data.at(i).at(j+1);
          if(c != d) pair_list.push_back(pair_type{c,d});
          if(c != r) pair_list.push_back(pair_type{c,r});
      }
@@ -230,6 +229,7 @@ field_type::field_type(std::string const & raw_field_text)
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
+    std::fill(reference_point.begin(),reference_point.end(),point_type{32,32});
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const
