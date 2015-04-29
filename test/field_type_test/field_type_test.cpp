@@ -26,6 +26,8 @@ class field_type_test : public QObject
         void put_and_remove_stone_test();
         void is_puttable_test_data();
         void is_puttable_test();
+        void is_removable_test_data();
+        void is_removable_test();
 
     private:
         std::string default_field_text;
@@ -242,6 +244,47 @@ void field_type_test::is_puttable_test()
     QFETCH(bool, puttable);
 
     QCOMPARE(field.is_puttable(stone, y, x), puttable);
+}
+
+void field_type_test::is_removable_test_data()
+{
+    QTest::addColumn<field_type>("field");
+    QTest::addColumn<stone_type>("stone");
+    QTest::addColumn<bool>("result");
+
+    auto stone2 = stone_type(
+        "00000000\r\n"
+        "00010000\r\n"
+        "00010000\r\n"
+        "01111000\r\n"
+        "00000000\r\n"
+        "00000000\r\n"
+        "00000000\r\n"
+        "00000000"s, 2);
+
+    QTest::newRow("removable")
+        << default_field.put_stone(default_stone, 0, -1)
+        << default_stone
+        << true;
+
+    QTest::newRow("not_removable_1")
+        << default_field
+        << default_stone
+        << false;
+
+    QTest::newRow("not_removable_2")
+        << default_field.put_stone(default_stone, 0, -1).put_stone(stone2, 1, 3)
+        << default_stone
+        << false;
+}
+
+void field_type_test::is_removable_test()
+{
+    QFETCH(field_type, field);
+    QFETCH(stone_type, stone);
+    QFETCH(bool, result);
+
+    QCOMPARE(field.is_removable(stone), result);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
