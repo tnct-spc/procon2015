@@ -78,25 +78,7 @@ size_t field_type::get_score()
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
     //さきに置けるか確かめる
-    for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
-    {
-        if(stone.at(i,j) == 0)//置かないならどうでも良い
-        {
-            continue;
-        }
-        else if(i+y < 0 || j+x < 0)//敷地外に石を置こうとした
-        {
-            throw std::runtime_error("Puted the stone out of rang.");
-         }
-        else if(raw_data.at(i+y).at(x+j) == 0)//敷地が0ならいいよ！
-        {
-            continue;
-        }
-        else if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1)
-        {
-            throw std::runtime_error("Failed to put the stone.");
-        }
-    }
+    if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
     //置く
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
@@ -114,13 +96,23 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-    for(size_t i = 0;i < 8;++i)
+    for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
-        for(size_t j = 0;j < 8;++j)
+        if(stone.at(i,j) == 0)//置かないならどうでも良い
         {
-            if(raw_data.at(i+y).at(j+x) == 0) continue;
-            else if(stone.at(i,j) == 0)continue;
-            else return false;
+            continue;
+        }
+        else if(i+y < 0 || j+x < 0)//敷地外に石を置こうとした
+        {
+            return false;
+         }
+        else if(raw_data.at(i+y).at(x+j) == 0)//敷地が0ならいいよ！
+        {
+            continue;
+        }
+        else if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1)
+        {
+            return false;
         }
     }
     return true;
@@ -131,7 +123,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
 {
     if (is_placed(stone) == false)
     {
-        throw std::runtime_error("The stone isn't placed.");
+        throw std::runtime_error("The stone isn't placed...in remove_stone");
     }
     else if(is_removable(stone) == false)
     {
@@ -153,7 +145,7 @@ bool field_type::is_removable(stone_type const& stone)
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
 
-     if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
+     if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed...in is_removable");
      if(placed_stone_list.size() == 1)return true;
 
      //継ぎ目を検出
