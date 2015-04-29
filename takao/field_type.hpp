@@ -181,8 +181,8 @@ bool field_type::is_removable(stone_type const& stone)
          int const target_stone_num = (each_remove_list.a == stone.get_nth())?each_remove_list.b:each_remove_list.a;
          for(auto const& each_pea_list : pair_list)
          {
-             if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b) ||
-                (each_pea_list.b == target_stone_num && each_pea_list.b > each_pea_list.a))
+             if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b && each_pea_list.b > 0) ||
+                (each_pea_list.b == target_stone_num && each_pea_list.b > each_pea_list.a && each_pea_list.a > 0))
              {
                  ans = true;
                  break;
