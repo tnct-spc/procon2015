@@ -96,6 +96,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
+    bool is_conection = false;
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
         if(stone.at(i,j) == 0)//置かないならどうでも良い
@@ -106,11 +107,16 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         {
             return false;
          }
-        else if(raw_data.at(i+y).at(x+j) == 0)//敷地が0ならいいよ！
+        else if(raw_data.at(i+y).at(j+x) == 0)//敷地が0ならいいよ！
         {
+            if(is_conection == true) continue;
+            else if(i+y > 1   && raw_data.at(i+y-1).at(j+x   ) < stone.get_nth()) is_conection = true;
+            else if(i+y < 30 && raw_data.at(i+y+1).at(j+x  ) < stone.get_nth()) is_conection = true;
+            else if(j+x > 1   && raw_data.at(i+y    ).at(j+x-1) < stone.get_nth()) is_conection = true;
+            else if(j+x < 30 && raw_data.at(i+y    ).at(j+x+1) < stone.get_nth()) is_conection = true;
             continue;
         }
-        else if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1)
+        else if(raw_data.at(y+i).at(j+x) != 0 && stone.at(i,j) == 1)
         {
             return false;
         }
@@ -144,12 +150,13 @@ bool field_type::is_removable(stone_type const& stone)
  {
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
-
-     if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed...in is_removable");
+     //std::cout << "remove sotne's nth = " << stone.get_nth() << std::endl;
+     //print_field();
+     //TODO:要仕様検討
+     if(is_placed(stone) == false) return false;/*throw std::runtime_error("The stone isn't' placed...in is_removable");*/
      if(placed_stone_list.size() == 1)return true;
-
      //継ぎ目を検出
-     for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
+     for(size_t i = 0; i < 31; ++i) for(size_t j = 0; j < 31; ++j)
      {
          int const c = raw_data.at(i).at(j);
          int const d = raw_data.at(i+1).at(j);
