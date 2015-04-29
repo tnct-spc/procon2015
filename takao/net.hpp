@@ -9,6 +9,8 @@
 #include <QByteArray>
 #include <QEventLoop>
 #include<iostream>
+
+//コンストラクタでURL指定してね
 class net : public QObject
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ net::net(QUrl url)
 {
     _url = url;
 }
+//GETで取ってくる
 QByteArray net::get()
 {
     manager = new QNetworkAccessManager(this);
@@ -41,7 +44,8 @@ QByteArray net::get()
     eventloop.exec();
     return reply->readAll();
 }
-
+//デストラクタ書いてないからメモリリークするよ
+//🍣　ご　め　ん　ね　🍣//
 net::~net()
 {
 
