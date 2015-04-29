@@ -10,6 +10,6 @@
 #include "placed_stone_type.hpp"
 #include "field_type.hpp"
 #include "data_type.hpp"
-
+#include "net.hpp"
 #endif // TAKAO_HPP
 
