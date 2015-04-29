@@ -20,14 +20,19 @@ class field_type_test : public QObject
     private Q_SLOTS:
         void construct_test_data();
         void construct_test();
+
         void get_score_test_data();
         void get_score_test();
+
         void put_stone_test_data();
         void put_stone_test();
+
         void remove_stone_test_data();
         void remove_stone_test();
+
         void is_puttable_test_data();
         void is_puttable_test();
+
         void is_removable_test_data();
         void is_removable_test();
 
