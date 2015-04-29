@@ -1,6 +1,7 @@
 #ifndef FIELD_TYPE
 #define FIELD_TYPE
 #include <iostream>
+#include <iomanip>
 // 敷地
 class SHARED_EXPORT field_type
 {
@@ -51,12 +52,15 @@ class SHARED_EXPORT field_type
 
         //石が置かれているか否かを返す
         bool is_placed(stone_type const& stone);
+
+        void print_field();
 };
 
-//石が置かれているか否かを返す
+//石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
-    return reference_point.at(stone.get_nth()) == point_type{32,32} ? true : false;
+    //std::cout << "reference_point.at("<< stone.get_nth() <<") = {" <<  reference_point.at(stone.get_nth()).x << "," << reference_point.at(stone.get_nth()).y <<"}" << std::endl;
+    return reference_point.at(stone.get_nth()) == point_type{32,32} ? false : true;
 }
 
 //現在の状態における得点を返す
@@ -100,10 +104,9 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         else if(stone.at(i,j) == 1)
         {
             raw_data.at(i+y).at(j+x) = stone.get_nth();
-             placed_stone_list.push_back(stone);
         }
     }
-
+    placed_stone_list.push_back(stone);
     reference_point.at(stone.get_nth()) = point_type{y,x};
     return *this;
 }
@@ -134,14 +137,13 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         throw std::runtime_error("The stone can't remove.");
     }
-    for(auto const& each_raw_data : raw_data) for(int each_block:each_raw_data)
+    for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
     {
-        if(each_block == stone.get_nth()) each_block = 0;
+        if(raw_data.at(i).at(j) == stone.get_nth())raw_data.at(i).at(j) = 0;
     }
     reference_point.at(stone.get_nth()) = point_type{32,32};
     auto result = std::remove_if(placed_stone_list.begin(), placed_stone_list.end(),[stone](stone_type const& list_stone) { return list_stone == stone; });
     placed_stone_list.erase(result, placed_stone_list.end());
-
     return *this;
  }
 
@@ -152,6 +154,7 @@ bool field_type::is_removable(stone_type const& stone)
      std::vector<pair_type> remove_list;
 
      if(is_placed(stone) == false) throw std::runtime_error("The stone isn't' placed");
+     if(placed_stone_list.size() == 1)return true;
 
      //継ぎ目を検出
      for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
@@ -235,6 +238,18 @@ field_type::field_type(std::string const & raw_field_text)
 field_type::raw_field_type const & field_type::get_raw_data() const
 {
     return raw_data;
+}
+
+void field_type::print_field()
+{
+    for(auto const&each_raw : raw_data)
+    {
+        for(auto each_block : each_raw)
+        {
+            std::cout << std::setw(3) << each_block;
+        }
+        std::cout << std::endl;
+    }
 }
 
 #endif // FIELD_TYPE
