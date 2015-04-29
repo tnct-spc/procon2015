@@ -1,5 +1,6 @@
 #include <iostream>
 #include <QCoreApplication>
+#include <takao.hpp>
 
 int main(int argc, char *argv[])
 {

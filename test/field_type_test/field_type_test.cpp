@@ -171,7 +171,15 @@ void field_type_test::put_and_remove_stone_test_data()
     QTest::addColumn<field_type::raw_field_type>("result");
 
     QTest::newRow("1")
-        << default_stones[0]
+        << stone_type(
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01000000\r\n"
+           "01110000\r\n"
+           "00000000"s, 1)
         << field_type(default_field_text)
         << 0
         << -1

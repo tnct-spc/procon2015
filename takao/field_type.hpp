@@ -1,6 +1,6 @@
 #ifndef FIELD_TYPE
 #define FIELD_TYPE
-
+#include <iostream>
 // 敷地
 class SHARED_EXPORT field_type
 {
@@ -38,9 +38,9 @@ class SHARED_EXPORT field_type
 
     private:
         raw_field_type raw_data;
-        std::array<std::array<int, 32>, 32> placed_order;
         std::vector<stone_type> placed_stone_list;
         std::array<point_type, 257> reference_point;
+        //point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
         struct pair_type
@@ -56,11 +56,7 @@ class SHARED_EXPORT field_type
 //石が置かれているか否かを返す
 bool field_type::is_placed(stone_type const& stone)
 {
-    for(auto const& each_placed_stone : placed_stone_list)
-    {
-        if(each_placed_stone == stone) return true;
-    }
-    return false;
+    return reference_point.at(stone.get_nth()) == point_type{32,32} ? true : false;
 }
 
 //現在の状態における得点を返す
@@ -80,19 +76,35 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     //さきに置けるか確かめる
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
-        if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1) throw std::runtime_error("Failed to put the stone.");
+        if(stone.at(i,j) == 0)//置かないならどうでも良い
+        {
+            continue;
+        }
+        else if(i+y < 0 || j+x < 0)//敷地外に石を置こうとした
+        {
+            throw std::runtime_error("Puted the stone out of rang.");
+         }
+        else if(raw_data.at(i+y).at(x+j) == 0)//敷地が0ならいいよ！
+        {
+            continue;
+        }
+        else if(raw_data.at(i+y).at(j+x) != 0 && stone.at(i,j) == 1)
+        {
+            throw std::runtime_error("Failed to put the stone.");
+        }
     }
     //置く
     for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
     {
-        if(raw_data.at(i+y).at(j+x) == 0 && stone.at(i,j) == 1)
+        if(i+y < 0 || j+x < 0) continue;
+        else if(stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.nth;
-            placed_order.at(i+y).at(j+x) = stone.nth;
-            placed_stone_list.push_back(stone);
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
+             placed_stone_list.push_back(stone);
         }
     }
-    reference_point.at(stone.nth) = point_type{y,x};
+
+    reference_point.at(stone.get_nth()) = point_type{y,x};
     return *this;
 }
 
@@ -122,10 +134,14 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         throw std::runtime_error("The stone can't remove.");
     }
-    for(auto const& each_placed_order : placed_order) for(int each_block:each_placed_order)
+    for(auto const& each_raw_data : raw_data) for(int each_block:each_raw_data)
     {
-        if(each_block == stone.nth) each_block = 0;
+        if(each_block == stone.get_nth()) each_block = 0;
     }
+    reference_point.at(stone.get_nth()) = point_type{32,32};
+    auto result = std::remove_if(placed_stone_list.begin(), placed_stone_list.end(),[stone](stone_type const& list_stone) { return list_stone == stone; });
+    placed_stone_list.erase(result, placed_stone_list.end());
+
     return *this;
  }
 
@@ -140,16 +156,16 @@ bool field_type::is_removable(stone_type const& stone)
      //継ぎ目を検出
      for(size_t i = 0; i < 39; ++i) for(size_t j = 0; j < 39; ++j)
      {
-         int const c = placed_order.at(i).at(j);
-         int const d = placed_order.at(i+1).at(j);
-         int const r = placed_order.at(i).at(j+1);
+         int const c = raw_data.at(i).at(j);
+         int const d = raw_data.at(i+1).at(j);
+         int const r = raw_data.at(i).at(j+1);
          if(c != d) pair_list.push_back(pair_type{c,d});
          if(c != r) pair_list.push_back(pair_type{c,r});
      }
      //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
      for(std::vector<pair_type>::iterator it = pair_list.begin();it != pair_list.end();)
      {
-         if(it->a == stone.nth || it->b == stone.nth)
+         if(it->a == stone.get_nth() || it->b == stone.get_nth())
          {
              remove_list.push_back(*it);
              it = pair_list.erase(it);
@@ -160,7 +176,7 @@ bool field_type::is_removable(stone_type const& stone)
      bool ans = false;
      for(auto const& each_remove_list : remove_list)
      {
-         int const target_stone_num = (each_remove_list.a == stone.nth)?each_remove_list.b:each_remove_list.a;
+         int const target_stone_num = (each_remove_list.a == stone.get_nth())?each_remove_list.b:each_remove_list.a;
          for(auto const& each_pea_list : pair_list)
          {
              if((each_pea_list.a == target_stone_num && each_pea_list.a > each_pea_list.b) ||
@@ -196,7 +212,7 @@ bool field_type::is_removable(stone_type const& stone)
     stone_type * stone;
 
     for (auto & placed_stone : placed_stone_list) {
-        if (placed_stone.nth == nth) {
+        if (placed_stone.get_nth() == nth) {
             stone = &placed_stone;
             break;
         }
@@ -213,6 +229,7 @@ field_type::field_type(std::string const & raw_field_text)
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
+    std::fill(reference_point.begin(),reference_point.end(),point_type{32,32});
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const
