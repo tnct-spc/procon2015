@@ -41,7 +41,7 @@ class SHARED_EXPORT field_type
         raw_field_type raw_data;
         std::vector<stone_type> placed_stone_list;
         std::array<point_type, 257> reference_point;
-        //point_type static constexpr not_puted = {32,32};
+        point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
         struct pair_type
@@ -150,10 +150,7 @@ bool field_type::is_removable(stone_type const& stone)
  {
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
-     //std::cout << "remove sotne's nth = " << stone.get_nth() << std::endl;
-     //print_field();
-     //TODO:要仕様検討
-     if(is_placed(stone) == false) return false;/*throw std::runtime_error("The stone isn't' placed...in is_removable");*/
+     if(is_placed(stone) == false) return false;
      if(placed_stone_list.size() == 1)return true;
      //継ぎ目を検出
      for(size_t i = 0; i < 31; ++i) for(size_t j = 0; j < 31; ++j)
