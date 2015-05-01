@@ -316,7 +316,6 @@ void field_type_test::is_removable_test_data()
             << field.put_stone(default_stones[0], 0, -1).put_stone(default_stones[1], 4, 0)
             << default_stones[0]
             << false;
-        }
     }
 }
 
