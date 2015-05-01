@@ -80,7 +80,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
     //置く
-    for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(i+y < 0 || j+x < 0) continue;
         else if(stone.at(i,j) == 1)
@@ -97,7 +97,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
     bool is_conection = false;
-    for(int i = 0; i < 8; ++i) for(int j = 0; j < 8; ++j)
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//置かないならどうでも良い
         {

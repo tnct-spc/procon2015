@@ -6,7 +6,7 @@ class SHARED_EXPORT stone_type
 {
     public:
         enum struct Sides {Head = 0, Tail = 1};
-        typedef std::array<std::array<int,8>,8> raw_stone_type;
+        typedef std::array<std::array<int,STONE_SIZE>,STONE_SIZE> raw_stone_type;
 
         stone_type() = default;
         ~stone_type() = default;
@@ -27,7 +27,7 @@ class SHARED_EXPORT stone_type
 
     private:
         int  nth;
-        std::array<raw_stone_type,8>  raw_data_set;
+        std::array<raw_stone_type,STONE_SIZE>  raw_data_set;
         Sides current_side = Sides::Head;
         std::size_t current_angle = 0;
 
@@ -126,7 +126,7 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
             break;
 
         case 1:
-            for(int i=0;i<8;i++) for(int j=0;j<8;j++)
+            for(int i=0;i<STONE_SIZE;i++) for(int j=0;j<STONE_SIZE;j++)
             {
                 return_data[i][j] = raw_data[7-j][i];
             }
@@ -142,7 +142,7 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
             break;
 
         case 3:
-            for(int i = 0;i < 8;i++) for(int j = 0;j < 8;j++)
+            for(int i = 0;i < STONE_SIZE;i++) for(int j = 0;j < STONE_SIZE;j++)
             {
                 return_data[i][j] = raw_data[j][7-i];
             }
