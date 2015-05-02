@@ -1,5 +1,6 @@
 #ifndef DATA_TYPE_HPP
 #define DATA_TYPE_HPP
+int constexpr STONE_SIZE = 8;
 
 //-----------------------------------------------------------
 // 問題データ
