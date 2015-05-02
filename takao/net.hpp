@@ -8,6 +8,7 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QByteArray>
 #include <QEventLoop>
+#include <QUrlQuery>
 #include<iostream>
 #include <stdexcept>
 #include <QSharedPointer>
@@ -23,6 +24,7 @@ public:
     ~net();
     std::string get();
     void send(answer_type answer);
+    void send();
 signals:
 
 public slots:
@@ -44,6 +46,7 @@ public:
 net::net(QUrl server_url)
 {
     _server_url = server_url;
+    _master_url = server_url;
 }
 net::net(QUrl server_url,QUrl master_url)
 {
@@ -68,8 +71,22 @@ std::string net::get()
 void net::send(answer_type answer){
     QEventLoop eventloop;
     QByteArray raw_data(answer.get_answer_str().c_str(),-1);
+    QByteArray postData;
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-    QNetworkReply *reply = manager->post(QNetworkRequest(_master_url),raw_data);
+   // QNetworkReply *reply = manager->post(QNetworkRequest(_master_url),raw_data);
+    QNetworkReply *reply = manager->post(QNetworkRequest(_master_url),postData);
+    connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+}
+void net::send(){
+    std::cout << "in send ()" << std::endl;
+    QEventLoop eventloop;
+    QUrlQuery postData;
+    postData.addQueryItem("tweet","Qt post test");
+    QNetworkRequest req(_master_url);
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+    QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
 }
