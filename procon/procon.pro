@@ -6,7 +6,6 @@
 
 QT       += core network
 
-QT       -= gui
 
 TARGET = procon
 CONFIG   += console
