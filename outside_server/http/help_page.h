@@ -1,14 +1,16 @@
 #ifndef HELPPAGE_H
 #define HELPPAGE_H
 
-#include <httprequesthandler.h>
+#include <src/qhttpserver.h>
+#include <src/qhttprequest.h>
+#include <src/qhttpresponse.h>
 
-class HelpPage : public HttpRequestHandler
+class HelpPage : public QObject
 {
     Q_OBJECT
 public:
     HelpPage(QObject* parent=0);
-    void service(/*HttpRequest& request,*/ HttpResponse& response);
+    void Service(/*QHttpRequest* request,*/ QHttpResponse* response);
 };
 
 #endif // HELPPAGE_H

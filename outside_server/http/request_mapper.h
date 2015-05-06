@@ -1,26 +1,30 @@
 #ifndef REQUESTMAPPER_H
 #define REQUESTMAPPER_H
 
-#include <httprequesthandler.h>
-#include <httpsessionstore.h>
-#include <staticfilecontroller.h>
-#include <httpsession.h>
 #include <http/help_page.h>
 #include <http/answer_form.h>
+#include <http/output_problem_page.h>
 
-class RequestMapper : public HttpRequestHandler
+#include <src/qhttpserver.h>
+#include <src/qhttprequest.h>
+#include <src/qhttpresponse.h>
+#include <QObject>
+
+class RequestMapper : public QObject
 {
     Q_OBJECT
 public:
-    RequestMapper(QObject* parent=0);
-    void service(HttpRequest& request, HttpResponse& response);
-    static HttpSessionStore* session_store;
-    static StaticFileController* static_file_controller;
+    explicit RequestMapper(QObject *parent = 0);
+
+private slots:
+    void service(QHttpRequest* request, QHttpResponse* response);
 
 private:
     HelpPage P_help_page;
     AnswerForm P_answer_page;
+    OutputProblemPage P_output_problem_page;
 };
 
 #endif // REQUESTMAPPER_H
+
 

@@ -1,22 +1,28 @@
 #ifndef ANSWERFORM_H
 #define ANSWERFORM_H
 
-#include <httprequesthandler.h>
+#include <src/qhttpserver.h>
+#include <src/qhttprequest.h>
+#include <src/qhttpresponse.h>
 #include <QCoreApplication>
 #include <global.h>
+#include <QFile>
+#include <QUrlQuery>
 
-class AnswerForm : public HttpRequestHandler
+
+class AnswerForm : public QObject
 {
     Q_OBJECT
 public:
     AnswerForm(QObject* parent=0);
-    void service(HttpRequest& request, HttpResponse& response);
+    //
+    void Service(QHttpRequest* request, QHttpResponse* response);
     //return point of answer
     QString SimulateAnswerPoint(QString answer_file_name);
+
 private:
     //put a stone on stage
     bool PutStone();
-
 
     //pass
     QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/etc/answer/";

@@ -2,18 +2,32 @@
 #include <http/request_mapper.h>
 
 
-AnswerForm::AnswerForm(QObject* parent) : HttpRequestHandler(parent) {
+AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
     // empty
 }
 
-void AnswerForm::service(HttpRequest &request, HttpResponse &response) {
-    QByteArray user_id=request.getParameter("userid");
-    QByteArray answer_data=request.getParameter("answerdata");
+void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
+
+    //Get GET data
+    QUrlQuery url_query(request->url());
+    QString pre_user_id=url_query.queryItemValue("userid");
+    QString pre_answer_data=url_query.queryItemValue("answerdata");
+
+    //Decode
+    pre_user_id.replace("+"," ");
+    pre_answer_data.replace("+"," ");
+    pre_answer_data.replace("%0D%0A","\n");
+    QByteArray user_id=pre_user_id.toUtf8();
+    QByteArray answer_data=pre_answer_data.toUtf8();
     QString answer_point;
 
-    response.setHeader("Content-Type", "text/html; charset=UTF-8");
-    response.write("<html><head><title>ANSWER FORM</title></head><body>");
+    //response head
+    response->setHeader("Content-Type", "text/html; charset=UTF-8");
+    response->writeHead(200);
+    response->write("<html><head><title>ANSWER FORM</title></head><body>");
 
+
+    /*Save answer and Display answer_point*/
     if (!user_id.isEmpty()) {
         QString filename_answer=AnswerFolderName+user_id+".txt";
         QString t_filename_answer=AnswerFolderName+"Temporary_"+user_id+".txt";
@@ -31,9 +45,9 @@ void AnswerForm::service(HttpRequest &request, HttpResponse &response) {
         t_answer.remove();
 
         if(answer_point=="-1"){
-            response.write("***Format Error***");
+            response->write("***Format Error***");
         }else{
-            response.write(answer_point.toUtf8());
+            response->write(answer_point.toUtf8());
             //save answer to file
             QFile answer(filename_answer);
             answer.open(QIODevice::WriteOnly);
@@ -47,17 +61,20 @@ void AnswerForm::service(HttpRequest &request, HttpResponse &response) {
             userids.close();
         }
 
+    /*Display Form*/
     }else{
-        response.write("<form method='POST' action='/answer'>");
-        response.write("Answer From:<br>");
-        response.write("UserId:  <input type='text' name='userid'><br>");
-        response.write("ProblemNumber: <input type='text' name='problemnumber'><br>");
-        response.write("Answer: <textarea name='answerdata' cols='100' rows='40'></textarea><br>");
-        response.write("<input type='submit'>");
-        response.write("</form>");
-        response.write("</body></html>",true);
+        response->write("<form method='GET' action='/answer'>");
+        response->write("Answer From:<br>");
+        response->write("UserId:  <input type='text' name='userid'><br>");
+        response->write("ProblemNumber: <input type='text' name='problemnumber'><br>");
+        response->write("Answer: <textarea name='answerdata' cols='100' rows='40'></textarea><br>");
+        response->write("<input type='submit'>");
+        response->write("</form>");
+        response->write("</body></html>");
     }
-        qDebug("requested answer4");
+
+    //end
+    response->end();
 }
 
 QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
