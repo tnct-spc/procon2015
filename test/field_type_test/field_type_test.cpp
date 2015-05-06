@@ -36,6 +36,9 @@ class field_type_test : public QObject
         void is_removable_test_data();
         void is_removable_test();
 
+        void get_answer_test_data();
+        void get_answer_test();
+
     private:
         std::string const default_field_text =
             "00000000000000001111111111111111\r\n"
@@ -123,7 +126,23 @@ class field_type_test : public QObject
             "00000000\r\n"
             "00000000\r\n"
             "00000000\r\n"
-            "00000000"s, 2}
+            "00000000"s, 2},
+            {"00000000\r\n"
+            "01100000\r\n"
+            "01100000\r\n"
+            "01100000\r\n"
+            "01100000\r\n"
+            "00000000\r\n"
+            "00000000\r\n"
+            "00000000"s, 3},
+            {"10000000\r\n"
+             "11000000\r\n"
+             "01100000\r\n"
+             "00110000\r\n"
+             "00011000\r\n"
+             "00001100\r\n"
+             "00000110\r\n"
+             "00000011"s, 4}
         };
 };
 
@@ -326,6 +345,36 @@ void field_type_test::is_removable_test()
     QFETCH(bool, result);
 
     QCOMPARE(field.is_removable(stone), result);
+}
+
+void field_type_test::get_answer_test_data()
+{
+    QTest::addColumn<field_type>("field");
+    QTest::addColumn<std::string>("result");
+
+    {
+        auto stones = default_stones;
+        auto field = default_field;
+
+        field.put_stone(stones[0], 2, 3);
+        field.put_stone(stones[1].flip().rotate(90), -3, -1);
+        field.put_stone(stones[3].rotate(270), 0, 6);
+
+        QTest::newRow("official_case")
+            << field
+            << "3 2 H 0\r\n"
+               "-1 -3 T 90\r\n"
+               "\r\n"
+               "6 0 H 270"s;
+    }
+}
+
+void field_type_test::get_answer_test()
+{
+    QFETCH(field_type, field);
+    QFETCH(std::string, result);
+
+    QCOMPARE(field.get_answer(), result);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
