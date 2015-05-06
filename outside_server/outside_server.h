@@ -2,6 +2,7 @@
 #define OUTSIDESERVER_H
 
 #include <QWidget>
+#include<QMatrix>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QTimer>
@@ -25,6 +26,8 @@ public slots:
     //ui
     void loadbutton_clicked();
     void uisizebutton_clicked();
+    void viewzoom(int value);
+    void viewresize(int value);
     void pnspinbutton_changed(QString num);
     //in class
     void ReserveAnswer();
