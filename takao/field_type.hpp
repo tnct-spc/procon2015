@@ -2,6 +2,22 @@
 #define FIELD_TYPE
 #include <iostream>
 #include <iomanip>
+
+// 解答データの手順ひとつ分
+class SHARED_EXPORT process_type
+{
+    public:
+        process_type() = default;
+        ~process_type() = default;
+
+        process_type(stone_type const & _stone,
+                     point_type const & _position)
+        : stone(_stone), position(_position) {}
+
+        stone_type stone;
+        point_type position;
+};
+
 // 敷地
 class SHARED_EXPORT field_type
 {
@@ -37,9 +53,12 @@ class SHARED_EXPORT field_type
 
         raw_field_type const & get_raw_data() const;
 
+        std::string get_answer() const;
+
     private:
         raw_field_type raw_data;
         std::vector<stone_type> placed_stone_list;
+        std::vector<process_type> processes;
         std::array<point_type, 257> reference_point;
         point_type static constexpr not_puted = {32,32};
 
@@ -246,6 +265,32 @@ void field_type::print_field()
         }
         std::cout << std::endl;
     }
+}
+
+std::string field_type::get_answer() const
+{
+    std::string result;
+    std::size_t prev_nth = 0;
+    for (auto const & process : processes) {
+        std::string line;
+
+        // 前回の石から順番が飛んでいる場合はパスした場合とみなす
+        if (static_cast<int>(prev_nth + 1) == process.stone.get_nth()) {
+            line += std::to_string(process.position.x)
+                  + " "
+                  + std::to_string(process.position.y)
+                  + " "
+                  + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
+                  + " "
+                  + std::to_string(process.stone.get_angle() * 90);
+        }
+
+        result.append(line);
+        result.append("\r\n");
+        prev_nth = process.stone.get_nth();
+    }
+
+    return result;
 }
 
 #endif // FIELD_TYPE

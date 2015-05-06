@@ -50,20 +50,6 @@ std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_t
     return result;
 }
 
-// 解答データの手順ひとつ分
-class SHARED_EXPORT process_type
-{
-    public:
-        process_type() = default;
-        ~process_type() = default;
-
-        process_type(stone_type const & _stone,
-                     point_type const & _position)
-        : stone(_stone), position(_position) {}
-
-        stone_type const & stone;
-        point_type position;
-};
 
 // 解答データ
 class SHARED_EXPORT answer_type
