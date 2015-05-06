@@ -21,10 +21,10 @@ public:
     explicit net(QObject *parent = 0);
     net(QUrl server_url); //スタンドアロンで動作する
     net(QUrl server_url,QUrl master_url);
+    net(QUrl server_url, QUrl master_url, std::string id, int problem_num);
     ~net();
     std::string get();
-    void send(answer_type answer);
-    void send();
+    std::string send(answer_type answer);
 signals:
 
 public slots:
@@ -36,23 +36,32 @@ private:
     //std::shared_ptr<QNetworkAccessManager> manager;
 
     QUrl _server_url,_master_url;
+    std::string _id;
+    int _problem_num;
     bool network_error_flag =false;
-};
-class Network_Timeout_Exception : public std::runtime_error{
-public:
-    Network_Timeout_Exception(const std::string& cause) : std::runtime_error("cause: " + cause ){}
 };
 
 net::net(QUrl server_url)
 {
     _server_url = server_url;
     _master_url = server_url;
+    _id = "0";
+    _problem_num = 1;
 }
 net::net(QUrl server_url,QUrl master_url)
 {
     _server_url = server_url;
     _master_url = master_url;
+    _id = "0";
+    _problem_num = 1;
 }
+net::net(QUrl server_url,QUrl master_url,std::string id,int problem_num){
+    _server_url = server_url;
+    _master_url = master_url;
+    _id = id;
+    _problem_num = problem_num;
+}
+
 //GETで取ってくる
 std::string net::get()
 {
@@ -63,32 +72,25 @@ std::string net::get()
     QNetworkReply *reply = manager->get(QNetworkRequest(_server_url));
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
-    manager->disconnect();
     if(network_error_flag)return std::string("");
     return std::string(reply->readAll().constData());
 }
-//sendはまだテストしてない何が起こるかわからない
-void net::send(answer_type answer){
-    QEventLoop eventloop;
-    QByteArray raw_data(answer.get_answer_str().c_str(),-1);
-    QByteArray postData;
-    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-   // QNetworkReply *reply = manager->post(QNetworkRequest(_master_url),raw_data);
-    QNetworkReply *reply = manager->post(QNetworkRequest(_master_url),postData);
-    connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
-    eventloop.exec();
-}
-void net::send(){
+
+std::string net::send(answer_type answer){
     std::cout << "in send ()" << std::endl;
     QEventLoop eventloop;
     QUrlQuery postData;
-    postData.addQueryItem("tweet","Qt post test");
+    postData.addQueryItem("id",_id.c_str());
+    postData.addQueryItem("quest_number",QString::number(_problem_num));
+    postData.addQueryItem("answer",answer.get_answer_str().c_str());
     QNetworkRequest req(_master_url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
     QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
+    if(network_error_flag)return std::string("");
+    return std::string(reply->readAll().constData());
 }
 
 //デストラクタ書いてないからメモリリークするよ
