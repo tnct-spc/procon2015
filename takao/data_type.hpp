@@ -1,6 +1,7 @@
 #ifndef DATA_TYPE_HPP
 #define DATA_TYPE_HPP
 
+
 //-----------------------------------------------------------
 // 問題データ
 class SHARED_EXPORT problem_type
@@ -107,14 +108,5 @@ std::string answer_type::get_answer_str() const
 
     return result;
 }
-
-// アルゴリズムの基底クラス
-// テンプレートのほうがいい?
-class SHARED_EXPORT algorithm_type
-{
-    public:
-        algorithm_type(problem_type);
-        virtual ~algorithm_type() = 0;
-};
 
 #endif // DATA_TYPE_HPP
