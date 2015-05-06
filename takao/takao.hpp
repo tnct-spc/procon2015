@@ -1,6 +1,8 @@
 #ifndef TAKAO_HPP
 #define TAKAO_HPP
 
+int constexpr STONE_SIZE = 8;
+
 #include "takao_global.hpp"
 
 #include "utils.hpp"
@@ -10,6 +12,7 @@
 #include "placed_stone_type.hpp"
 #include "field_type.hpp"
 #include "data_type.hpp"
+#include "algorithm_type.hpp"
 
 #endif // TAKAO_HPP
 
