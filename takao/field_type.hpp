@@ -272,24 +272,27 @@ void field_type::print_field()
 std::string field_type::get_answer() const
 {
     std::string result;
-    std::size_t prev_nth = 0;
+    int prev_nth = 0;
     for (auto const & process : processes) {
         std::string line;
 
-        // 前回の石から順番が飛んでいる場合はパスした場合とみなす
-        if (static_cast<int>(prev_nth + 1) == process.stone.get_nth()) {
-            line += std::to_string(process.position.x)
-                  + " "
-                  + std::to_string(process.position.y)
-                  + " "
-                  + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
-                  + " "
-                  + std::to_string(process.stone.get_angle() * 90);
+        auto current_nth = process.stone.get_nth();
+
+        // スキップ分の改行を挿入する
+        for (int i = prev_nth + 1; i < current_nth; ++i) {
+            result.append("\r\n");
         }
 
+        line += std::to_string(process.position.x)
+                + " "
+                + std::to_string(process.position.y)
+                + " "
+                + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
+                + " "
+                + std::to_string(process.stone.get_angle());
         result.append(line);
         result.append("\r\n");
-        prev_nth = process.stone.get_nth();
+        prev_nth = current_nth;
     }
 
     return result;
