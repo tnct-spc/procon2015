@@ -46,7 +46,7 @@ class SHARED_EXPORT field_type
         bool is_removable(stone_type const& stone);
 
         //置かれた石の一覧を表す配列を返す
-        std::vector<stone_type> const & list_of_stones() const;
+        std::vector<stone_type> list_of_stones() const;
 
         //
         placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
@@ -57,9 +57,7 @@ class SHARED_EXPORT field_type
 
     private:
         raw_field_type raw_data;
-        std::vector<stone_type> placed_stone_list;
         std::vector<process_type> processes;
-        std::array<point_type, 257> reference_point;
         point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
@@ -78,8 +76,9 @@ class SHARED_EXPORT field_type
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
-    //std::cout << "reference_point.at("<< stone.get_nth() <<") = {" <<  reference_point.at(stone.get_nth()).x << "," << reference_point.at(stone.get_nth()).y <<"}" << std::endl;
-    return reference_point.at(stone.get_nth()) == point_type{32,32} ? false : true;
+    return std::find_if(processes.begin(), processes.end(),
+                        [& stone](auto const & process) { return process.stone == stone; }
+           ) != processes.end();
 }
 
 //現在の状態における得点を返す
@@ -107,8 +106,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
-    placed_stone_list.push_back(stone);
-    reference_point.at(stone.get_nth()) = point_type{y,x};
+    processes.emplace_back(stone, point_type{y, x});
     return *this;
 }
 
@@ -158,9 +156,9 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         if(raw_data.at(i).at(j) == stone.get_nth())raw_data.at(i).at(j) = 0;
     }
-    reference_point.at(stone.get_nth()) = point_type{32,32};
-    auto result = std::remove_if(placed_stone_list.begin(), placed_stone_list.end(),[stone](stone_type const& list_stone) { return list_stone == stone; });
-    placed_stone_list.erase(result, placed_stone_list.end());
+    processes.erase(std::remove_if(processes.begin(), processes.end(),
+                                   [& stone](auto const & process) { return process.stone == stone; }),
+                    processes.end());
     return *this;
  }
 
@@ -170,7 +168,7 @@ bool field_type::is_removable(stone_type const& stone)
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
      if(is_placed(stone) == false) return false;
-     if(placed_stone_list.size() == 1)return true;
+     if(processes.size() == 1)return true;
      //継ぎ目を検出
      for(size_t i = 0; i < 31; ++i) for(size_t j = 0; j < 31; ++j)
      {
@@ -212,9 +210,12 @@ bool field_type::is_removable(stone_type const& stone)
  }
 
  //置かれた石の一覧を表す配列を返す
- std::vector<stone_type> const & field_type::list_of_stones() const
+ std::vector<stone_type> field_type::list_of_stones() const
  {
-     return placed_stone_list;
+     std::vector<stone_type> result;
+     std::transform(processes.begin(), processes.end(), std::back_inserter(result),
+                    [](auto const & process) { return process.stone; });
+     return result;
  }
 
 //コメント書こう
@@ -225,13 +226,15 @@ bool field_type::is_removable(stone_type const& stone)
         throw std::runtime_error("There is no stone.");
     }
 
-    point_type pf = reference_point[nth];
+    point_type pf = std::find_if(processes.begin(), processes.end(),
+                                 [& nth](auto const & process) { return process.stone.get_nth() == nth; }
+                                )->position;
     point_type ps = {pf.y - static_cast<int>(y), pf.x - static_cast<int>(x)};
     stone_type * stone;
 
-    for (auto & placed_stone : placed_stone_list) {
-        if (placed_stone.get_nth() == nth) {
-            stone = &placed_stone;
+    for (auto & process : processes) {
+        if (process.stone.get_nth() == nth) {
+            stone = &process.stone;
             break;
         }
     }
@@ -247,7 +250,6 @@ field_type::field_type(std::string const & raw_field_text)
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
-    std::fill(reference_point.begin(),reference_point.end(),point_type{32,32});
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const
@@ -270,24 +272,27 @@ void field_type::print_field()
 std::string field_type::get_answer() const
 {
     std::string result;
-    std::size_t prev_nth = 0;
+    int prev_nth = 0;
     for (auto const & process : processes) {
         std::string line;
 
-        // 前回の石から順番が飛んでいる場合はパスした場合とみなす
-        if (static_cast<int>(prev_nth + 1) == process.stone.get_nth()) {
-            line += std::to_string(process.position.x)
-                  + " "
-                  + std::to_string(process.position.y)
-                  + " "
-                  + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
-                  + " "
-                  + std::to_string(process.stone.get_angle() * 90);
+        auto current_nth = process.stone.get_nth();
+
+        // スキップ分の改行を挿入する
+        for (int i = prev_nth + 1; i < current_nth; ++i) {
+            result.append("\r\n");
         }
 
+        line += std::to_string(process.position.x)
+                + " "
+                + std::to_string(process.position.y)
+                + " "
+                + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
+                + " "
+                + std::to_string(process.stone.get_angle());
         result.append(line);
         result.append("\r\n");
-        prev_nth = process.stone.get_nth();
+        prev_nth = current_nth;
     }
 
     return result;

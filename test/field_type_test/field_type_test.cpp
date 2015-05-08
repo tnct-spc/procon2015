@@ -365,7 +365,7 @@ void field_type_test::get_answer_test_data()
             << "3 2 H 0\r\n"
                "-1 -3 T 90\r\n"
                "\r\n"
-               "6 0 H 270"s;
+               "6 0 H 270\r\n"s;
     }
 }
 
@@ -374,7 +374,7 @@ void field_type_test::get_answer_test()
     QFETCH(field_type, field);
     QFETCH(std::string, result);
 
-    //QCOMPARE(field.get_answer(), result);
+    QCOMPARE(field.get_answer(), result);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
