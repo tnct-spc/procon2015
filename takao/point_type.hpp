@@ -31,6 +31,11 @@ class SHARED_EXPORT point_type
         {
             return point_type{ lhs.x + rhs.x, lhs.y + rhs.y };
         }
+        friend inline std::ostream& operator<<(std::ostream& os, const point_type& point)
+        {
+            os << '{' << point.y << ',' << point.x << '}';
+            return os;
+        }
 
 };
 
