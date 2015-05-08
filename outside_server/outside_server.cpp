@@ -16,8 +16,6 @@ OutsideServer::OutsideServer(QWidget *parent) : QWidget(parent),ui(new Ui::proco
     QTimer *reserve_answer_timer;
     reserve_answer_timer = new QTimer();
     connect(reserve_answer_timer, SIGNAL(timeout()), this, SLOT(ReserveAnswer()));
-    connect(ui->horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(viewzoom(int)));
-    connect(ui->verticalSlider,SIGNAL(valueChanged(int)),this,SLOT(viewresize(int)));
     reserve_answer_timer->start(1/*interval 1*/);
 
     //intialize
@@ -270,16 +268,14 @@ bool OutsideServer::ResetFolder(const QString &dir_name)
     return result;
 }
 
-void OutsideServer::viewzoom(int value)
+void OutsideServer::resizeEvent(QResizeEvent *event)
 {
-    //qreal scale = qPow(qreal(2), (value - 250) / qreal(50));
-
     QMatrix matrix;
-    matrix.scale((double)value / 100.0, (double)value / 100.0);
-    //graphicsView->setMatrix(matrix);
+    if((double)(width()-200)/(double)height()-1720.0/1080.0>0){
+        matrix.scale((double)height() / 1080.0, (double)height() / 1080.0);
+    }else{
+        matrix.scale((double)(width()-200) / 1720.0, (double)(width()-200) / 1720.0);
+    }
     ui->graphicsView->setMatrix(matrix);
-}
-void OutsideServer::viewresize(int value)
-{
-    ui->graphicsView->resize(value * 8 ,value * 8);
+    ui->graphicsView->resize(width()-200 ,height());
 }

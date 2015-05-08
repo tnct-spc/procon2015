@@ -26,8 +26,6 @@ public slots:
     //ui
     void loadbutton_clicked();
     void uisizebutton_clicked();
-    void viewzoom(int value);
-    void viewresize(int value);
     void pnspinbutton_changed(QString num);
     //in class
     void ReserveAnswer();
@@ -43,6 +41,8 @@ private:
     int ConvertAnswer(QString filename_answer,int answer_flow[256][4]);
     //reset folder
     bool ResetFolder(const QString & dirName);
+    //
+    void resizeEvent(QResizeEvent *event);
 
 
 
