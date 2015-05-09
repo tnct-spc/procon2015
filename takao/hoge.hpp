@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class hoge : public QObject
+class SHARED_EXPORT hoge : public QObject
 {
     Q_OBJECT
 public:
@@ -14,5 +14,7 @@ signals:
 
 public slots:
 };
+
+
 
 #endif // HOGE_H

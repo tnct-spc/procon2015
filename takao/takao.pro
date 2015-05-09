@@ -22,7 +22,8 @@ HEADERS += takao_global.hpp \
         placed_stone_type.hpp \
         field_type.hpp \
    		net.hpp \
-     	algorithm_type.hpp
+     	algorithm_type.hpp \
+    hoge.hpp
 
 unix {
     target.path = /usr/lib
