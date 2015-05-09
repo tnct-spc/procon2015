@@ -14,7 +14,7 @@
 #include <QSharedPointer>
 #include "takao.hpp"
 //コンストラクタでURL指定してね
-class SHARED_EXPORT net : public QObject
+class net : public QObject
 {
     Q_OBJECT
 public:
@@ -112,5 +112,4 @@ void net::networkerror(QNetworkReply::NetworkError e){
     std::cout << "network error code " << code  << std::endl;
     network_error_flag = true;
 }
-
 #endif // NET_H

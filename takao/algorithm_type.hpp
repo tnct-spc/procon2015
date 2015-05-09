@@ -4,7 +4,7 @@
 
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
-class SHARED_EXPORT algorithm_type
+class algorithm_type
 {
     public:
         algorithm_type(problem_type const& _problem);

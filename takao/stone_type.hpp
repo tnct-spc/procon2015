@@ -2,7 +2,7 @@
 #define STONE_TYPE
 
 // 石
-class SHARED_EXPORT stone_type
+class stone_type
 {
     public:
         enum struct Sides {Head = 0, Tail = 1};

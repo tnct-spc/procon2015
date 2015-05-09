@@ -11,18 +11,6 @@ TEMPLATE = lib
 
 DEFINES += TAKAO_LIBRARY
 
-SOURCES +=
-
-HEADERS += takao_global.hpp \
-        takao.hpp \
-        utils.hpp \
-        point_type.hpp \
-        stone_type.hpp \
-        placed_stone_type.hpp \
-        field_type.hpp \
-        net.hpp \
-     	algorithm_type.hpp \
-        problem_type.hpp
 
 unix {
     target.path = /usr/lib
@@ -30,3 +18,5 @@ unix {
 }
 
 QMAKE_CXXFLAGS += -std=c++14
+
+include(./takao.pri)

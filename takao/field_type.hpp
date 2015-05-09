@@ -4,7 +4,7 @@
 #include <iomanip>
 
 // 解答データの手順ひとつ分
-class SHARED_EXPORT process_type
+class process_type
 {
     public:
         process_type() = default;
@@ -19,7 +19,7 @@ class SHARED_EXPORT process_type
 };
 
 // 敷地
-class SHARED_EXPORT field_type
+class field_type
 {
     public:
         typedef std::array<std::array<int, 32>, 32> raw_field_type;

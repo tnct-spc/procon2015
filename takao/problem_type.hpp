@@ -3,7 +3,7 @@
 
 //-----------------------------------------------------------
 // 問題データ
-class SHARED_EXPORT problem_type
+class problem_type
 {
     public:
         problem_type() = default;

@@ -2,7 +2,7 @@
 #define PLACED_STONE_TYPE
 
 // 敷地に置かれた石の情報
-class SHARED_EXPORT placed_stone_type
+class placed_stone_type
 {
     public:
         placed_stone_type() = default;
