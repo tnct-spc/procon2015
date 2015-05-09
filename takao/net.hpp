@@ -24,7 +24,7 @@ public:
     net(QUrl server_url, QUrl master_url, std::string id, int problem_num);
     ~net();
     std::string get();
-    std::string send(answer_type answer);
+    std::string send(field_type answer);
 signals:
 
 public slots:
@@ -76,13 +76,13 @@ std::string net::get()
     return std::string(reply->readAll().constData());
 }
 
-std::string net::send(answer_type answer){
+std::string net::send(field_type answer){
     std::cout << "in send ()" << std::endl;
     QEventLoop eventloop;
     QUrlQuery postData;
     postData.addQueryItem("id",_id.c_str());
     postData.addQueryItem("quest_number",QString::number(_problem_num));
-    postData.addQueryItem("answer",answer.get_answer_str().c_str());
+    postData.addQueryItem("answer",answer.get_answer().c_str());
     QNetworkRequest req(_master_url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));

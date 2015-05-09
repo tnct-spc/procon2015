@@ -1,8 +1,6 @@
 #ifndef ALGORITHM_TYPE
 #define ALGORITHM_TYPE
-
-class problem_type;
-class answer_type;
+#include "takao.hpp"
 
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
@@ -12,7 +10,7 @@ class SHARED_EXPORT algorithm_type
         algorithm_type(problem_type const& _problem);
         virtual ~algorithm_type() = 0;
 
-        virtual answer_type get() = 0;
+        virtual field_type get() = 0;
         virtual bool is_continuable() = 0;
 
     private:
