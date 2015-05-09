@@ -11,7 +11,7 @@ int constexpr STONE_SIZE = 8;
 #include "stone_type.hpp"
 #include "placed_stone_type.hpp"
 #include "field_type.hpp"
-#include "data_type.hpp"
+#include "problem_type.hpp"
 #include "algorithm_type.hpp"
 #include "net.hpp"
 #endif // TAKAO_HPP

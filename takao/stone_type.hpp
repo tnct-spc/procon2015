@@ -49,11 +49,11 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
     }
 
     //rotate用のarrayを準備する
-    raw_data_set.at(4) = _flip(raw_data_set.at(0));
+    std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
     for(size_t i = 1; i < 4; ++i)
     {
-        raw_data_set.at(i) = _rotate(raw_data_set.at(0), i*90);
-        raw_data_set.at(4+i) = _flip(raw_data_set.at(i));
+        raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
+        raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
     }
 }
 
