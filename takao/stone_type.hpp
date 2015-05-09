@@ -1,6 +1,6 @@
 #ifndef STONE_TYPE
 #define STONE_TYPE
-
+#include "takao_global.hpp"
 // 石
 class stone_type
 {

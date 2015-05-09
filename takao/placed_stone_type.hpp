@@ -1,6 +1,6 @@
 #ifndef PLACED_STONE_TYPE
 #define PLACED_STONE_TYPE
-
+#include "takao_global.hpp"
 // 敷地に置かれた石の情報
 class placed_stone_type
 {

@@ -1,6 +1,6 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
-
+#include "takao_global.hpp"
 #include <string>
 
 // 文字列を文字列のデリミタにより分割する

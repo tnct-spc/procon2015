@@ -1,6 +1,6 @@
 #ifndef ALGORITHM_TYPE
 #define ALGORITHM_TYPE
-#include "takao.hpp"
+#include "takao_global.hpp"
 
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?

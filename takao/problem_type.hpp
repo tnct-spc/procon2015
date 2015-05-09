@@ -1,6 +1,6 @@
 #ifndef DATA_TYPE_HPP
 #define DATA_TYPE_HPP
-
+#include "takao_global.hpp"
 //-----------------------------------------------------------
 // 問題データ
 class problem_type

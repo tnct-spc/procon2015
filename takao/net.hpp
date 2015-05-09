@@ -12,7 +12,8 @@
 #include<iostream>
 #include <stdexcept>
 #include <QSharedPointer>
-#include "takao.hpp"
+#include "takao_global.hpp"
+#include "field_type.hpp"
 //コンストラクタでURL指定してね
 class net : public QObject
 {

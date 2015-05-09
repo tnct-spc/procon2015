@@ -2,7 +2,10 @@
 #define FIELD_TYPE
 #include <iostream>
 #include <iomanip>
-
+#include "takao_global.hpp"
+#include "stone_type.hpp"
+#include "point_type.hpp"
+#include "placed_stone_type.hpp"
 // 解答データの手順ひとつ分
 class process_type
 {
