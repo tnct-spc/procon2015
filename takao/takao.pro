@@ -22,7 +22,8 @@ HEADERS += takao_global.hpp \
         field_type.hpp \
         net.hpp \
      	algorithm_type.hpp \
-        problem_type.hpp
+        problem_type.hpp \
+    processor.hpp
 
 unix {
     target.path = /usr/lib

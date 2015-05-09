@@ -2,7 +2,6 @@
 #define TAKAO_HPP
 
 int constexpr STONE_SIZE = 8;
-
 #include "takao_global.hpp"
 
 #include "utils.hpp"
@@ -14,5 +13,6 @@ int constexpr STONE_SIZE = 8;
 #include "problem_type.hpp"
 #include "algorithm_type.hpp"
 #include "net.hpp"
+#include "processor.hpp"
 #endif // TAKAO_HPP
 
