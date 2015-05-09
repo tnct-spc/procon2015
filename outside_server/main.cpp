@@ -16,6 +16,12 @@ int g_stone_num_;
 
 int main(int argc, char *argv[])
 {
+    //mkdir
+    QDir().mkdir("docroot");
+    QDir().mkdir("docroot/files");
+    QDir().mkdir("etc");
+    QDir().mkdir("etc/answer");
+
     QApplication app(argc, argv);
     OutsideServer w;
     w.showFullScreen();

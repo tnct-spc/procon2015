@@ -2,6 +2,7 @@
 #define OUTSIDESERVER_H
 
 #include <QWidget>
+#include<QMatrix>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QTimer>
@@ -40,6 +41,8 @@ private:
     int ConvertAnswer(QString filename_answer,int answer_flow[256][4]);
     //reset folder
     bool ResetFolder(const QString & dirName);
+    //
+    void resizeEvent(QResizeEvent *event);
 
 
 

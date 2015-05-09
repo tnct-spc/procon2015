@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
   <widget class="QGraphicsView" name="graphicsView">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>200</x>
      <y>0</y>
      <width>1720</width>
      <height>1080</height>
@@ -29,70 +29,52 @@
     <enum>QFrame::NoFrame</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="exitbutton">
+  <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>1770</x>
-     <y>1000</y>
-     <width>99</width>
-     <height>27</height>
+     <x>0</x>
+     <y>0</y>
+     <width>201</width>
+     <height>251</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Exit</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="loadbutton">
-   <property name="geometry">
-    <rect>
-     <x>1770</x>
-     <y>950</y>
-     <width>99</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Load</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="uisizebutton">
-   <property name="geometry">
-    <rect>
-     <x>1740</x>
-     <y>10</y>
-     <width>131</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Small/FullScreen</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label1">
-   <property name="geometry">
-    <rect>
-     <x>1720</x>
-     <y>925</y>
-     <width>121</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Problem Number:</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="pnspinbutton">
-   <property name="geometry">
-    <rect>
-     <x>1850</x>
-     <y>910</y>
-     <width>48</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="4" column="0">
+     <widget class="QPushButton" name="exitbutton">
+      <property name="text">
+       <string>Exit</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="uisizebutton">
+      <property name="text">
+       <string>Small/FullScreen</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QSpinBox" name="pnspinbutton">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="loadbutton">
+      <property name="text">
+       <string>Load</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label1">
+      <property name="text">
+       <string>Problem Number:</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -105,12 +87,12 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1802</x>
-     <y>1033</y>
+     <x>43</x>
+     <y>223</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1751</x>
-     <y>1007</y>
+     <x>355</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -121,12 +103,12 @@
    <slot>loadbutton_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1817</x>
-     <y>972</y>
+     <x>58</x>
+     <y>190</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1750</x>
-     <y>942</y>
+     <x>355</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -137,11 +119,11 @@
    <slot>uisizebutton_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1797</x>
-     <y>24</y>
+     <x>107</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1813</x>
+     <x>355</x>
      <y>46</y>
     </hint>
    </hints>
@@ -153,12 +135,12 @@
    <slot>pnspinbutton_changed(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1866</x>
-     <y>919</y>
+     <x>27</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1865</x>
-     <y>872</y>
+     <x>355</x>
+     <y>375</y>
     </hint>
    </hints>
   </connection>
@@ -167,5 +149,6 @@
   <slot>loadbutton_clicked()</slot>
   <slot>uisizebutton_clicked()</slot>
   <slot>pnspinbutton_changed(QString)</slot>
+  <slot>viewzoom(int)</slot>
  </slots>
 </ui>
