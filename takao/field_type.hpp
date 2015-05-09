@@ -7,15 +7,23 @@
 class SHARED_EXPORT process_type
 {
     public:
-        process_type() = default;
+        process_type() = delete;
         ~process_type() = default;
 
         process_type(stone_type const & _stone,
                      point_type const & _position)
         : stone(_stone), position(_position) {}
 
-        stone_type stone;
-        point_type position;
+        // copy assignment operator
+        process_type & operator=(process_type const & other)
+        {
+            const_cast<stone_type &>(stone) = other.stone;
+            const_cast<point_type &>(position) = other.position;
+            return *this;
+        }
+
+        stone_type const & stone;
+        point_type const position;
 };
 
 // 敷地
@@ -58,7 +66,6 @@ class SHARED_EXPORT field_type
     private:
         raw_field_type raw_data;
         std::vector<process_type> processes;
-        point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
         struct pair_type
@@ -156,9 +163,8 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         if(raw_data.at(i).at(j) == stone.get_nth())raw_data.at(i).at(j) = 0;
     }
-    processes.erase(std::remove_if(processes.begin(), processes.end(),
-                                   [& stone](auto const & process) { return process.stone == stone; }),
-                    processes.end());
+    processes.erase(std::find_if(processes.begin(), processes.end(),
+                                 [& stone](auto const & process) { return process.stone == stone; }));
     return *this;
  }
 
@@ -230,7 +236,7 @@ bool field_type::is_removable(stone_type const& stone)
                                  [& nth](auto const & process) { return process.stone.get_nth() == nth; }
                                 )->position;
     point_type ps = {pf.y - static_cast<int>(y), pf.x - static_cast<int>(x)};
-    stone_type * stone;
+    stone_type const * stone;
 
     for (auto & process : processes) {
         if (process.stone.get_nth() == nth) {
