@@ -1,6 +1,7 @@
 #include <iostream>
 #include <QCoreApplication>
-#include <takao.hpp>
+#include "net.hpp"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);

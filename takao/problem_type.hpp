@@ -1,9 +1,12 @@
 #ifndef DATA_TYPE_HPP
 #define DATA_TYPE_HPP
+
 #include <string>
 #include <vector>
 #include <tuple>
+
 #include "field_type.hpp"
+
 //-----------------------------------------------------------
 // 問題データ
 class problem_type

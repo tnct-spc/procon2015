@@ -1,6 +1,6 @@
 #include "stone_type.hpp"
 #include "utils.hpp"
-#include <algorithm>
+
 // 石
 
 bool operator== (stone_type const& lhs, stone_type const& rhs)

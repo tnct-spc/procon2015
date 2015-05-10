@@ -1,11 +1,14 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
-#include <QObject>
-#include "problem_type.hpp"
-#include "algorithm_type.hpp"
+
 #include <vector>
 #include <mutex>
 #include <string>
+
+#include <QObject>
+
+#include "takao.hpp"
+
 class processor : public QObject
 {
    Q_OBJECT

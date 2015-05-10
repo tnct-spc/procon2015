@@ -1,7 +1,8 @@
 #ifndef ALGORITHM_TYPE
 #define ALGORITHM_TYPE
+
 #include "problem_type.hpp"
-#include "field_type.hpp"
+
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
 class algorithm_type

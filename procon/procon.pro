@@ -14,7 +14,9 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    processor.cpp \
+    net.cpp
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../takao/release/ -ltakao
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../takao/debug/ -ltakao
@@ -24,3 +26,7 @@ INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao
 
 QMAKE_CXXFLAGS += -std=c++14
+
+HEADERS += \
+    net.hpp \
+    processor.hpp

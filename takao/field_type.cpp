@@ -1,9 +1,6 @@
-
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
 #include "field_type.hpp"
 #include "utils.hpp"
+
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {

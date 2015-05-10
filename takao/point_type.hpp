@@ -1,6 +1,8 @@
 #ifndef POINT_TYPE
 #define POINT_TYPE
-#include <ostream>
+
+#include <iostream>
+
 // 何らかの座標を表すクラス
 class point_type
 {
@@ -31,12 +33,11 @@ class point_type
         {
             return point_type{ lhs.x + rhs.x, lhs.y + rhs.y };
         }
-        friend inline std::ostream& operator<<(std::ostream& os, const point_type& point)
+        friend inline std::ostream & operator<< (std::ostream & os, point_type const & point)
         {
-            os << '{' << point.y << ',' << point.x << '}';
+            os << "{" << point.y << ", " << point.x << "}";
             return os;
         }
-
 };
 
 #endif // POINT_TYPE
