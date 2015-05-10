@@ -104,6 +104,12 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
     QStringList list=d.split("\n");
     answer_num_=list.size();
     while(flow_count<answer_num_){
+        if(list[flow_count]==""){
+            //パスする石
+            answer_flow_[flow_count][0]=-1;
+            flow_count++;
+            continue;
+        }
         pos=0;
         //左右
         if (list[flow_count].mid(pos+1,1) == " "){
@@ -152,6 +158,7 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
 
 bool AnswerForm::PutStone(){
+    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];

@@ -97,6 +97,7 @@ void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString useri
 }
 
 void GameStage::AnswerAnimation(){
+    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];
