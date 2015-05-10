@@ -10,15 +10,15 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     //Get GET data
     QUrlQuery url_query(request->url());
-    QString pre_user_id=url_query.queryItemValue("userid");
-    QString pre_answer_data=url_query.queryItemValue("answerdata");
+    QString plaintext_user_id=url_query.queryItemValue("userid");
+    QString plaintext_answer_data=url_query.queryItemValue("answerdata");
 
     //Decode
-    pre_user_id.replace("+"," ");
-    pre_answer_data.replace("+"," ");
-    pre_answer_data.replace("%0D%0A","\n");
-    QByteArray user_id=pre_user_id.toUtf8();
-    QByteArray answer_data=pre_answer_data.toUtf8();
+    plaintext_user_id.replace("+"," ");
+    plaintext_answer_data.replace("+"," ");
+    plaintext_answer_data.replace("%0D%0A","\n");
+    QByteArray user_id=plaintext_user_id.toUtf8();
+    QByteArray answer_data=plaintext_answer_data.toUtf8();
     QString answer_point;
 
     //response head
@@ -29,36 +29,39 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     /*Save answer and Display answer_point*/
     if (!user_id.isEmpty()) {
-        QString filename_answer=AnswerFolderName+user_id+".txt";
-        QString t_filename_answer=AnswerFolderName+"Temporary_"+user_id+".txt";
-
-        //save answer to Temporary file
-        QFile t_answer(t_filename_answer);
-        t_answer.open(QIODevice::WriteOnly);
-        t_answer.write(answer_data);
-        t_answer.close();
-
         //responce answer point
-        answer_point=SimulateAnswerPoint(t_filename_answer);
-
-        //remove t_answer
-        t_answer.remove();
+        answer_point=SimulateAnswerPoint(plaintext_answer_data);
 
         if(answer_point=="-1"){
-            response->write("***Format Error***");
+            response->write("FormatError");
         }else{
             response->write(answer_point.toUtf8());
-            //save answer to file
-            QFile answer(filename_answer);
-            answer.open(QIODevice::WriteOnly);
-            answer.write(answer_data);
-            answer.close();
-            //save userid to file
-            QFile userids(AnswerFolderName+"userids.txt");
-            userids.open(QIODevice::Append);
-            userids.write(user_id);
-            userids.write("\n");
-            userids.close();
+            //save in global
+            //すでにあれば更新
+            int user_data_itr=-1;
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                if(user_id==g_user_data[i].userid){
+                    g_user_data[i].is_renewal=true;
+                    user_data_itr=i;
+                }
+            }
+            //なければ新規作成
+            if(user_data_itr==-1){
+                user_data_type new_user_data;
+                new_user_data.userid=user_id;
+                new_user_data.append_stage_number=-1;
+                new_user_data.is_renewal=true;
+                g_user_data.push_back(new_user_data);
+                user_data_itr=g_user_data.size()-1;
+            }
+            //解答ファイルを入れる
+            g_user_data[user_data_itr].answer_point=answer_point.toInt();
+            g_user_data[user_data_itr].answer_num=answer_num_;
+            for(int i=0;i<answer_num_;i++){
+                for(int j=0;j<4;j++){
+                    g_user_data[user_data_itr].answer_flow[i][j]=answer_flow_[i][j];
+                }
+            }
         }
 
     /*Display Form*/
@@ -77,7 +80,7 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
     response->end();
 }
 
-QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
+QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
     //copy data
     for(int y=0;y<48;y++){
@@ -94,50 +97,39 @@ QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
         }
     }
 
-
-
-    //アンサー情報のロード
-    QFile questionfile(filename_answer);
-    questionfile.open(QIODevice::ReadOnly);
-    QString line,line2;
-    //ファイル解析
     //フィールド情報を配列に格納,フィールドの更新
-    int i=0;
-    while(1){
-        if(questionfile.atEnd()){
-            questionfile.close();
-            answer_num_=i;
-            break;
-        }
+    QString d=plaintext_answer_data;
+    int pos;
+    int flow_count=0;
+    QStringList list=d.split("\n");
+    answer_num_=list.size();
+    while(flow_count<answer_num_){
+        pos=0;
         //左右
-        line = questionfile.read(1);
-        line2 = questionfile.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = questionfile.read(1);
+        if (list[flow_count].mid(pos+1,1) == " "){
+            answer_flow_[flow_count][0] = list[flow_count].mid(pos,1).toInt();
+        }else{
+            answer_flow_[flow_count][0] = list[flow_count].mid(pos,2).toInt();
+            pos++;
         }
-        answer_flow_[i][0] = line.toInt();
+        pos+=2;
         //上下
-        line = questionfile.read(1);
-        line2 = questionfile.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = questionfile.read(1);
+        if (list[flow_count].mid(pos+1,1) == " "){
+            answer_flow_[flow_count][1] = list[flow_count].mid(pos,1).toInt();
+        }else{
+            answer_flow_[flow_count][1] = list[flow_count].mid(pos,2).toInt();
+            pos++;
         }
-        answer_flow_[i][1] = line.toInt();
+        pos+=2;
         //裏表
-        line = questionfile.read(1);
-        if (line == "H") answer_flow_[i][2] = 0;
-        if (line == "T") answer_flow_[i][2] = 1;
-        line = questionfile.read(1);//空白分
+        if (list[flow_count].mid(pos,1) == "H") answer_flow_[flow_count][2] = 0;
+        if (list[flow_count].mid(pos,1) == "T") answer_flow_[flow_count][2] = 1;
+        pos+=2;
         //角度
-        line = questionfile.readLine(8);
-        answer_flow_[i][3] = line.toInt();
-        i++;
+        answer_flow_[flow_count][3] = list[flow_count].mid(pos).toInt();
+        flow_count++;
     }
     stone_flow_count_=0;
-
-
 
     //put a stone on stage
     while(PutStone());

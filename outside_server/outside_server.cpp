@@ -48,78 +48,76 @@ OutsideServer::~OutsideServer()
     delete ui;
 }
 
+//1ミリ秒間隔で画面に表示する解答の更新を行う
 void OutsideServer::ReserveAnswer(){
 
     if (problem_flag){
-        QFile questionfile(AnswerFolderName+"userids.txt");
-        QString userid;
-        int answer_flow[256][4];
-
-        //解答が送られてきたか確認(get userid for userids.txt)
-        if(QFile::exists(AnswerFolderName+"userids.txt")){
-            questionfile.open(QIODevice::ReadOnly);
-            while(1){
-                userid = questionfile.read(256);
-                userid = userid.trimmed();
-                if(userid.isEmpty()) break;
-
-
-                /*Convert Answer(txt file to int.answer_flow)*/
-                int answer_num=ConvertAnswer(AnswerFolderName+userid+".txt",answer_flow);
-
-                /*Allocation*/
-                int set_pos=-1;
-                int answer_point=pointer.SimulateAnswerPoint(AnswerFolderName+userid+".txt").toInt();
-
-                if(set_pos==-1){
-                    //同じ名前があればそれに更新
-                    for(int i=0;i<6;i++){
-                        if(userid==answer_players_[i]){
-                            set_pos=i;
-                            break;
-                        }
+        //renewalが一つでもあれば更新(負荷軽減)
+        bool renewal_flag=false;
+        for(unsigned long i=0;i<g_user_data.size();i++){
+            if(g_user_data[i].is_renewal){
+                renewal_flag=true;
+                break;
+            }
+        }
+        if(renewal_flag){
+            qDebug("＊＊＊表示の更新＊＊＊");
+            //user_sortを介してg_user_dataを得点が高い順にソート
+            std::vector<int> user_sort;
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                user_sort.push_back(i);
+            }
+            int buff;
+            //bubble sort
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                for(unsigned long j=1;j<g_user_data.size();j++){
+                    if(g_user_data[user_sort[j-1]].answer_point < g_user_data[user_sort[j]].answer_point){
+                        buff=user_sort[j];
+                        user_sort[j]=user_sort[j-1];
+                        user_sort[j-1]=buff;
                     }
                 }
-                if(set_pos==-1){
-                    //何も入っていないものから埋める
-                    for(int i=0;i<6;i++){
-                        if(answer_points_[i]==-1){
-                            set_pos=i;
-                            break;
-                        }
+            }
+            //得点が高い順に最大6つ,ステージに配置していく
+            unsigned long stage_max;
+            if(g_user_data.size()<6){
+                stage_max=g_user_data.size();
+            }else{
+                stage_max=6;
+            }
+            for(unsigned long i=0;i<stage_max;i++){
+                if(g_user_data[user_sort[i]].append_stage_number >= 0){
+                    //すでにステージにある
+                    if(g_user_data[user_sort[i]].is_renewal){
+                        //更新されているので書き換える
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData();
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
+                    }else{
+                        //もとのデータのままなので飛ばす
+                        continue;
                     }
-                }
-                if(set_pos==-1){
-                    //得点が小さい順にソート
-                    int sort_point[6]={0,1,2,3,4,5};
-                    int buff;
-                    //bubble sort
-                    for(int i=0;i<6;i++){
-                        for(int j=1;j<6;j++){
-                            if(answer_points_[sort_point[j-1]] > answer_points_[sort_point[j]]){
-                                buff=sort_point[j];
-                                sort_point[j]=sort_point[j-1];
-                                sort_point[j-1]=buff;
+                }else{
+                    //ステージに無いので空いている場所又はステージにある解答の中で一番得点が小さいものと交換する
+                    int append_minimum_stage_num;
+                    if(g_user_data.size()<=6){
+                        append_minimum_stage_num=g_user_data.size()-1;
+                    }else{
+                        for(unsigned long j=g_user_data.size();j>0;j--){
+                            if(g_user_data[user_sort[j-1]].append_stage_number > 0){
+                                append_minimum_stage_num=g_user_data[user_sort[j-1]].append_stage_number;
+                                g_user_data[user_sort[j-1]].append_stage_number=-1;
+                                break;
                             }
                         }
                     }
-                    if(answer_point > answer_points_[sort_point[0]]){//表示されている人の中で特典が一番小さい人より,特典が大きければそのステージを更新
-                        set_pos=sort_point[0];
-                    }
-                }
-                if(set_pos==-1){
-                    //表示する価値なし
-                }
-                if(set_pos!=-1){
-                    //submit
-                    game_stage_[set_pos].MakeStageData(/*g_stage_state_,g_stone_state_,g_stone_num_*/);
-                    game_stage_[set_pos].StartAnswer(answer_flow,answer_num,userid);
-                    answer_points_[set_pos]=answer_point;
-                    answer_players_[set_pos]=userid;
+                    //書き換える
+                    g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
+                    game_stage_[append_minimum_stage_num].MakeStageData();
+                    game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
                 }
             }
-            questionfile.close();
-            questionfile.remove();
+            //すべての更新フラグ(renewal)をfalseに
+            for(unsigned long i=0;i<g_user_data.size();i++) g_user_data[i].is_renewal=false;
         }
     }
 }

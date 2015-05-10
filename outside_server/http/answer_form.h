@@ -18,7 +18,7 @@ public:
     //
     void Service(QHttpRequest* request, QHttpResponse* response);
     //return point of answer
-    QString SimulateAnswerPoint(QString answer_file_name);
+    QString SimulateAnswerPoint(QString plaintext_answer_data);
 
 private:
     //put a stone on stage
@@ -35,7 +35,6 @@ private:
     int answer_flow_[256][4];
     int answer_num_;
     int stone_flow_count_;
-
 
 };
 

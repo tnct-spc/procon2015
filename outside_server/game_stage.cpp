@@ -80,15 +80,14 @@ void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString useri
     tag_name_->setPlainText(userid);
     //pointtag
     tag_point_->setPlainText("???");
-
     //copy answer flow
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
         for(int j=0;j<4;j++){
+            //qDebug("%s",qPrintable(QString::number(answer_flow[i][j])));
             answer_flow_[i][j]=answer_flow[i][j];
         }
     }
-
     //解答処理を開始する
     stone_flow_count_=0;
     answer_animation_timer_->start(400);
