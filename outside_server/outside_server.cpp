@@ -52,15 +52,8 @@ OutsideServer::~OutsideServer()
 void OutsideServer::ReserveAnswer(){
 
     if (problem_flag){
-        //renewalが一つでもあれば更新(負荷軽減)
-        bool renewal_flag=false;
-        for(unsigned long i=0;i<g_user_data.size();i++){
-            if(g_user_data[i].is_renewal){
-                renewal_flag=true;
-                break;
-            }
-        }
-        if(renewal_flag){
+        if(g_user_data_updated){
+            g_user_data_updated=false;
             qDebug("＊＊＊表示の更新＊＊＊");
             //user_sortを介してg_user_dataを得点が高い順にソート
             std::vector<int> user_sort;

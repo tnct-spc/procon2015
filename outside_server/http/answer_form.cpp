@@ -35,8 +35,6 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
         }else{
             //responce answer point
             answer_point=SimulateAnswerPoint(plaintext_answer_data);
-
-            response->write(answer_point.toUtf8());
             //save in global
             //すでにあれば更新
             int user_data_itr=-1;
@@ -63,6 +61,11 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
                     g_user_data[user_data_itr].answer_flow[i][j]=answer_flow_[i][j];
                 }
             }
+
+            //得点を表示する
+            response->write(answer_point.toUtf8());
+            //update_flagを立てる
+            g_user_data_updated=true;
         }
 
     /*Display Form*/
