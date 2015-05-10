@@ -1,7 +1,7 @@
 #ifndef ALGORITHM_TYPE
 #define ALGORITHM_TYPE
-#include "takao_global.hpp"
-
+#include "problem_type.hpp"
+#include "field_type.hpp"
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
 class algorithm_type
@@ -16,9 +16,4 @@ class algorithm_type
     private:
         problem_type problem;
 };
-
-algorithm_type::algorithm_type(problem_type const& _problem): problem(_problem)
-{
-}
-
 #endif // ALGORITHM_TYPE

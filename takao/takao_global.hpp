@@ -1,6 +1,6 @@
 #ifndef TAKAO_GLOBAL_HPP
 #define TAKAO_GLOBAL_HPP
-
+/*
 #include <QtCore/qglobal.h>
 
 int constexpr STONE_SIZE = 8;
@@ -15,5 +15,5 @@ class field_type;
 class problem_type;
 class algorithm_type;
 class net;
-
+*/
 #endif // TAKAO_GLOBAL_HPP

@@ -1,6 +1,6 @@
 #ifndef POINT_TYPE
 #define POINT_TYPE
-#include "takao_global.hpp"
+#include <ostream>
 // 何らかの座標を表すクラス
 class point_type
 {

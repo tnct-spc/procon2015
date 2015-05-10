@@ -11,6 +11,8 @@ TEMPLATE = lib
 
 DEFINES += TAKAO_LIBRARY
 
+LIBS += \
+       -lboost_system\
 
 unix {
     target.path = /usr/lib
