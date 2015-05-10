@@ -72,6 +72,9 @@ void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][
             }
         }
     }
+    //Reset tag
+    tag_name_->setPlainText("");
+    tag_point_->setPlainText("");
 }
 
 
