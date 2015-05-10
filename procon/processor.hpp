@@ -7,7 +7,7 @@
 
 #include <QObject>
 
-#include "takao.hpp"
+#include "algorithm.hpp"
 
 class processor : public QObject
 {

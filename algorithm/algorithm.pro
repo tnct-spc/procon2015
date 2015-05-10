@@ -6,10 +6,10 @@
 
 QT       -= gui
 
-TARGET = takao
+TARGET = algorithm
 TEMPLATE = lib
 
-DEFINES += TAKAO_LIBRARY
+DEFINES += ALGORITHM_LIBRARY
 
 SOURCES += \
     algorithm_type.cpp \
@@ -21,8 +21,8 @@ SOURCES += \
     stone_type.cpp
 
 HEADERS += \
-    takao_global.hpp \
-    takao.hpp \
+    algorithm_global.hpp \
+    algorithm.hpp \
     utils.hpp \
     point_type.hpp \
     stone_type.hpp \

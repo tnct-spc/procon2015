@@ -15,7 +15,7 @@
 #include <QEventLoop>
 #include <QUrlQuery>
 
-#include "takao.hpp"
+#include "algorithm.hpp"
 
 //コンストラクタでURL指定してね
 class net : public QObject

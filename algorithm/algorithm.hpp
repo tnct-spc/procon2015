@@ -1,7 +1,7 @@
 #ifndef TAKAO_HPP
 #define TAKAO_HPP
 
-#include "takao_global.hpp"
+#include "algorithm_global.hpp"
 
 #include "utils.hpp"
 #include "point_type.hpp"

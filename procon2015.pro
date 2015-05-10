@@ -2,6 +2,6 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     procon \
-    takao \
+    algorithm \
     test \
     outside_server
