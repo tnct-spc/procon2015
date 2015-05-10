@@ -1,5 +1,5 @@
-#include <QObject>
 #include "net.hpp"
+
 //コンストラクタでURL指定してね
 net::net(QUrl server_url)
 {

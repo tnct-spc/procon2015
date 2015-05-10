@@ -1,7 +1,11 @@
 #ifndef NET_H
 #define NET_H
-#include "field_type.hpp"
+
 #include <string>
+#include <iostream>
+#include <stdexcept>
+
+#include <QSharedPointer>
 #include <QObject>
 #include <QUrl>
 #include <QtNetwork/QNetworkAccessManager>
@@ -10,9 +14,9 @@
 #include <QByteArray>
 #include <QEventLoop>
 #include <QUrlQuery>
-#include <iostream>
-#include <stdexcept>
-#include <QSharedPointer>
+
+#include "algorithm.hpp"
+
 //コンストラクタでURL指定してね
 class net : public QObject
 {

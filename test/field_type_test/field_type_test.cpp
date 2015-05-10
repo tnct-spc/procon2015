@@ -1,7 +1,7 @@
 #include <QString>
 #include <QtTest>
 #define private public
-#include "takao.hpp"
+#include "algorithm.hpp"
 #undef private
 Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(field_type)

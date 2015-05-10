@@ -1,9 +1,4 @@
 #include "processor.hpp"
-#include<string>
-#include<vector>
-#include<mutex>
-#include<queue>
-#include <QObject>
 
 processor::processor(std::string raw_data){
     _problem = problem_type(raw_data);

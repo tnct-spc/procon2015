@@ -1,5 +1,6 @@
 #include "problem_type.hpp"
 #include "utils.hpp"
+
 problem_type::problem_type(std::string const & problem_text)
 {
     auto && split = _split_problem_text(problem_text);

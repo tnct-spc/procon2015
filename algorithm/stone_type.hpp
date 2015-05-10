@@ -1,7 +1,11 @@
 #ifndef STONE_TYPE
 #define STONE_TYPE
+
+#include <algorithm>
 #include <array>
+
 int constexpr STONE_SIZE = 8;
+
 // 石
 class stone_type
 {

@@ -1,11 +1,16 @@
 #ifndef FIELD_TYPE
 #define FIELD_TYPE
-#include "stone_type.hpp"
-#include "point_type.hpp"
-#include "placed_stone_type.hpp"
+
+#include <algorithm>
 #include <array>
 #include <string>
 #include <vector>
+#include <iomanip>
+
+#include "point_type.hpp"
+#include "stone_type.hpp"
+#include "placed_stone_type.hpp"
+
 // 解答データの手順ひとつ分
 class process_type
 {
