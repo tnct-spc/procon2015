@@ -4,7 +4,6 @@
 #include "problem_type.hpp"
 #include "algorithm_type.hpp"
 #include <vector>
-#include <boost/thread.hpp>
 #include <mutex>
 #include <string>
 class processor : public QObject
@@ -13,13 +12,11 @@ class processor : public QObject
 public:
     processor(std::string raw_data);
     void run();
-    //boost::optional<answer_type> pop();
     ~processor();
 private:
     problem_type  _problem;
     //std::vector<std::tuple<algorithm_type,bool>> v_algorithm;
     std::vector<bool> enable_algorithm;
-    //boost::thread_group thread_grp;
     std::mutex mtx;
     int best_zk = 0;
 private slots:

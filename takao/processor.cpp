@@ -2,8 +2,6 @@
 #include<string>
 #include<vector>
 #include<mutex>
-#include <boost/optional.hpp>
-#include <boost/thread.hpp>
 #include<queue>
 #include <QObject>
 

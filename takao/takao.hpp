@@ -10,8 +10,7 @@
 #include "problem_type.hpp"
 #include "algorithm_type.hpp"
 #include "net.hpp"
+#include "processor.hpp"
 #include "takao_global.hpp"
-
-
 #endif // TAKAO_HPP
 
