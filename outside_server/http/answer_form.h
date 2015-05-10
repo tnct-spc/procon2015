@@ -8,6 +8,7 @@
 #include <global.h>
 #include <QFile>
 #include <QUrlQuery>
+#include <QRegExp>
 
 
 class AnswerForm : public QObject
@@ -23,6 +24,8 @@ public:
 private:
     //put a stone on stage
     bool PutStone();
+    //
+    bool format_check(QString plain_data,QString format_type);
 
     //pass
     QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/etc/answer/";

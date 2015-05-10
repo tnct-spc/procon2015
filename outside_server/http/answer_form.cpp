@@ -29,12 +29,13 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     /*Save answer and Display answer_point*/
     if (!user_id.isEmpty()) {
-        //responce answer point
-        answer_point=SimulateAnswerPoint(plaintext_answer_data);
 
-        if(answer_point=="-1"){
+        if(!format_check(plaintext_answer_data,"ANSWER")){
             response->write("FormatError");
         }else{
+            //responce answer point
+            answer_point=SimulateAnswerPoint(plaintext_answer_data);
+
             response->write(answer_point.toUtf8());
             //save in global
             //すでにあれば更新
@@ -78,6 +79,211 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     //end
     response->end();
+}
+
+bool AnswerForm::format_check(QString plain_data, QString format_type){
+    if(format_type=="ANSWER"){
+
+
+
+        QString d=plain_data;
+        int pos;
+        int flow_count=0;
+        int answer_num;
+        int answer_flow[256][4];
+
+        //正規表現
+        QRegExp re_num("^\\d$");
+
+        //改行で分割
+        QStringList list=d.split("\n");
+        answer_num=list.size();
+        if(answer_num-1 > g_stone_num_) return false;
+
+        while(flow_count<answer_num){
+            if(list[flow_count]==""){
+                //パスする石
+                answer_flow[flow_count][0]=-1;
+                flow_count++;
+                continue;
+            }
+            pos=0;
+            //左右
+            if (!(re_num.exactMatch(list[flow_count].mid(pos,1)))){
+                return false;
+            }
+            if (list[flow_count].mid(pos+1,1) == " "){
+                answer_flow[flow_count][0] = list[flow_count].mid(pos,1).toInt();
+            }else{
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
+                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                answer_flow[flow_count][0] = list[flow_count].mid(pos,2).toInt();
+                pos++;
+            }
+            pos+=2;
+            //上下
+            if (!re_num.exactMatch(list[flow_count].mid(pos,1))) return false;
+            if (list[flow_count].mid(pos+1,1) == " "){
+                answer_flow[flow_count][0] = list[flow_count].mid(pos,1).toInt();
+                answer_flow[flow_count][1] = list[flow_count].mid(pos,1).toInt();
+            }else{
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
+                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                answer_flow[flow_count][1] = list[flow_count].mid(pos,2).toInt();
+                pos++;
+            }
+            pos+=2;
+            //裏表
+            if (list[flow_count].mid(pos,1) == "H"){
+                answer_flow[flow_count][2] = 0;
+            }else if (list[flow_count].mid(pos,1) == "T"){
+                answer_flow[flow_count][2] = 1;
+            }else{
+                return false;
+            }
+            if (!(list[flow_count].mid(pos+1,1)==" ")) return false;
+            pos+=2;
+            //角度
+            /*
+             * 0
+             * 90
+             * 180
+             * 270
+            */
+            if(!(list[flow_count].mid(pos)=="0" || list[flow_count].mid(pos)=="90" || list[flow_count].mid(pos)=="180" || list[flow_count].mid(pos)=="270")) return false;
+            answer_flow[flow_count][3] = list[flow_count].mid(pos).toInt();
+            flow_count++;
+        }
+
+        //copy data
+        int stage_state[48][48];//0=empty;1=block;2=answer_block
+        bool stone_state[256][8][8];
+        int stone_num;
+        int stone_flow_count=0;
+
+        for(int y=0;y<48;y++){
+            for(int x=0;x<48;x++){
+                stage_state[y][x]=g_stage_state_[y][x];
+            }
+        }
+        stone_num=g_stone_num_;
+        for(int n=0;n<stone_num;n++){
+            for(int y=0;y<8;y++){
+                for(int x=0;x<8;x++){
+                    stone_state[n][y][x]=g_stone_state_[n][y][x];
+                }
+            }
+        }
+    qDebug("ん");
+        while(1){
+            while(answer_flow[stone_flow_count][0]==-1)stone_flow_count++;//-1ならパスする
+            /*反転させる*/
+            if (answer_flow[stone_flow_count][2]){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[y][8 - x - 1];
+                    }
+                }
+            }
+            /*回転させる*/
+            if (answer_flow[stone_flow_count][3]==90){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[8 - x - 1][y];
+                    }
+                }
+            }
+            else if (answer_flow[stone_flow_count][3] == 180){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[8 - y - 1][8 - x - 1];
+                    }
+                }
+            }
+            else if(answer_flow[stone_flow_count][3] == 270){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[x][8 - y - 1];
+                    }
+                }
+            }
+            /*設置*/
+            //フィールドに置く
+            //フォーマットチェック
+            //既存のブロックに接してないとアウト(最初以外)
+            bool touch_other_block_flag=false;
+            for (int y = 0; y < 8; y++){
+                for (int x = 0; x < 8; x++){
+                    if (stone_state[stone_flow_count][y][x]){
+                        //範囲超えたら(はみ出したら)アウト
+                        if(y + answer_flow[stone_flow_count][1] >= 32 || y + answer_flow[stone_flow_count][1] < 0) return false;
+                        if(x + answer_flow[stone_flow_count][0] >= 32 || x + answer_flow[stone_flow_count][0] < 0) return false;
+                        //被ったらアウト
+                        if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]] > 0) return false;
+                        //既存のブロックに接しているか
+                        if(y + answer_flow[stone_flow_count][1] != 31){//下
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1] + 1][8 + x + answer_flow[stone_flow_count][0]]==2) touch_other_block_flag=true;
+                        }
+                        if(y + answer_flow[stone_flow_count][1] != 0){//上
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1] - 1][8 + x + answer_flow[stone_flow_count][0]]==2) touch_other_block_flag=true;
+                        }
+                        if(x + answer_flow[stone_flow_count][0] != 31){//右
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0] + 1]==2) touch_other_block_flag=true;
+                        }
+                        if(x + answer_flow[stone_flow_count][0] != 0){//左
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0] - 1]==2) touch_other_block_flag=true;
+                        }
+                    }
+                }
+            }
+            if(!(stone_flow_count==0 || touch_other_block_flag)) return false;
+            //ブロックの挿入
+            for (int y = 0; y < 8; y++){
+                for (int x = 0; x < 8; x++){
+                    if (stone_state[stone_flow_count][y][x]){
+                        //ok
+                        stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]]=2;
+                    }
+                }
+            }
+            /*後処理*/
+            stone_flow_count++;
+            if (stone_flow_count >= answer_num){
+                break;
+            }
+        }
+
+
+        return true;
+
+    }else{
+        qDebug("error: Unknown format-type. Return false.");
+        return false;
+    }
 }
 
 QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
