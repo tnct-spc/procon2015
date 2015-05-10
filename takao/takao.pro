@@ -10,7 +10,7 @@ TARGET = takao
 TEMPLATE = lib
 
 DEFINES += TAKAO_LIBRARY
-
+LIBS += -lboost_system -lboost_thread
 
 unix {
     target.path = /usr/lib

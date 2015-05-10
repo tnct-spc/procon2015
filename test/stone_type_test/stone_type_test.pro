@@ -14,7 +14,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-
+LIBS += -lboost_system
 SOURCES += stone_type_test.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
