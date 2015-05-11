@@ -54,7 +54,6 @@ void OutsideServer::ReserveAnswer(){
     if (problem_flag){
         if(g_user_data_updated){
             g_user_data_updated=false;
-            qDebug("＊＊＊表示の更新＊＊＊");
             //user_sortを介してg_user_dataを得点が高い順にソート
             std::vector<int> user_sort;
             for(unsigned long i=0;i<g_user_data.size();i++){
