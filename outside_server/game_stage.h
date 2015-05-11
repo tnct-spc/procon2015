@@ -27,10 +27,12 @@ public:
     void MakeStageData(/*bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
     //Read Answer(answer.txt)
     void StartAnswer(int answer_flow[256][4],int answer_num,QString userid);
+    //
+    void update_ranking_tag(int ranking);
 
 private: 
     //Check Answer Point
-    QString CheckPoint();   
+    QString CheckPoint();
 
     //field
     QGraphicsScene *field_; //Field pointer
@@ -46,6 +48,7 @@ private:
     //tag
     QGraphicsTextItem *tag_name_; //NameTag
     QGraphicsTextItem *tag_point_; //PointTag
+    QGraphicsTextItem *tag_ranking_; //Ranking
     //answer
     int answer_flow_[256][4];
     int answer_num_;

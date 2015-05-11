@@ -15,6 +15,7 @@ bool g_stone_state_[256][8][8];
 int g_stone_num_;
 std::vector<user_data_type> g_user_data;
 bool g_user_data_updated=false;
+bool g_need_rankingtag_updated=false;
 
 int main(int argc, char *argv[])
 {

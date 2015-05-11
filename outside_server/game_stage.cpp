@@ -35,6 +35,12 @@ void GameStage::IntializeStage(QGraphicsScene *field,int base_x,int base_y,int b
     tag_point_->setX(based_point_.x-40+450);
     tag_point_->setY(based_point_.y-50);
     tag_point_->setZValue(3);
+    //RankingTag
+    f.setPixelSize(150);
+    tag_ranking_ = field_->addText("",f);
+    tag_ranking_->setX(based_point_.x-40);
+    tag_ranking_->setY(based_point_.y-50);
+    tag_ranking_->setZValue(3);
 
 
     //answer animation timer set
@@ -75,6 +81,7 @@ void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][
     //Reset tag
     tag_name_->setPlainText("");
     tag_point_->setPlainText("");
+    tag_ranking_->setPlainText("");
 }
 
 
@@ -168,6 +175,8 @@ void GameStage::AnswerAnimation(){
     if (stone_flow_count_ >= answer_num_){
         //show point
         tag_point_->setPlainText(CheckPoint());
+        //flag update rankingtag
+        g_need_rankingtag_updated=true;
         //stop timer
         answer_animation_timer_->stop();
     }
@@ -183,4 +192,36 @@ QString GameStage::CheckPoint(){
         }
     }
     return QString::number(point);
+}
+
+void GameStage::update_ranking_tag(int ranking){
+    switch(ranking){
+    case 1:
+        tag_ranking_->setDefaultTextColor(QColor("gold"));
+        tag_ranking_->setPlainText("1st");
+        break;
+    case 2:
+        tag_ranking_->setDefaultTextColor(QColor("silver"));
+        tag_ranking_->setPlainText("2nd");
+        break;
+    case 3:
+        tag_ranking_->setDefaultTextColor(QColor("blonze"));
+        tag_ranking_->setPlainText("3rd");
+        break;
+    case 4:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("4th");
+        break;
+    case 5:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("5th");
+        break;
+    case 6:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("6th");
+        break;
+    default:
+        qDebug("***error*** in GameStage::update_ranking_tag, ranking_str(int) value is invalid");
+        break;
+    }
 }

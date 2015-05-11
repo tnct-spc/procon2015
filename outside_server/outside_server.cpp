@@ -52,7 +52,7 @@ OutsideServer::~OutsideServer()
 void OutsideServer::ReserveAnswer(){
 
     if (problem_flag){
-        if(g_user_data_updated){
+        if(g_need_rankingtag_updated || g_user_data_updated){
             g_user_data_updated=false;
             //user_sortを介してg_user_dataを得点が高い順にソート
             std::vector<int> user_sort;
@@ -81,15 +81,17 @@ void OutsideServer::ReserveAnswer(){
                 if(g_user_data[user_sort[i]].append_stage_number >= 0){
                     //すでにステージにある
                     if(g_user_data[user_sort[i]].is_renewal){
-                        //更新されているので書き換える
+                        //[1]更新されているので書き換える
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData();
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
                     }else{
-                        //もとのデータのままなので飛ばす
+                        //[2]もとのデータのままなので順位を更新して飛ばす
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
                         continue;
                     }
                 }else{
-                    //ステージに無いので空いている場所又はステージにある解答の中で一番得点が小さいものと交換する
+                    //[3]ステージに無いので空いている場所又はステージにある解答の中で一番得点が小さいものと交換する
                     int append_minimum_stage_num;
                     if(g_user_data.size()<=6){
                         append_minimum_stage_num=g_user_data.size()-1;
@@ -106,10 +108,12 @@ void OutsideServer::ReserveAnswer(){
                     g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
                     game_stage_[append_minimum_stage_num].MakeStageData();
                     game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
+                    if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(i+1/*Ranking*/);
                 }
             }
             //すべての更新フラグ(renewal)をfalseに
             for(unsigned long i=0;i<g_user_data.size();i++) g_user_data[i].is_renewal=false;
+            g_need_rankingtag_updated=false;
         }
     }
 }
