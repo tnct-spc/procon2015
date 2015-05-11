@@ -390,11 +390,11 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
 
     //Simulate point
-    int point=0;
+    int point=1024/*32*32*/;
     for (int y = 0; y < 32; y++){
         for (int x = 0; x < 32; x++){
-            if (stage_state_[8+y][8+x]==2){
-                point+=1;
+            if (stage_state_[8+y][8+x] > 0){
+                point-=1;
             }
         }
     }

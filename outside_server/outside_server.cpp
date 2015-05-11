@@ -63,7 +63,7 @@ void OutsideServer::ReserveAnswer(){
             //bubble sort
             for(unsigned long i=0;i<g_user_data.size();i++){
                 for(unsigned long j=1;j<g_user_data.size();j++){
-                    if(g_user_data[user_sort[j-1]].answer_point < g_user_data[user_sort[j]].answer_point){
+                    if(g_user_data[user_sort[j-1]].answer_point > g_user_data[user_sort[j]].answer_point){
                         buff=user_sort[j];
                         user_sort[j]=user_sort[j-1];
                         user_sort[j-1]=buff;
@@ -83,7 +83,7 @@ void OutsideServer::ReserveAnswer(){
                     if(g_user_data[user_sort[i]].is_renewal){
                         //[1]更新されているので書き換える
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData();
-                        game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
                         if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
                     }else{
                         //[2]もとのデータのままなので順位を更新して飛ばす
@@ -107,7 +107,7 @@ void OutsideServer::ReserveAnswer(){
                     //書き換える
                     g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
                     game_stage_[append_minimum_stage_num].MakeStageData();
-                    game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid);
+                    game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
                     if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(i+1/*Ranking*/);
                 }
             }

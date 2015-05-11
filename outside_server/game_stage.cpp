@@ -85,12 +85,13 @@ void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][
 }
 
 
-void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString userid){
+void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString userid,int answer_point){
     //nametag name
     tag_name_->setPlainText(userid);
     //pointtag
     tag_point_->setPlainText("???");
-    //copy answer flow
+    //copy answer
+    answer_point_=answer_point;
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
         for(int j=0;j<4;j++){
@@ -174,24 +175,12 @@ void GameStage::AnswerAnimation(){
     stone_flow_count_++;
     if (stone_flow_count_ >= answer_num_){
         //show point
-        tag_point_->setPlainText(CheckPoint());
+        tag_point_->setPlainText(QString::number(answer_point_));
         //flag update rankingtag
         g_need_rankingtag_updated=true;
         //stop timer
         answer_animation_timer_->stop();
     }
-}
-
-QString GameStage::CheckPoint(){
-    int point=0;
-    for (int y = 0; y < 32; y++){
-        for (int x = 0; x < 32; x++){
-            if (stage_[8+y][8+x]->brush()==Qt::green){
-                point+=1;
-            }
-        }
-    }
-    return QString::number(point);
 }
 
 void GameStage::update_ranking_tag(int ranking){
