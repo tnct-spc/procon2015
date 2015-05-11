@@ -123,7 +123,6 @@ void OutsideServer::uisizebutton_clicked(){
     if(toggleuisize==1){
         toggleuisize=0;
         this->showNormal();
-        this->showMaximized();
     }else{
         toggleuisize=1;
         this->showFullScreen();
