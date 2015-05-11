@@ -261,6 +261,7 @@ bool OutsideServer::ResetFolder(const QString &dir_name)
 
 void OutsideServer::resizeEvent(QResizeEvent *event)
 {
+    (void)event;
     QMatrix matrix;
     if((double)(width()-200)/(double)height()-1720.0/1080.0>0){
         matrix.scale((double)height() / 1080.0, (double)height() / 1080.0);
