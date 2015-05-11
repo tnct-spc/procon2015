@@ -1,8 +1,10 @@
 #ifndef PLACED_STONE_TYPE
 #define PLACED_STONE_TYPE
-
+#include "takao_global.hpp"
+#include "stone_type.hpp"
+#include "point_type.hpp"
 // 敷地に置かれた石の情報
-class SHARED_EXPORT placed_stone_type
+class placed_stone_type
 {
     public:
         placed_stone_type() = default;

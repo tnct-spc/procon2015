@@ -1,10 +1,6 @@
 #ifndef TAKAO_HPP
 #define TAKAO_HPP
 
-int constexpr STONE_SIZE = 8;
-
-#include "takao_global.hpp"
-
 #include "utils.hpp"
 
 #include "point_type.hpp"
@@ -13,6 +9,8 @@ int constexpr STONE_SIZE = 8;
 #include "field_type.hpp"
 #include "problem_type.hpp"
 #include "algorithm_type.hpp"
-
+#include "net.hpp"
+#include "processor.hpp"
+#include "takao_global.hpp"
 #endif // TAKAO_HPP
 

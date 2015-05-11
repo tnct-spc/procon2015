@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>procon26server</class>
+ <widget class="QWidget" name="procon26server">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>procon26server</string>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <widget class="QGraphicsView" name="graphicsView">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>0</y>
+     <width>1720</width>
+     <height>1080</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>201</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="4" column="0">
+     <widget class="QPushButton" name="exitbutton">
+      <property name="text">
+       <string>Exit</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="uisizebutton">
+      <property name="text">
+       <string>Small/FullScreen</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QSpinBox" name="pnspinbutton">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="loadbutton">
+      <property name="text">
+       <string>Load</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label1">
+      <property name="text">
+       <string>Problem Number:</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>exitbutton</sender>
+   <signal>clicked()</signal>
+   <receiver>procon26server</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>43</x>
+     <y>223</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>375</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadbutton</sender>
+   <signal>clicked()</signal>
+   <receiver>procon26server</receiver>
+   <slot>loadbutton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>190</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>375</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uisizebutton</sender>
+   <signal>clicked()</signal>
+   <receiver>procon26server</receiver>
+   <slot>uisizebutton_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>46</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pnspinbutton</sender>
+   <signal>valueChanged(QString)</signal>
+   <receiver>procon26server</receiver>
+   <slot>pnspinbutton_changed(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>27</x>
+     <y>157</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>375</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>loadbutton_clicked()</slot>
+  <slot>uisizebutton_clicked()</slot>
+  <slot>pnspinbutton_changed(QString)</slot>
+  <slot>viewzoom(int)</slot>
+ </slots>
+</ui>

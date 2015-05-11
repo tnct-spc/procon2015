@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += testlib
+QT       += testlib core network
 
 QT       -= gui
 
@@ -14,7 +14,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-
+LIBS += -lboost_system
 SOURCES += field_type_test.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 

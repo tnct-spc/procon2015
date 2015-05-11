@@ -1,8 +1,8 @@
 #ifndef POINT_TYPE
 #define POINT_TYPE
-
+#include <ostream>
 // 何らかの座標を表すクラス
-class SHARED_EXPORT point_type
+class point_type
 {
     public:
         point_type() = default;

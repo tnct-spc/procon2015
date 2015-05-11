@@ -1,3 +1,4 @@
+QT       += core network
 TEMPLATE = subdirs
 
 SUBDIRS += \
