@@ -24,3 +24,13 @@ INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao
 
 QMAKE_CXXFLAGS += -std=c++14
+
+unix:!macx: LIBS += -L$$OUT_PWD/../muen_zuka/ -lmuen_zuka
+
+INCLUDEPATH += $$PWD/../muen_zuka
+DEPENDPATH += $$PWD/../muen_zuka
+
+unix:!macx: LIBS += -L$$OUT_PWD/../tengu/ -ltengu
+
+INCLUDEPATH += $$PWD/../tengu
+DEPENDPATH += $$PWD/../tengu
