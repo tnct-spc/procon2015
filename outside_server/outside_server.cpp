@@ -161,11 +161,25 @@ void OutsideServer::loadbutton_clicked()
         }
         problem_file.read(2);//改行分
         //ストーンの個数を取得
-
-        g_stone_num_ = problem_file.read(1).toInt();
+        QString s1,s2,s3;
+        s1 = problem_file.read(1);
+        s2 = problem_file.read(1);
+        s3 = problem_file.read(1);
+        if(s3=="0" || s3=="1" || s3=="2" || s3=="3" || s3=="4" || s3=="5" || s3=="6" || s3=="7" || s3=="8" || s3=="9"){
+            //3keta
+            g_stone_num_=s1.toInt()*100 + s2.toInt()*10 + s3.toInt();
+            problem_file.read(2);//改行分
+        }else if(s2=="0" || s2=="1" || s2=="2" || s2=="3" || s2=="4" || s2=="5" || s2=="6" || s2=="7" || s2=="8" || s2=="9"){
+            //2keta
+            g_stone_num_=s1.toInt()*10 + s2.toInt();
+            problem_file.read(1);
+        }else{
+            //1keta
+            g_stone_num_=s1.toInt();
+        }
         //それぞれのストーンを取得
         for (int n = 0; n < g_stone_num_; n++){
-            problem_file.read(2);//改行分
+            if(n!=0) problem_file.read(2);//改行分
             for (int y = 0; y < 8; y++){
                 for (int x = 0; x < 8; x++){
                     line = problem_file.read(1);
@@ -182,7 +196,6 @@ void OutsideServer::loadbutton_clicked()
             }
         }
         problem_file.close();
-
 
         //make all gamestage data
         for(int m=0;m<6;m++){
