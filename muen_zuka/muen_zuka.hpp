@@ -3,11 +3,6 @@
 
 #include "muen_zuka_global.h"
 
-class MUEN_ZUKASHARED_EXPORT Muen_zuka
-{
-
-public:
-    Muen_zuka();
-};
-
+#include "net.hpp"
+#include "processor.hpp"
 #endif // MUEN_ZUKA_HPP

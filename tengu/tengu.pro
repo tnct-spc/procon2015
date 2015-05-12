@@ -11,12 +11,18 @@ TEMPLATE = lib
 
 DEFINES += TENGU_LIBRARY
 
-SOURCES += tengu.cpp
+SOURCES += simple_algorithm.cpp
 
 HEADERS += tengu.hpp\
-        tengu_global.h
+        tengu_global.h \
+    simple_algorithm.hpp
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
+QMAKE_CXXFLAGS += -std=c++14
+INCLUDEPATH += $$PWD/../takao
+DEPENDPATH += $$PWD/../takao

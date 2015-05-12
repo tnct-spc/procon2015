@@ -4,4 +4,6 @@ SUBDIRS += \
     procon \
     takao \
     test \
-    outside_server
+    outside_server\
+    tengu\
+    muen_zuka

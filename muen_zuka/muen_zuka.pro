@@ -11,12 +11,19 @@ TEMPLATE = lib
 
 DEFINES += MUEN_ZUKA_LIBRARY
 
-SOURCES += muen_zuka.cpp
+SOURCES += net.cpp \
+    processor.cpp
 
 HEADERS += muen_zuka.hpp\
-        muen_zuka_global.h
+        muen_zuka_global.h \
+    net.hpp \
+    processor.hpp
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
+QMAKE_CXXFLAGS += -std=c++14
+INCLUDEPATH += $$PWD/../takao
+DEPENDPATH += $$PWD/../takao
