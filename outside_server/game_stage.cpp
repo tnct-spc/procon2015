@@ -35,6 +35,12 @@ void GameStage::IntializeStage(QGraphicsScene *field,int base_x,int base_y,int b
     tag_point_->setX(based_point_.x-40+450);
     tag_point_->setY(based_point_.y-50);
     tag_point_->setZValue(3);
+    //RankingTag
+    f.setPixelSize(150);
+    tag_ranking_ = field_->addText("",f);
+    tag_ranking_->setX(based_point_.x-40);
+    tag_ranking_->setY(based_point_.y-50);
+    tag_ranking_->setZValue(3);
 
 
     //answer animation timer set
@@ -72,29 +78,34 @@ void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][
             }
         }
     }
+    //Reset tag
+    tag_name_->setPlainText("");
+    tag_point_->setPlainText("");
+    tag_ranking_->setPlainText("");
 }
 
 
-void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString userid){
+void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString userid,int answer_point){
     //nametag name
     tag_name_->setPlainText(userid);
     //pointtag
     tag_point_->setPlainText("???");
-
-    //copy answer flow
+    //copy answer
+    answer_point_=answer_point;
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
         for(int j=0;j<4;j++){
+            //qDebug("%s",qPrintable(QString::number(answer_flow[i][j])));
             answer_flow_[i][j]=answer_flow[i][j];
         }
     }
-
     //解答処理を開始する
     stone_flow_count_=0;
     answer_animation_timer_->start(400);
 }
 
 void GameStage::AnswerAnimation(){
+    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];
@@ -164,20 +175,42 @@ void GameStage::AnswerAnimation(){
     stone_flow_count_++;
     if (stone_flow_count_ >= answer_num_){
         //show point
-        tag_point_->setPlainText(CheckPoint());
+        tag_point_->setPlainText(QString::number(answer_point_));
+        //flag update rankingtag
+        g_need_rankingtag_updated=true;
         //stop timer
         answer_animation_timer_->stop();
     }
 }
 
-QString GameStage::CheckPoint(){
-    int point=0;
-    for (int y = 0; y < 32; y++){
-        for (int x = 0; x < 32; x++){
-            if (stage_[8+y][8+x]->brush()==Qt::green){
-                point+=1;
-            }
-        }
+void GameStage::update_ranking_tag(int ranking){
+    switch(ranking){
+    case 1:
+        tag_ranking_->setDefaultTextColor(QColor("gold"));
+        tag_ranking_->setPlainText("1st");
+        break;
+    case 2:
+        tag_ranking_->setDefaultTextColor(QColor("silver"));
+        tag_ranking_->setPlainText("2nd");
+        break;
+    case 3:
+        tag_ranking_->setDefaultTextColor(QColor("blonze"));
+        tag_ranking_->setPlainText("3rd");
+        break;
+    case 4:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("4th");
+        break;
+    case 5:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("5th");
+        break;
+    case 6:
+        tag_ranking_->setDefaultTextColor(QColor("pink"));
+        tag_ranking_->setPlainText("6th");
+        break;
+    default:
+        qDebug("***error*** in GameStage::update_ranking_tag, ranking_str(int) value is invalid");
+        break;
     }
-    return QString::number(point);
 }

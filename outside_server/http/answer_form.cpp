@@ -10,15 +10,15 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     //Get GET data
     QUrlQuery url_query(request->url());
-    QString pre_user_id=url_query.queryItemValue("userid");
-    QString pre_answer_data=url_query.queryItemValue("answerdata");
+    QString plaintext_user_id=url_query.queryItemValue("userid");
+    QString plaintext_answer_data=url_query.queryItemValue("answerdata");
 
     //Decode
-    pre_user_id.replace("+"," ");
-    pre_answer_data.replace("+"," ");
-    pre_answer_data.replace("%0D%0A","\n");
-    QByteArray user_id=pre_user_id.toUtf8();
-    QByteArray answer_data=pre_answer_data.toUtf8();
+    plaintext_user_id.replace("+"," ");
+    plaintext_answer_data.replace("+"," ");
+    plaintext_answer_data.replace("%0D%0A","\n");
+    QByteArray user_id=plaintext_user_id.toUtf8();
+    QByteArray answer_data=plaintext_answer_data.toUtf8();
     QString answer_point;
 
     //response head
@@ -29,36 +29,43 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
     /*Save answer and Display answer_point*/
     if (!user_id.isEmpty()) {
-        QString filename_answer=AnswerFolderName+user_id+".txt";
-        QString t_filename_answer=AnswerFolderName+"Temporary_"+user_id+".txt";
 
-        //save answer to Temporary file
-        QFile t_answer(t_filename_answer);
-        t_answer.open(QIODevice::WriteOnly);
-        t_answer.write(answer_data);
-        t_answer.close();
-
-        //responce answer point
-        answer_point=SimulateAnswerPoint(t_filename_answer);
-
-        //remove t_answer
-        t_answer.remove();
-
-        if(answer_point=="-1"){
-            response->write("***Format Error***");
+        if(!format_check(plaintext_answer_data,"ANSWER")){
+            response->write("FormatError(このフォーマットチェック関数はテストが不十分です.)");
         }else{
+            //responce answer point
+            answer_point=SimulateAnswerPoint(plaintext_answer_data);
+            //save in global
+            //すでにあれば更新
+            int user_data_itr=-1;
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                if(user_id==g_user_data[i].userid){
+                    g_user_data[i].is_renewal=true;
+                    user_data_itr=i;
+                }
+            }
+            //なければ新規作成
+            if(user_data_itr==-1){
+                user_data_type new_user_data;
+                new_user_data.userid=user_id;
+                new_user_data.append_stage_number=-1;
+                new_user_data.is_renewal=true;
+                g_user_data.push_back(new_user_data);
+                user_data_itr=g_user_data.size()-1;
+            }
+            //解答ファイルを入れる
+            g_user_data[user_data_itr].answer_point=answer_point.toInt();
+            g_user_data[user_data_itr].answer_num=answer_num_;
+            for(int i=0;i<answer_num_;i++){
+                for(int j=0;j<4;j++){
+                    g_user_data[user_data_itr].answer_flow[i][j]=answer_flow_[i][j];
+                }
+            }
+
+            //得点を表示する
             response->write(answer_point.toUtf8());
-            //save answer to file
-            QFile answer(filename_answer);
-            answer.open(QIODevice::WriteOnly);
-            answer.write(answer_data);
-            answer.close();
-            //save userid to file
-            QFile userids(AnswerFolderName+"userids.txt");
-            userids.open(QIODevice::Append);
-            userids.write(user_id);
-            userids.write("\n");
-            userids.close();
+            //update_flagを立てる
+            g_user_data_updated=true;
         }
 
     /*Display Form*/
@@ -77,7 +84,250 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
     response->end();
 }
 
-QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
+bool AnswerForm::format_check(QString plain_data, QString format_type){
+    if(format_type=="ANSWER"){
+
+
+
+        QString d=plain_data;
+        int pos;
+        int flow_count=0;
+        int answer_num;
+        int answer_flow[256][4];
+
+        //正規表現
+        QRegExp re_num("^\\d$");
+        //改行で分割
+        QStringList list=d.split("\n");
+        answer_num=list.size();
+        if(answer_num != g_stone_num_) return false;
+
+        while(flow_count<answer_num){
+            if(list[flow_count]==""){
+                //パスする石
+                answer_flow[flow_count][0]=-1;
+                flow_count++;
+                continue;
+            }
+            pos=0;
+            //左右
+            bool is_minus=false;
+            if (!(re_num.exactMatch(list[flow_count].mid(pos,1)))){
+                if(list[flow_count].mid(pos,1)=="-"){
+                    //add minus
+                    is_minus=true;
+                    pos++;
+                }else{
+                    return false;
+                }
+            }
+            if (list[flow_count].mid(pos+1,1) == " "){
+                if(is_minus){
+                    answer_flow[flow_count][0] = -list[flow_count].mid(pos,1).toInt();
+                }else{
+                    answer_flow[flow_count][0] = list[flow_count].mid(pos,1).toInt();
+                }
+            }else{
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
+                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                if(is_minus){
+                    answer_flow[flow_count][0] = -list[flow_count].mid(pos,2).toInt();
+                }else{
+                    answer_flow[flow_count][0] = list[flow_count].mid(pos,2).toInt();
+                }
+                pos++;
+            }
+            pos+=2;
+            //上下
+            is_minus=false;
+            if (!re_num.exactMatch(list[flow_count].mid(pos,1))){
+                if(list[flow_count].mid(pos,1)=="-"){
+                    //add minus
+                    is_minus=true;
+                    pos++;
+                }else{
+                    return false;
+                }
+            }
+            if (list[flow_count].mid(pos+1,1) == " "){
+                if(is_minus){
+                    answer_flow[flow_count][1] = -list[flow_count].mid(pos,1).toInt();
+                }else{
+                    answer_flow[flow_count][1] = list[flow_count].mid(pos,1).toInt();
+                }
+            }else{
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
+                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                if(is_minus){
+                    answer_flow[flow_count][1] = -list[flow_count].mid(pos,2).toInt();
+                }else{
+                    answer_flow[flow_count][1] = list[flow_count].mid(pos,2).toInt();
+                }
+                pos++;
+            }
+            pos+=2;
+            //裏表
+            if (list[flow_count].mid(pos,1) == "H"){
+                answer_flow[flow_count][2] = 0;
+            }else if (list[flow_count].mid(pos,1) == "T"){
+                answer_flow[flow_count][2] = 1;
+            }else{
+                return false;
+            }
+            if (!(list[flow_count].mid(pos+1,1)==" ")) return false;
+            pos+=2;
+            //角度
+            /*
+             * 0
+             * 90
+             * 180
+             * 270
+            */
+            if(!(list[flow_count].mid(pos)=="0" || list[flow_count].mid(pos)=="90" || list[flow_count].mid(pos)=="180" || list[flow_count].mid(pos)=="270")) return false;
+            answer_flow[flow_count][3] = list[flow_count].mid(pos).toInt();
+            flow_count++;
+        }
+        //copy data
+        int stage_state[48][48];//0=empty;1=block;2=answer_block
+        bool stone_state[256][8][8];
+        int stone_num;
+        int stone_flow_count=0;
+
+        for(int y=0;y<48;y++){
+            for(int x=0;x<48;x++){
+                stage_state[y][x]=g_stage_state_[y][x];
+            }
+        }
+        stone_num=g_stone_num_;
+        for(int n=0;n<stone_num;n++){
+            for(int y=0;y<8;y++){
+                for(int x=0;x<8;x++){
+                    stone_state[n][y][x]=g_stone_state_[n][y][x];
+                }
+            }
+        }
+        bool start_append_block=false;//stone has passed, while false.
+        while(1){
+            while(answer_flow[stone_flow_count][0]==-1)stone_flow_count++;//-1ならパスする
+            //if pass is end of stone flow, finish.
+            if (stone_flow_count >= answer_num){
+                return true;
+            }
+            /*反転させる*/
+            if (answer_flow[stone_flow_count][2]){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[y][8 - x - 1];
+                    }
+                }
+            }
+            /*回転させる*/
+            if (answer_flow[stone_flow_count][3]==90){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[8 - x - 1][y];
+                    }
+                }
+            }
+            else if (answer_flow[stone_flow_count][3] == 180){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[8 - y - 1][8 - x - 1];
+                    }
+                }
+            }
+            else if(answer_flow[stone_flow_count][3] == 270){
+                bool buff[8][8];
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        buff[y][x] = stone_state[stone_flow_count][y][x];
+                    }
+                }
+                for (int y = 0; y < 8; y++){
+                    for (int x = 0; x < 8; x++){
+                        stone_state[stone_flow_count][y][x] = buff[x][8 - y - 1];
+                    }
+                }
+            }
+            /*設置*/
+            //フィールドに置く
+            //フォーマットチェック
+            //既存のブロックに接してないとアウト(最初以外)
+            bool touch_other_block_flag=false;
+            for (int y = 0; y < 8; y++){
+                for (int x = 0; x < 8; x++){
+                    if (stone_state[stone_flow_count][y][x]){
+                        //範囲超えたら(はみ出したら)アウト
+                        if(y + answer_flow[stone_flow_count][1] >= 32 || y + answer_flow[stone_flow_count][1] < 0) return false;
+                        if(x + answer_flow[stone_flow_count][0] >= 32 || x + answer_flow[stone_flow_count][0] < 0) return false;
+                        //被ったらアウト
+                        if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]] > 0) return false;
+                        //既存のブロックに接しているか
+                        if(y + answer_flow[stone_flow_count][1] != 31){//下
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1] + 1][8 + x + answer_flow[stone_flow_count][0]]==2) touch_other_block_flag=true;
+                        }
+                        if(y + answer_flow[stone_flow_count][1] != 0){//上
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1] - 1][8 + x + answer_flow[stone_flow_count][0]]==2) touch_other_block_flag=true;
+                        }
+                        if(x + answer_flow[stone_flow_count][0] != 31){//右
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0] + 1]==2) touch_other_block_flag=true;
+                        }
+                        if(x + answer_flow[stone_flow_count][0] != 0){//左
+                            if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0] - 1]==2) touch_other_block_flag=true;
+                        }
+                    }
+                }
+            }
+            //初めのパス以外で、置く予定のブロックが置いてあるブロックに接していなければダメ
+            if(!start_append_block){
+                start_append_block=true;
+            }else{
+                if(!touch_other_block_flag) return false;
+            }
+            //ブロックの挿入
+            for (int y = 0; y < 8; y++){
+                for (int x = 0; x < 8; x++){
+                    if (stone_state[stone_flow_count][y][x]){
+                        //ok
+                        stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]]=2;
+                    }
+                }
+            }
+            /*後処理*/
+            stone_flow_count++;
+            if (stone_flow_count >= answer_num){
+                break;
+            }
+        }
+
+
+        return true;
+
+    }else{
+        qDebug("error: Unknown format-type. Return false.");
+        return false;
+    }
+}
+
+QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
     //copy data
     for(int y=0;y<48;y++){
@@ -94,50 +344,45 @@ QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
         }
     }
 
-
-
-    //アンサー情報のロード
-    QFile questionfile(filename_answer);
-    questionfile.open(QIODevice::ReadOnly);
-    QString line,line2;
-    //ファイル解析
     //フィールド情報を配列に格納,フィールドの更新
-    int i=0;
-    while(1){
-        if(questionfile.atEnd()){
-            questionfile.close();
-            answer_num_=i;
-            break;
+    QString d=plaintext_answer_data;
+    int pos;
+    int flow_count=0;
+    QStringList list=d.split("\n");
+    answer_num_=list.size();
+    while(flow_count<answer_num_){
+        if(list[flow_count]==""){
+            //パスする石
+            answer_flow_[flow_count][0]=-1;
+            flow_count++;
+            continue;
         }
+        pos=0;
         //左右
-        line = questionfile.read(1);
-        line2 = questionfile.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = questionfile.read(1);
+        if (list[flow_count].mid(pos+1,1) == " "){
+            answer_flow_[flow_count][0] = list[flow_count].mid(pos,1).toInt();
+        }else{
+            answer_flow_[flow_count][0] = list[flow_count].mid(pos,2).toInt();
+            pos++;
         }
-        answer_flow_[i][0] = line.toInt();
+        pos+=2;
         //上下
-        line = questionfile.read(1);
-        line2 = questionfile.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = questionfile.read(1);
+        if (list[flow_count].mid(pos+1,1) == " "){
+            answer_flow_[flow_count][1] = list[flow_count].mid(pos,1).toInt();
+        }else{
+            answer_flow_[flow_count][1] = list[flow_count].mid(pos,2).toInt();
+            pos++;
         }
-        answer_flow_[i][1] = line.toInt();
+        pos+=2;
         //裏表
-        line = questionfile.read(1);
-        if (line == "H") answer_flow_[i][2] = 0;
-        if (line == "T") answer_flow_[i][2] = 1;
-        line = questionfile.read(1);//空白分
+        if (list[flow_count].mid(pos,1) == "H") answer_flow_[flow_count][2] = 0;
+        if (list[flow_count].mid(pos,1) == "T") answer_flow_[flow_count][2] = 1;
+        pos+=2;
         //角度
-        line = questionfile.readLine(8);
-        answer_flow_[i][3] = line.toInt();
-        i++;
+        answer_flow_[flow_count][3] = list[flow_count].mid(pos).toInt();
+        flow_count++;
     }
     stone_flow_count_=0;
-
-
 
     //put a stone on stage
     while(PutStone());
@@ -145,11 +390,11 @@ QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
 
 
     //Simulate point
-    int point=0;
+    int point=1024/*32*32*/;
     for (int y = 0; y < 32; y++){
         for (int x = 0; x < 32; x++){
-            if (stage_state_[8+y][8+x]==2){
-                point+=1;
+            if (stage_state_[8+y][8+x] > 0){
+                point-=1;
             }
         }
     }
@@ -160,6 +405,7 @@ QString AnswerForm::SimulateAnswerPoint(QString filename_answer){
 
 
 bool AnswerForm::PutStone(){
+    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];

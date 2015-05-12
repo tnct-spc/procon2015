@@ -48,78 +48,72 @@ OutsideServer::~OutsideServer()
     delete ui;
 }
 
+//1ミリ秒間隔で画面に表示する解答の更新を行う
 void OutsideServer::ReserveAnswer(){
 
     if (problem_flag){
-        QFile questionfile(AnswerFolderName+"userids.txt");
-        QString userid;
-        int answer_flow[256][4];
-
-        //解答が送られてきたか確認(get userid for userids.txt)
-        if(QFile::exists(AnswerFolderName+"userids.txt")){
-            questionfile.open(QIODevice::ReadOnly);
-            while(1){
-                userid = questionfile.read(256);
-                userid = userid.trimmed();
-                if(userid.isEmpty()) break;
-
-
-                /*Convert Answer(txt file to int.answer_flow)*/
-                int answer_num=ConvertAnswer(AnswerFolderName+userid+".txt",answer_flow);
-
-                /*Allocation*/
-                int set_pos=-1;
-                int answer_point=pointer.SimulateAnswerPoint(AnswerFolderName+userid+".txt").toInt();
-
-                if(set_pos==-1){
-                    //同じ名前があればそれに更新
-                    for(int i=0;i<6;i++){
-                        if(userid==answer_players_[i]){
-                            set_pos=i;
-                            break;
-                        }
+        if(g_need_rankingtag_updated || g_user_data_updated){
+            g_user_data_updated=false;
+            //user_sortを介してg_user_dataを得点が高い順にソート
+            std::vector<int> user_sort;
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                user_sort.push_back(i);
+            }
+            int buff;
+            //bubble sort
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                for(unsigned long j=1;j<g_user_data.size();j++){
+                    if(g_user_data[user_sort[j-1]].answer_point > g_user_data[user_sort[j]].answer_point){
+                        buff=user_sort[j];
+                        user_sort[j]=user_sort[j-1];
+                        user_sort[j-1]=buff;
                     }
                 }
-                if(set_pos==-1){
-                    //何も入っていないものから埋める
-                    for(int i=0;i<6;i++){
-                        if(answer_points_[i]==-1){
-                            set_pos=i;
-                            break;
-                        }
+            }
+            //得点が高い順に最大6つ,ステージに配置していく
+            unsigned long stage_max;
+            if(g_user_data.size()<6){
+                stage_max=g_user_data.size();
+            }else{
+                stage_max=6;
+            }
+            for(unsigned long i=0;i<stage_max;i++){
+                if(g_user_data[user_sort[i]].append_stage_number >= 0){
+                    //すでにステージにある
+                    if(g_user_data[user_sort[i]].is_renewal){
+                        //[1]更新されているので書き換える
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData();
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
+                    }else{
+                        //[2]もとのデータのままなので順位を更新して飛ばす
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
+                        continue;
                     }
-                }
-                if(set_pos==-1){
-                    //得点が小さい順にソート
-                    int sort_point[6]={0,1,2,3,4,5};
-                    int buff;
-                    //bubble sort
-                    for(int i=0;i<6;i++){
-                        for(int j=1;j<6;j++){
-                            if(answer_points_[sort_point[j-1]] > answer_points_[sort_point[j]]){
-                                buff=sort_point[j];
-                                sort_point[j]=sort_point[j-1];
-                                sort_point[j-1]=buff;
+                }else{
+                    //[3]ステージに無いので空いている場所又はステージにある解答の中で一番得点が小さいものと交換する
+                    int append_minimum_stage_num;
+                    if(g_user_data.size()<=6){
+                        append_minimum_stage_num=g_user_data.size()-1;
+                    }else{
+                        for(unsigned long j=g_user_data.size();j>0;j--){
+                            if(g_user_data[user_sort[j-1]].append_stage_number > 0){
+                                append_minimum_stage_num=g_user_data[user_sort[j-1]].append_stage_number;
+                                g_user_data[user_sort[j-1]].append_stage_number=-1;
+                                break;
                             }
                         }
                     }
-                    if(answer_point > answer_points_[sort_point[0]]){//表示されている人の中で特典が一番小さい人より,特典が大きければそのステージを更新
-                        set_pos=sort_point[0];
-                    }
-                }
-                if(set_pos==-1){
-                    //表示する価値なし
-                }
-                if(set_pos!=-1){
-                    //submit
-                    game_stage_[set_pos].MakeStageData(/*g_stage_state_,g_stone_state_,g_stone_num_*/);
-                    game_stage_[set_pos].StartAnswer(answer_flow,answer_num,userid);
-                    answer_points_[set_pos]=answer_point;
-                    answer_players_[set_pos]=userid;
+                    //書き換える
+                    g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
+                    game_stage_[append_minimum_stage_num].MakeStageData();
+                    game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
+                    if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(i+1/*Ranking*/);
                 }
             }
-            questionfile.close();
-            questionfile.remove();
+            //すべての更新フラグ(renewal)をfalseに
+            for(unsigned long i=0;i<g_user_data.size();i++) g_user_data[i].is_renewal=false;
+            g_need_rankingtag_updated=false;
         }
     }
 }
@@ -129,7 +123,6 @@ void OutsideServer::uisizebutton_clicked(){
     if(toggleuisize==1){
         toggleuisize=0;
         this->showNormal();
-        this->showMaximized();
     }else{
         toggleuisize=1;
         this->showFullScreen();
@@ -168,11 +161,25 @@ void OutsideServer::loadbutton_clicked()
         }
         problem_file.read(2);//改行分
         //ストーンの個数を取得
-
-        g_stone_num_ = problem_file.read(1).toInt();
+        QString s1,s2,s3;
+        s1 = problem_file.read(1);
+        s2 = problem_file.read(1);
+        s3 = problem_file.read(1);
+        if(s3=="0" || s3=="1" || s3=="2" || s3=="3" || s3=="4" || s3=="5" || s3=="6" || s3=="7" || s3=="8" || s3=="9"){
+            //3keta
+            g_stone_num_=s1.toInt()*100 + s2.toInt()*10 + s3.toInt();
+            problem_file.read(2);//改行分
+        }else if(s2=="0" || s2=="1" || s2=="2" || s2=="3" || s2=="4" || s2=="5" || s2=="6" || s2=="7" || s2=="8" || s2=="9"){
+            //2keta
+            g_stone_num_=s1.toInt()*10 + s2.toInt();
+            problem_file.read(1);
+        }else{
+            //1keta
+            g_stone_num_=s1.toInt();
+        }
         //それぞれのストーンを取得
         for (int n = 0; n < g_stone_num_; n++){
-            problem_file.read(2);//改行分
+            if(n!=0) problem_file.read(2);//改行分
             for (int y = 0; y < 8; y++){
                 for (int x = 0; x < 8; x++){
                     line = problem_file.read(1);
@@ -189,7 +196,6 @@ void OutsideServer::loadbutton_clicked()
             }
         }
         problem_file.close();
-
 
         //make all gamestage data
         for(int m=0;m<6;m++){
@@ -270,6 +276,7 @@ bool OutsideServer::ResetFolder(const QString &dir_name)
 
 void OutsideServer::resizeEvent(QResizeEvent *event)
 {
+    (void)event;
     QMatrix matrix;
     if((double)(width()-200)/(double)height()-1720.0/1080.0>0){
         matrix.scale((double)height() / 1080.0, (double)height() / 1080.0);
