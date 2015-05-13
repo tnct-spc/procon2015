@@ -15,4 +15,11 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    raw_field.cpp \
+    file_export.cpp
+
+HEADERS += \
+    raw_field.hpp \
+    file_export.hpp \
+    main.hpp

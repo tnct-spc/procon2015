@@ -4,7 +4,7 @@
 #include <random>
 #include <functional>
 #include <iostream>
-
+/*
 class raw_stone {
 private:
     int static constexpr STONE_SIZE = 8;
@@ -38,6 +38,7 @@ public:
 int main(int argc, char *argv[])
 {
     //QCoreApplication a(argc, argv);
+    int constexpr num_of_problem = 10;
 
     raw_stone stone;
     stone.create();
@@ -45,3 +46,4 @@ int main(int argc, char *argv[])
     //return a.exec();
     return 0;
 }
+*/
