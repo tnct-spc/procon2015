@@ -11,7 +11,7 @@ raw_field::raw_field()
 
 void raw_field::fill_row(int const row)
 {
-    for(int i = FIELD_SIZE - row;i < FIELD_SIZE; i++)
+    for(int i = FIELD_SIZE - row; i < FIELD_SIZE; i++)
     {
         for(int j = 0; j < FIELD_SIZE; j++)
         {

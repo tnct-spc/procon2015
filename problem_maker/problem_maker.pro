@@ -23,3 +23,5 @@ HEADERS += \
     raw_field.hpp \
     file_export.hpp \
     main.hpp
+
+QMAKE_CXXFLAGS += -std=c++14

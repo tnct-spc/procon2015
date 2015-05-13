@@ -6,8 +6,7 @@
 class raw_field
 {
 private:
-    std::array<std::array<int,FIELD_SIZE>,FIELD_SIZE> field;
-
+    raw_field_type field;
     ~raw_field() = default;
 
 public:
