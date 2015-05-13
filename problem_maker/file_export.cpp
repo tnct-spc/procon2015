@@ -14,13 +14,26 @@ file_export::file_export(int const nth, raw_field_type field, std::vector<raw_st
     file << nth << ".txt";
 
     std::ofstream output_file(file.str());
-    for(auto cell_row : field)
+    for(auto const cell_row : field)
     {
-        for(auto cell : cell_row)
+        for(auto const cell : cell_row)
         {
             cell == 0 ? output_file << '0' : output_file << '1';
         }
         output_file << std::endl;
+    }
+
+    for(auto const each_stone : stones)
+    {
+        for(auto const cell_row : each_stone)
+        {
+            for(auto const cell : cell_row)
+            {
+                cell == 0 ? output_file << '0' : output_file << '1';
+            }
+            output_file << std::endl;
+        }
+        output_file << std::endl << std::endl;
     }
     output_file.close();
 }
