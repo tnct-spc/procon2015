@@ -8,6 +8,8 @@ QT       += testlib core network
 
 QT       -= gui
 
+QT      += core
+
 TARGET = field_type_test
 CONFIG   += console
 CONFIG   -= app_bundle
