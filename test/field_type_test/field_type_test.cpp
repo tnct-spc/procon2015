@@ -397,7 +397,7 @@ void field_type_test::get_answer_test()
                     "6 0 H 270\r\n"s;
 
     auto result = field.get_answer();
-    std::cerr << result;
+    //std::cerr << result;
     QCOMPARE(result, expected);
 }
 
