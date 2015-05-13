@@ -160,7 +160,7 @@ bool field_type::is_removable(stone_type const& stone)
     point_type pf = std::find_if(processes.begin(), processes.end(),
                                  [& nth](auto const & process) { return process.stone.get_nth() == nth; }
                                 )->position;
-    point_type ps = {pf.y - static_cast<int>(y), pf.x - static_cast<int>(x)};
+    point_type ps = {static_cast<int>(y) - pf.y, static_cast<int>(x) - pf.x};
     const stone_type * stone;
 
     for (auto & process : processes) {
@@ -169,9 +169,6 @@ bool field_type::is_removable(stone_type const& stone)
             break;
         }
     }
-    print_field();
-    std::cout << "p in field = " << pf << std::endl;
-    std::cout << "p in stone = " << ps << std::endl;
     return placed_stone_type(*stone, pf, ps);
 }
 
