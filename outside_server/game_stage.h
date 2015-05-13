@@ -26,7 +26,7 @@ public:
     //Intialize stage
     void MakeStageData(/*bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
     //Read Answer(answer.txt)
-    void StartAnswer(int answer_flow[256][4],int answer_num,QString userid, int answer_point);
+    void StartAnswer(int answer_flow[256][5],int answer_num,QString userid, int answer_point);
     //
     void update_ranking_tag(int ranking);
 
@@ -47,7 +47,7 @@ private:
     QGraphicsTextItem *tag_point_; //PointTag
     QGraphicsTextItem *tag_ranking_; //Ranking
     //answer
-    int answer_flow_[256][4];
+    int answer_flow_[256][5];
     int answer_num_;
     int answer_point_;
     //answer animation

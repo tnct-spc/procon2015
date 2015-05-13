@@ -35,7 +35,7 @@ private:
     bool stone_state_[256][8][8];
     int stone_num_;
     //answer data
-    int answer_flow_[256][4];
+    int answer_flow_[256][5];
     int answer_num_;
     int stone_flow_count_;
 

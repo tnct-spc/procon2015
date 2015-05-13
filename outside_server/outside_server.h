@@ -38,7 +38,7 @@ private:
     AnswerForm pointer;
 
     //return answer num
-    int ConvertAnswer(QString filename_answer,int answer_flow[256][4]);
+    int ConvertAnswer(QString filename_answer,int answer_flow[256][5]);
     //reset folder
     bool ResetFolder(const QString & dirName);
     //

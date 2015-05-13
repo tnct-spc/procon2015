@@ -57,7 +57,7 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
             g_user_data[user_data_itr].answer_point=answer_point.toInt();
             g_user_data[user_data_itr].answer_num=answer_num_;
             for(int i=0;i<answer_num_;i++){
-                for(int j=0;j<4;j++){
+                for(int j=0;j<5;j++){
                     g_user_data[user_data_itr].answer_flow[i][j]=answer_flow_[i][j];
                 }
             }
@@ -93,7 +93,7 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         int pos;
         int flow_count=0;
         int answer_num;
-        int answer_flow[256][4];
+        int answer_flow[256][5];
 
         //正規表現
         QRegExp re_num("^\\d$");
@@ -105,9 +105,11 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         while(flow_count<answer_num){
             if(list[flow_count]==""){
                 //パスする石
-                answer_flow[flow_count][0]=-1;
+                answer_flow[flow_count][4]=1;
                 flow_count++;
                 continue;
+            }else{
+                answer_flow[flow_count][4]=0;
             }
             pos=0;
             //左右
@@ -208,7 +210,7 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         }
         bool start_append_block=false;//stone has passed, while false.
         while(1){
-            while(answer_flow[stone_flow_count][0]==-1)stone_flow_count++;//-1ならパスする
+            while(answer_flow[stone_flow_count][4]==1)stone_flow_count++;//パスする
             //if pass is end of stone flow, finish.
             if (stone_flow_count >= answer_num){
                 return true;
@@ -353,9 +355,11 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
     while(flow_count<answer_num_){
         if(list[flow_count]==""){
             //パスする石
-            answer_flow_[flow_count][0]=-1;
+            answer_flow_[flow_count][4]=1;
             flow_count++;
             continue;
+        }else{
+            answer_flow_[flow_count][4]=0;
         }
         pos=0;
         //左右
@@ -405,7 +409,7 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
 
 bool AnswerForm::PutStone(){
-    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
+    while(answer_flow_[stone_flow_count_][4]==1)stone_flow_count_++;//パスする
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];

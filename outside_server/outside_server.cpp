@@ -209,7 +209,7 @@ void OutsideServer::loadbutton_clicked()
 }
 
 /*アンサー情報のロード*/
-int OutsideServer::ConvertAnswer(QString filename_answer,int answer_flow[256][4]){
+int OutsideServer::ConvertAnswer(QString filename_answer,int answer_flow[256][5]){
 
     QFile answer_file(filename_answer);
     answer_file.open(QIODevice::ReadOnly);

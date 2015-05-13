@@ -85,7 +85,7 @@ void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][
 }
 
 
-void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString userid,int answer_point){
+void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString userid,int answer_point){
     //nametag name
     tag_name_->setPlainText(userid);
     //pointtag
@@ -94,7 +94,7 @@ void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString useri
     answer_point_=answer_point;
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
-        for(int j=0;j<4;j++){
+        for(int j=0;j<5;j++){
             //qDebug("%s",qPrintable(QString::number(answer_flow[i][j])));
             answer_flow_[i][j]=answer_flow[i][j];
         }
@@ -105,7 +105,9 @@ void GameStage::StartAnswer(int answer_flow[256][4],int answer_num,QString useri
 }
 
 void GameStage::AnswerAnimation(){
-    while(answer_flow_[stone_flow_count_][0]==-1)stone_flow_count_++;//-1ならパスする
+    while(answer_flow_[stone_flow_count_][4]==1){
+        stone_flow_count_++;//パスする
+    }
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];

@@ -10,7 +10,7 @@ struct user_data_type{
     int append_stage_number;
     bool is_renewal;
     //answer
-    int answer_flow[256][4];
+    int answer_flow[256][5];
     int answer_num;
     int answer_point;
 };
