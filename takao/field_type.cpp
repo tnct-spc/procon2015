@@ -169,7 +169,9 @@ bool field_type::is_removable(stone_type const& stone)
             break;
         }
     }
-
+    print_field();
+    std::cout << "p in field = " << pf << std::endl;
+    std::cout << "p in stone = " << ps << std::endl;
     return placed_stone_type(*stone, pf, ps);
 }
 

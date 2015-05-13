@@ -3,14 +3,13 @@
 #define private public
 #include "takao.hpp"
 #undef private
-#include "QMetaType"
+#include <iostream>
 
 Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(field_type)
 Q_DECLARE_METATYPE(field_type::raw_field_type)
 Q_DECLARE_METATYPE(stone_type)
 Q_DECLARE_METATYPE(placed_stone_type)
-//qRegisterMetaType<placed_stone_type>("placed_stone_type");
 
 using namespace std::string_literals;
 
@@ -405,10 +404,9 @@ void field_type_test::get_answer_test()
 void field_type_test::get_stone_test_data()
 {
     using namespace std::string_literals;
-    QTest::addColumn<std::size_t>("y");
-    QTest::addColumn<std::size_t>("x");
+    QTest::addColumn<int>("y");
+    QTest::addColumn<int>("x");
     QTest::addColumn<field_type>("field");
-    //qRegisterMetaType<placed_stone_type>("result");
     QTest::addColumn<placed_stone_type>("result");
 
     auto field = default_field;
@@ -417,19 +415,19 @@ void field_type_test::get_stone_test_data()
     QTest::newRow("case1")
             << 0
             << 0
-            << field.put_stone(default_stones[0], 0, -1);
-            //<< result;
+            << field.put_stone(default_stones[0], 0, -1)
+            << result;
 
 }
 
 void field_type_test::get_stone_test()
 {
-    QFETCH(std::size_t, y);
-    QFETCH(std::size_t, x);
+    QFETCH(int, y);
+    QFETCH(int, x);
     QFETCH(field_type, field);
-    //QFETCH(placed_stone_type, result);
+    QFETCH(placed_stone_type, result);
 
-    //QCOMPARE(field.get_stone(y,x),result);
+    QCOMPARE(field.get_stone(y,x),result);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)
