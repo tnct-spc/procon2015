@@ -1,6 +1,6 @@
-#ifndef FILE_EXPORT_H
-#define FILE_EXPORT_H
-#include "main.hpp"
+#ifndef FILE_EXPORT_HPP
+#define FILE_EXPORT_HPP
+#include "problem_maker.hpp"
 #include <array>
 #include <vector>
 
@@ -16,4 +16,4 @@ public:
                 std::vector<raw_stone_type> stones);
 };
 
-#endif // FILE_EXPORT_H
+#endif // FILE_EXPORT_HPP

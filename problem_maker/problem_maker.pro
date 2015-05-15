@@ -17,11 +17,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     raw_field.cpp \
-    file_export.cpp
+    file_export.cpp \
+    raw_stone.cpp
 
 HEADERS += \
     raw_field.hpp \
     file_export.hpp \
-    main.hpp
+    raw_stone.hpp \
+    problem_maker.hpp
 
 QMAKE_CXXFLAGS += -std=c++14

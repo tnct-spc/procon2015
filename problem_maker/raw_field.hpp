@@ -1,6 +1,6 @@
-#ifndef RAW_FIELD_H
-#define RAW_FIELD_H
-#include "main.hpp"
+#ifndef RAW_FIELD_HPP
+#define RAW_FIELD_HPP
+#include "problem_maker.hpp"
 #include <array>
 
 class raw_field
@@ -16,4 +16,4 @@ public:
     raw_field();
 };
 
-#endif // RAW_FIELD_H
+#endif // RAW_FIELD_HPP
