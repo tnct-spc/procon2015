@@ -21,9 +21,9 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
         response->write("<html><head><title>ANSWER FORM</title></head><body>");
         response->write("<form method='POST' action='/answer'>");
         response->write("Answer From:<br>");
-        response->write("UserId:  <input type='text' name='userid'><br>");
-        response->write("ProblemNumber: <input type='text' name='problemnumber'><br>");
-        response->write("Answer: <textarea name='answerdata' cols='100' rows='40'></textarea><br>");
+        response->write("UserId:  <input type='text' name='id'><br>");
+        response->write("ProblemNumber: <input type='text' name='quest_number'><br>");
+        response->write("Answer: <textarea name='answer' cols='100' rows='40'></textarea><br>");
         response->write("<input type='submit'>");
         response->write("</form>");
         response->write("</body></html>");
@@ -38,8 +38,8 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
 
     //Get request data
     QUrlQuery url_query(lowdata);
-    QString plaintext_user_id=url_query.queryItemValue("userid");
-    QString plaintext_answer_data=url_query.queryItemValue("answerdata");
+    QString plaintext_user_id=url_query.queryItemValue("id");
+    QString plaintext_answer_data=url_query.queryItemValue("answer");
 
     //問題ファイルを開く
     QFile problem_file("/home/saho/data/problem.txt");
@@ -125,7 +125,7 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         //改行で分割
         QStringList list=d.split("\n");
         answer_num=list.size();
-        if(answer_num != g_stone_num_) return false;
+        if(answer_num > g_stone_num_) return false;
 
         while(flow_count<answer_num){
             if(list[flow_count]==""){
@@ -376,7 +376,11 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
     int pos;
     int flow_count=0;
     QStringList list=d.split("\n");
-    answer_num_=list.size();
+    if(list[0]==""){
+        answer_num_=0;
+    }else{
+        answer_num_=list.size();
+    }
     while(flow_count<answer_num_){
         if(list[flow_count]==""){
             //パスする石
