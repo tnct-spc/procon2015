@@ -21,7 +21,11 @@ public:
     //return point of answer
     QString SimulateAnswerPoint(QString plaintext_answer_data);
 
+private slots:
+    void ServiceRequestCompleted(QByteArray lowdata);
+
 private:
+    QHttpResponse *new_response_;
     //put a stone on stage
     bool PutStone();
     //

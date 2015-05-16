@@ -7,18 +7,50 @@ AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
 }
 
 void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
+    new_response_=response;
 
-    //Get GET data
-    QUrlQuery url_query(request->url());
+    if(request->method()==QHttpRequest::HTTP_POST && request->body().isEmpty()){
+        //Wait get body
+        connect(request,SIGNAL(data(QByteArray)),this,SLOT(ServiceRequestCompleted(QByteArray)));
+    }else{
+        //Form
+
+        //response head
+        response->setHeader("Content-Type", "text/html; charset=UTF-8");
+        response->writeHead(200);
+        response->write("<html><head><title>ANSWER FORM</title></head><body>");
+        response->write("<form method='POST' action='/answer'>");
+        response->write("Answer From:<br>");
+        response->write("UserId:  <input type='text' name='userid'><br>");
+        response->write("ProblemNumber: <input type='text' name='problemnumber'><br>");
+        response->write("Answer: <textarea name='answerdata' cols='100' rows='40'></textarea><br>");
+        response->write("<input type='submit'>");
+        response->write("</form>");
+        response->write("</body></html>");
+
+        //end
+        response->end();
+    }
+}
+
+void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
+    QHttpResponse *response=new_response_;
+
+    //Get request data
+    QUrlQuery url_query(lowdata);
     QString plaintext_user_id=url_query.queryItemValue("userid");
     QString plaintext_answer_data=url_query.queryItemValue("answerdata");
 
-    //Decode
+    //問題ファイルを開く
+    QFile problem_file("/home/saho/data/problem.txt");
+    problem_file.open(QIODevice::WriteOnly);
+    problem_file.write(plaintext_answer_data.toUtf8());
+
+    //Decode request data
     plaintext_user_id.replace("+"," ");
     plaintext_answer_data.replace("+"," ");
     plaintext_answer_data.replace("%0D%0A","\n");
     QByteArray user_id=plaintext_user_id.toUtf8();
-    QByteArray answer_data=plaintext_answer_data.toUtf8();
     QString answer_point;
 
     //response head
@@ -28,10 +60,16 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
 
 
     /*Save answer and Display answer_point*/
-    if (!user_id.isEmpty()) {
-
+    if (user_id.isEmpty()) {
+        response->write("error userid is empty.");
+    }else{
         if(!format_check(plaintext_answer_data,"ANSWER")){
             response->write("FormatError(このフォーマットチェック関数はテストが不十分です.)");
+#ifdef _DEBUG
+            qDebug("***format error***");
+        }
+        if(false){
+#endif
         }else{
             //responce answer point
             answer_point=SimulateAnswerPoint(plaintext_answer_data);
@@ -67,20 +105,7 @@ void AnswerForm::Service(QHttpRequest *request, QHttpResponse *response) {
             //update_flagを立てる
             g_user_data_updated=true;
         }
-
-    /*Display Form*/
-    }else{
-        response->write("<form method='GET' action='/answer'>");
-        response->write("Answer From:<br>");
-        response->write("UserId:  <input type='text' name='userid'><br>");
-        response->write("ProblemNumber: <input type='text' name='problemnumber'><br>");
-        response->write("Answer: <textarea name='answerdata' cols='100' rows='40'></textarea><br>");
-        response->write("<input type='submit'>");
-        response->write("</form>");
-        response->write("</body></html>");
     }
-
-    //end
     response->end();
 }
 
