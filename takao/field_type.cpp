@@ -213,7 +213,8 @@ std::string field_type::get_answer() const
         for (int i = prev_nth + 1; i < current_nth; ++i) {
             result.append("\r\n");
         }
-
+        prev_nth = current_nth;
+        if(prev_nth!=0) result.append("\r\n");
         line += std::to_string(process.position.x)
                 + " "
                 + std::to_string(process.position.y)
@@ -222,10 +223,7 @@ std::string field_type::get_answer() const
                 + " "
                 + std::to_string(process.stone.get_angle());
         result.append(line);
-        result.append("\r\n");
-        prev_nth = current_nth;
     }
-
     return result;
 }
 
