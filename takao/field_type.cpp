@@ -44,30 +44,34 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-    bool is_conection = false;
+    bool is_connection = false;
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//置かないならどうでも良い
         {
             continue;
         }
-        else if(i+y < 0 || j+x < 0)//敷地外に石を置こうとした
+        else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
         {
             return false;
-         }
+        }
         else if(raw_data.at(i+y).at(j+x) == 0)//敷地が0ならいいよ！
         {
-            if(is_conection == true) continue;
-            else if(i+y > 1   && raw_data.at(i+y-1).at(j+x   ) < stone.get_nth()) is_conection = true;
-            else if(i+y < 30 && raw_data.at(i+y+1).at(j+x  ) < stone.get_nth()) is_conection = true;
-            else if(j+x > 1   && raw_data.at(i+y    ).at(j+x-1) < stone.get_nth()) is_conection = true;
-            else if(j+x < 30 && raw_data.at(i+y    ).at(j+x+1) < stone.get_nth()) is_conection = true;
+            if(is_connection == true) continue;
+            else if(stone.get_nth()==0) is_connection = true;
+            else if(i+y > 1 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
+            else if(i+y < 30 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
+            else if(j+x > 1 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
+            else if(j+x < 30 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
             continue;
         }
         else if(raw_data.at(y+i).at(j+x) != 0 && stone.at(i,j) == 1)
         {
             return false;
         }
+    }
+    if(!is_connection){
+        return false;
     }
     return true;
 }
@@ -204,6 +208,7 @@ std::string field_type::get_answer() const
 {
     std::string result;
     int prev_nth = 0;
+    int process_count=0;
     for (auto const & process : processes) {
         std::string line;
 
@@ -213,8 +218,7 @@ std::string field_type::get_answer() const
         for (int i = prev_nth + 1; i < current_nth; ++i) {
             result.append("\r\n");
         }
-        prev_nth = current_nth;
-        if(prev_nth!=0) result.append("\r\n");
+        if(process_count!=0) result.append("\r\n");
         line += std::to_string(process.position.x)
                 + " "
                 + std::to_string(process.position.y)
@@ -223,6 +227,8 @@ std::string field_type::get_answer() const
                 + " "
                 + std::to_string(process.stone.get_angle());
         result.append(line);
+        prev_nth = current_nth;
+        process_count++;
     }
     return result;
 }
