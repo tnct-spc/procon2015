@@ -105,6 +105,15 @@ void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString useri
 }
 
 void GameStage::AnswerAnimation(){
+    if (stone_flow_count_ >= answer_num_){
+        //show point
+        tag_point_->setPlainText(QString::number(answer_point_));
+        //flag update rankingtag
+        g_need_rankingtag_updated=true;
+        //stop timer
+        answer_animation_timer_->stop();
+        return;
+    }
     while(answer_flow_[stone_flow_count_][4]==1){
         stone_flow_count_++;//パスする
     }
@@ -173,16 +182,7 @@ void GameStage::AnswerAnimation(){
             }
         }
     }
-    //後処理
     stone_flow_count_++;
-    if (stone_flow_count_ >= answer_num_){
-        //show point
-        tag_point_->setPlainText(QString::number(answer_point_));
-        //flag update rankingtag
-        g_need_rankingtag_updated=true;
-        //stop timer
-        answer_animation_timer_->stop();
-    }
 }
 
 void GameStage::update_ranking_tag(int ranking){
