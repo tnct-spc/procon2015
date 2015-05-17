@@ -1,6 +1,6 @@
 #include "answer_form.h"
 #include <http/request_mapper.h>
-
+//#define _DEBUG
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
     // empty
@@ -66,7 +66,6 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
         if(!format_check(plaintext_answer_data,"ANSWER")){
             response->write("FormatError(このフォーマットチェック関数はテストが不十分です.)");
 #ifdef _DEBUG
-            qDebug("***format error***");
         }
         if(false){
 #endif
@@ -125,7 +124,12 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         //改行で分割
         QStringList list=d.split("\n");
         answer_num=list.size();
-        if(answer_num > g_stone_num_) return false;
+        if(answer_num > g_stone_num_){
+#ifdef _DEBUG
+            qDebug("***format error*** 解答の石数が問題の石数より多い");
+#endif
+            return false;
+        }
 
         while(flow_count<answer_num){
             if(list[flow_count]==""){
@@ -145,6 +149,9 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
                     is_minus=true;
                     pos++;
                 }else{
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のxの書式が違います",flow_count+1);
+#endif
                     return false;
                 }
             }
@@ -155,8 +162,18 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
                     answer_flow[flow_count][0] = list[flow_count].mid(pos,1).toInt();
                 }
             }else{
-                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
-                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のxの書式が違います",flow_count+1);
+#endif
+                    return false;
+                }
+                if (!(list[flow_count].mid(pos+2,1)==" ")){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のxの書式が違います",flow_count+1);
+#endif
+                    return false;
+                }
                 if(is_minus){
                     answer_flow[flow_count][0] = -list[flow_count].mid(pos,2).toInt();
                 }else{
@@ -173,6 +190,9 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
                     is_minus=true;
                     pos++;
                 }else{
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のyの書式が違います",flow_count+1);
+#endif
                     return false;
                 }
             }
@@ -183,8 +203,18 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
                     answer_flow[flow_count][1] = list[flow_count].mid(pos,1).toInt();
                 }
             }else{
-                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))) return false;
-                if (!(list[flow_count].mid(pos+2,1)==" ")) return false;
+                if (!re_num.exactMatch(list[flow_count].mid(pos+1,1))){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のyの書式が違います",flow_count+1);
+#endif
+                    return false;
+                }
+                if (!(list[flow_count].mid(pos+2,1)==" ")){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のyの書式が違います",flow_count+1);
+#endif
+                    return false;
+                }
                 if(is_minus){
                     answer_flow[flow_count][1] = -list[flow_count].mid(pos,2).toInt();
                 }else{
@@ -199,9 +229,17 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
             }else if (list[flow_count].mid(pos,1) == "T"){
                 answer_flow[flow_count][2] = 1;
             }else{
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のHorTの書式が違います",flow_count+1);
+#endif
                 return false;
             }
-            if (!(list[flow_count].mid(pos+1,1)==" ")) return false;
+            if (!(list[flow_count].mid(pos+1,1)==" ")){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のHorTの書式が違います",flow_count+1);
+#endif
+                return false;
+            }
             pos+=2;
             //角度
             /*
@@ -210,7 +248,12 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
              * 180
              * 270
             */
-            if(!(list[flow_count].mid(pos)=="0" || list[flow_count].mid(pos)=="90" || list[flow_count].mid(pos)=="180" || list[flow_count].mid(pos)=="270")) return false;
+            if(!(list[flow_count].mid(pos)=="0" || list[flow_count].mid(pos)=="90" || list[flow_count].mid(pos)=="180" || list[flow_count].mid(pos)=="270")){
+#ifdef _DEBUG
+            qDebug("***format error*** %d行目のangleの書式が違います",flow_count+1);
+#endif
+                return false;
+            }
             answer_flow[flow_count][3] = list[flow_count].mid(pos).toInt();
             flow_count++;
         }
@@ -303,10 +346,25 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
                 for (int x = 0; x < 8; x++){
                     if (stone_state[stone_flow_count][y][x]){
                         //範囲超えたら(はみ出したら)アウト
-                        if(y + answer_flow[stone_flow_count][1] >= 32 || y + answer_flow[stone_flow_count][1] < 0) return false;
-                        if(x + answer_flow[stone_flow_count][0] >= 32 || x + answer_flow[stone_flow_count][0] < 0) return false;
+                        if(y + answer_flow[stone_flow_count][1] >= 32 || y + answer_flow[stone_flow_count][1] < 0){
+#ifdef _DEBUG
+            qDebug("***format error*** %d個目がフィールドの範囲を越えています",stone_flow_count+1);
+#endif
+                            return false;
+                        }
+                        if(x + answer_flow[stone_flow_count][0] >= 32 || x + answer_flow[stone_flow_count][0] < 0){
+#ifdef _DEBUG
+            qDebug("***format error*** %d個目がフィールドの範囲を越えています",stone_flow_count+1);
+#endif
+                            return false;
+                        }
                         //被ったらアウト
-                        if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]] > 0) return false;
+                        if(stage_state[8 + y + answer_flow[stone_flow_count][1]][8 + x + answer_flow[stone_flow_count][0]] > 0){
+#ifdef _DEBUG
+            qDebug("***format error*** %d個目がフィールドの他の石や障害物と被っています",stone_flow_count+1);
+#endif
+                            return false;
+                        }
                         //既存のブロックに接しているか
                         if(y + answer_flow[stone_flow_count][1] != 31){//下
                             if(stage_state[8 + y + answer_flow[stone_flow_count][1] + 1][8 + x + answer_flow[stone_flow_count][0]]==2) touch_other_block_flag=true;
@@ -327,7 +385,12 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
             if(!start_append_block){
                 start_append_block=true;
             }else{
-                if(!touch_other_block_flag) return false;
+                if(!touch_other_block_flag) {
+#ifdef _DEBUG
+            qDebug("***format error*** %d個目がどの石とも繋がっていません",stone_flow_count+1);
+#endif
+                    return false;
+                }
             }
             //ブロックの挿入
             for (int y = 0; y < 8; y++){
