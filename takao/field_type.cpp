@@ -31,10 +31,10 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     //置く
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
-        if(i+y < 0 || j+x < 0) continue;
+        if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31) continue;
         else if(stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.get_nth();
+            raw_data.at(i+y).at(j+x) = stone.get_nth()+1;
         }
     }
     processes.emplace_back(stone, point_type{y, x});
@@ -59,13 +59,31 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         {
             if(is_connection == true) continue;
             else if(stone.get_nth()==0) is_connection = true;
-            else if(i+y > 1 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
-            else if(i+y < 30 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
-            else if(j+x > 1 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
-            else if(j+x < 30 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
+            else{
+                if(i+y > 0){
+                    if(raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()+1){
+                        is_connection = true;
+                    }
+                }
+                if(i+y < 31){
+                    if(raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()+1){
+                        is_connection = true;
+                    }
+                }
+                if(j+x > 0){
+                    if(raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()+1){
+                        is_connection = true;
+                    }
+                }
+                if(j+x < 31){
+                    if(raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()+1){
+                        is_connection = true;
+                    }
+                }
+            }
             continue;
         }
-        else if(raw_data.at(y+i).at(j+x) != 0 && stone.at(i,j) == 1)
+        else
         {
             return false;
         }
