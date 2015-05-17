@@ -2,6 +2,7 @@
 #define SLAVE_H
 
 #include <QWidget>
+#include <net.hpp>
 
 namespace Ui {
 class Slave;
@@ -17,6 +18,9 @@ public:
 
 private:
     Ui::Slave *ui;
+
+private slots:
+    void clicked_run_button();
 };
 
 #endif // SLAVE_H

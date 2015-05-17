@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Slave</class>
- <widget class="QWidget" name="Slave" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Slave">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,12 +10,49 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Slave</string>
   </property>
+  <widget class="QPushButton" name="run_button">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>401</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>56</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>START!!!</string>
+   </property>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>run_button</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>clicked_run_button()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>268</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>562</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>clicked_run_button()</slot>
+ </slots>
 </ui>

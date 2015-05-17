@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,3 +20,18 @@ HEADERS  += slave.h
 FORMS    += slave.ui
 
 QMAKE_CXXFLAGS += -std=c++14
+
+unix:!macx: LIBS += -L$$OUT_PWD/../muen_zuka/ -lmuen_zuka
+
+INCLUDEPATH += $$PWD/../muen_zuka
+DEPENDPATH += $$PWD/../muen_zuka
+
+unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
+
+INCLUDEPATH += $$PWD/../takao
+DEPENDPATH += $$PWD/../takao
+
+unix:!macx: LIBS += -L$$OUT_PWD/../tengu/ -ltengu
+
+INCLUDEPATH += $$PWD/../tengu
+DEPENDPATH += $$PWD/../tengu
