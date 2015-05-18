@@ -1,7 +1,7 @@
 #include "simple_algorithm.hpp"
 #include <QFile>
 #include <QIODevice>
-#include <iostream>
+
 simple_algorithm::simple_algorithm(problem_type _problem)
 {
     problem = _problem;
@@ -14,14 +14,18 @@ simple_algorithm::~simple_algorithm()
 
 void simple_algorithm::run(){
 
-    //problem_type problem(problem_data);
-
-    auto put_func = [&](stone_type stone){
-        for(int dy=-8;dy<=32;dy++){
-            for(int dx=-8;dx<=32;dx++){
+    //端から置ける場所を探して石を挿入していく関数
+    auto put_a_stone = [&](stone_type stone){
+        //設置可能範囲は左上座標(-7,-7)から左上座標(31,31)まで
+        for(int dy=-7;dy<=32;dy++){
+            for(int dx=-7;dx<=32;dx++){
+                //反転
                 for(int flip = 0; flip < 2; flip ++){
+                    //回転
                      for(int angle = 0; angle < 4; angle ++){
+                         //フィールドに置けるかチェック
                          if(problem.field.is_puttable(stone,dy,dx)){
+                             //設置
                              problem.field.put_stone(stone,dy,dx);
                              return;
                          }
@@ -32,30 +36,12 @@ void simple_algorithm::run(){
             }
         }
     };
-    /*
-    //端から置ける場所を探して石を挿入していく
-    for(unsigned int stone_num=0;stone_num<problem.stones.size();stone_num++){
-        for(int dy=-8;dy<=32;dy++){
-            for(int dx=-8;dx<=32;dx++){
-                //フィールドに置けるかチェック
-                if(problem.field.is_puttable(problem.stones[stone_num],dy,dx)){
-                    //設置
-                    problem.field.put_stone(problem.stones[stone_num],dy,dx);
-                    goto NEXT_STONE;
-                    //お手軽GOTOを使うな
-                }
-            }
-        }
-        NEXT_STONE:;
-    }
-    */
+
+    //石を設置
     for(auto _stone : problem.stones){
-                put_func(_stone);
+                put_a_stone(_stone);
     }
 
-    for(auto stone : problem.field.list_of_stones()){
-        std::cout << stone.get_angle() << std::endl;
-    }
-    //return problem.field;
+    //解答の送信
     emit answer_ready(problem.field);
 }
