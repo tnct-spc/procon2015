@@ -3,10 +3,13 @@
 #define private public
 #include "takao.hpp"
 #undef private
+#include <iostream>
+
 Q_DECLARE_METATYPE(std::string)
 Q_DECLARE_METATYPE(field_type)
 Q_DECLARE_METATYPE(field_type::raw_field_type)
 Q_DECLARE_METATYPE(stone_type)
+Q_DECLARE_METATYPE(placed_stone_type)
 
 using namespace std::string_literals;
 
@@ -39,8 +42,10 @@ class field_type_test : public QObject
         void is_placed_test_data();
         void is_placed_test();
 
-        void get_answer_test_data();
         void get_answer_test();
+
+        void get_stone_test_data();
+        void get_stone_test();
 
     private:
         std::string const default_field_text =
@@ -377,34 +382,52 @@ void field_type_test::is_placed_test()
     QCOMPARE(field.is_placed(stone),result);
 }
 
-void field_type_test::get_answer_test_data()
-{
-    QTest::addColumn<field_type>("field");
-    QTest::addColumn<std::string>("result");
-
-    {
-        auto stones = default_stones;
-        auto field = default_field;
-
-        field.put_stone(stones[0], 2, 3);
-        field.put_stone(stones[1].flip().rotate(90), -3, -1);
-        field.put_stone(stones[3].rotate(270), 0, 6);
-
-        QTest::newRow("official_case")
-            << field
-            << "3 2 H 0\r\n"
-               "-1 -3 T 90\r\n"
-               "\r\n"
-               "6 0 H 270\r\n"s;
-    }
-}
-
 void field_type_test::get_answer_test()
 {
-    QFETCH(field_type, field);
-    QFETCH(std::string, result);
+    auto stones = default_stones;
+    auto field = default_field;
 
-    QCOMPARE(field.get_answer(), result);
+    field.put_stone(stones[0], 2, 3);
+    field.put_stone(stones[1].flip().rotate(90), -3, -1);
+    field.put_stone(stones[3].rotate(270), 0, 6);
+
+    auto expected = "3 2 H 0\r\n"
+                    "-1 -3 T 90\r\n"
+                    "\r\n"
+                    "6 0 H 270\r\n"s;
+
+    auto result = field.get_answer();
+    //std::cerr << result;
+    QCOMPARE(result, expected);
+}
+
+void field_type_test::get_stone_test_data()
+{
+    using namespace std::string_literals;
+    QTest::addColumn<int>("y");
+    QTest::addColumn<int>("x");
+    QTest::addColumn<field_type>("field");
+    QTest::addColumn<placed_stone_type>("result");
+
+    auto field = default_field;
+    placed_stone_type result (default_stones[0],point_type{0,-1},point_type{0,1});
+
+    QTest::newRow("case1")
+            << 0
+            << 0
+            << field.put_stone(default_stones[0], 0, -1)
+            << result;
+
+}
+
+void field_type_test::get_stone_test()
+{
+    QFETCH(int, y);
+    QFETCH(int, x);
+    QFETCH(field_type, field);
+    QFETCH(placed_stone_type, result);
+
+    QCOMPARE(field.get_stone(y,x),result);
 }
 
 QTEST_APPLESS_MAIN(field_type_test)

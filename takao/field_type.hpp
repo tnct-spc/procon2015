@@ -10,15 +10,23 @@
 class process_type
 {
     public:
-        process_type() = default;
+        process_type() = delete;
         ~process_type() = default;
 
         process_type(stone_type const & _stone,
                      point_type const & _position)
         : stone(_stone), position(_position) {}
 
-        stone_type stone;
-        point_type position;
+        // copy assignment operator
+        process_type & operator=(process_type const & other)
+        {
+            const_cast<stone_type &>(stone) = other.stone;
+            const_cast<point_type &>(position) = other.position;
+            return *this;
+        }
+
+        stone_type const & stone;
+        point_type const position;
 };
 
 // 敷地
@@ -61,7 +69,6 @@ class field_type
     private:
         raw_field_type raw_data;
         std::vector<process_type> processes;
-        point_type static constexpr not_puted = {32,32};
 
         //is_removableで必要
         struct pair_type
@@ -75,6 +82,5 @@ class field_type
 
         void print_field();
 };
-
 
 #endif // FIELD_TYPE
