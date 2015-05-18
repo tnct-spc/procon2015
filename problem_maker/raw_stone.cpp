@@ -4,11 +4,7 @@
 
 raw_stone::raw_stone()
 {
-    for(int i = 0; i < STONE_SIZE; i++) {
-        for(int j = 0; j < STONE_SIZE; j++) {
-            data[i][j] = false;
-        }
-    }
+    for(auto each_row : data) each_row.fill(0);
 }
 
 void raw_stone::create(int zk)
