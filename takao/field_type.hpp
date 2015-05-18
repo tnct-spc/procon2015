@@ -10,7 +10,7 @@
 class process_type
 {
     public:
-        process_type() = default;
+        process_type() = delete;
         ~process_type() = default;
 
         process_type(stone_type const & _stone,
@@ -25,7 +25,7 @@ class process_type
             return *this;
         }
 
-        stone_type const & stone;
+        stone_type const stone;
         point_type const position;
 };
 
