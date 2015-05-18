@@ -6,4 +6,5 @@ SUBDIRS += \
     outside_server\
     tengu\
     muen_zuka \
-    slave
+    slave \
+    master
