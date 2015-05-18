@@ -37,7 +37,6 @@ std::string net::get()
 }
 
 std::string net::send(field_type answer){
-    std::cout << "in send ()" << std::endl;
     QEventLoop eventloop;
     QUrlQuery postData;
     postData.addQueryItem("id",_id.c_str());
