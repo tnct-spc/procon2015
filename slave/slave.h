@@ -2,6 +2,8 @@
 #define SLAVE_H
 
 #include <QWidget>
+#include <QString>
+#include <QUrl>
 #include <net.hpp>
 #include <mutex>
 #include "takao.hpp"
