@@ -72,3 +72,6 @@ void net::networkerror(QNetworkReply::NetworkError e){
     std::cout << "network error code " << code  << std::endl;
     network_error_flag = true;
 }
+bool net::is_error(){
+    return network_error_flag;
+}

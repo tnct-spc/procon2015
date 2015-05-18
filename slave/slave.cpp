@@ -27,14 +27,19 @@ Slave::~Slave()
 void Slave::clicked_run_button(){
 
     //set url
-    QUrl gethost("http://localhost:8080/files/problem1.txt");
-    QUrl posthost("http://localhost:8080/answer");
-
+    QUrl gethost(ui->get_line_edit->text());
+    QUrl posthost(ui->post_line_edit->text());
     //get problem
     //net network(gethost,posthost,"testman",1);
-    network = new net(gethost,posthost,"testman",1);
+    network = new net(gethost,posthost,std::string(ui->token_line_edit->text().toLocal8Bit()),ui->prob_num_line_edit->text().toInt());
 
     //std::string problem_data = network->get();
+    auto str = network->get();
+    if(network->is_error()){
+        ui->net_label->setText("ネットが死んでる");
+        return;
+    }
+    ui->net_label->setText("ネットは生きてる");
     problem_type problem(network->get());
 
     //solve
