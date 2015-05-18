@@ -9,7 +9,7 @@ problem_type::problem_type(std::string const & problem_text)
     field = field_type(field_text);
     for(std::size_t i = 0; i < stone_texts.size(); ++i)
     {
-         stones.emplace_back(stone_texts[i], i);
+         stones.emplace_back(stone_texts[i], i+1/*一つ目の石のnthは1(1st) iつ目でi+1*/);
     }
 }
 
