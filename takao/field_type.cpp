@@ -34,7 +34,7 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
         if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31) continue;
         else if(stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.get_nth()+1;
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
     //processes.emplace_back(stone, point_type{y, x});
@@ -59,25 +59,25 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         else if(raw_data.at(i+y).at(j+x) == 0)//敷地が0ならいいよ！
         {
             if(is_connection == true) continue;
-            else if(stone.get_nth()==0) is_connection = true;
+            else if(stone.get_nth()==1) is_connection = true;
             else{
                 if(i+y > 0){
-                    if(raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()+1){
+                    if(raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()){
                         is_connection = true;
                     }
                 }
                 if(i+y < 31){
-                    if(raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()+1){
+                    if(raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()){
                         is_connection = true;
                     }
                 }
                 if(j+x > 0){
-                    if(raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()+1){
+                    if(raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()){
                         is_connection = true;
                     }
                 }
                 if(j+x < 31){
-                    if(raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()+1){
+                    if(raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()){
                         is_connection = true;
                     }
                 }
@@ -108,7 +108,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     }
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
     {
-        if(raw_data.at(i).at(j) == stone.get_nth())raw_data.at(i).at(j) = 0;
+        if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
     }
     processes.erase(std::remove_if(processes.begin(), processes.end(),
                                    [& stone](auto const & process) { return process.stone == stone; }),
