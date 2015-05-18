@@ -11,11 +11,11 @@ TEMPLATE = lib
 
 DEFINES += TENGU_LIBRARY
 
-SOURCES += simple_algorithm.cpp
+SOURCES += algorithm/simple_algorithm.cpp
 
 HEADERS += tengu.hpp\
         tengu_global.h \
-    simple_algorithm.hpp
+    algorithm/simple_algorithm.hpp
 
 unix {
     target.path = /usr/lib

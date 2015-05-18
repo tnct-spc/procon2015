@@ -2,10 +2,11 @@
 #include "ui_slave.h"
 #include <QUrl>
 #include <string>
-#include <simple_algorithm.hpp>
 #include "takao.hpp"
 
-#define _DEBUG
+#include <algorithm/simple_algorithm.hpp>
+
+//#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
     #include <iostream>
