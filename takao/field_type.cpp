@@ -124,13 +124,17 @@ bool field_type::is_removable(stone_type const& stone)
      if(is_placed(stone) == false) return false;
      if(processes.size() == 1)return true;
      //継ぎ目を検出
-     for(size_t i = 0; i < 31; ++i) for(size_t j = 0; j < 31; ++j)
+     for(size_t i = 0; i < 32; ++i) for(size_t j = 0; j < 32; ++j)
      {
          int const c = raw_data.at(i).at(j);
-         int const d = raw_data.at(i+1).at(j);
-         int const r = raw_data.at(i).at(j+1);
-         if(c != d) pair_list.push_back(pair_type{c,d});
-         if(c != r) pair_list.push_back(pair_type{c,r});
+         if(i!=31){
+             int const d = raw_data.at(i+1).at(j);
+             if(c != d) pair_list.push_back(pair_type{c,d});
+         }
+         if(j!=31){
+             int const r = raw_data.at(i).at(j+1);
+             if(c != r) pair_list.push_back(pair_type{c,r});
+         }
      }
      //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
      for(std::vector<pair_type>::iterator it = pair_list.begin();it != pair_list.end();)
