@@ -10,7 +10,7 @@
 class process_type
 {
     public:
-        process_type() = delete;
+        process_type() = default;
         ~process_type() = default;
 
         process_type(stone_type const & _stone,
