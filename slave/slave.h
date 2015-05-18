@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include <net.hpp>
-
+#include <mutex>
+#include "takao.hpp"
+#include "muen_zuka.hpp"
 namespace Ui {
 class Slave;
 }
@@ -18,9 +20,11 @@ public:
 
 private:
     Ui::Slave *ui;
-
+    net *network;
+    std::mutex net_mtx;
 private slots:
     void clicked_run_button();
+    void answer_send(field_type answer);
 };
 
 #endif // SLAVE_H

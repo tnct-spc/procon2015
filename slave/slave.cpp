@@ -30,16 +30,24 @@ void Slave::clicked_run_button(){
     QUrl posthost("http://localhost:8080/answer");
 
     //get problem
-    net network(gethost,posthost,"testman",1);
-    std::string problem_data = network.get();
+    //net network(gethost,posthost,"testman",1);
+    network = new net(gethost,posthost,"testman",1);
+
+    //std::string problem_data = network->get();
+    problem_type problem(network->get());
 
     //solve
-    simple_algorithm algorithm;
-    field_type answer = algorithm.run(problem_data);
-#ifdef _DEBUG
-    std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
-#endif
+    //simple_algorithm algorithm;
+    simple_algorithm algorithm(problem);
 
-    //send
-    network.send(answer);
+    connect(&algorithm,&simple_algorithm::answer_ready,this,&Slave::answer_send);
+
+    //algorithm.run(problem_data);
+    algorithm.run();
+}
+void Slave::answer_send(field_type answer){
+    std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
+    net_mtx.lock();
+    network->send(answer);
+    net_mtx.unlock();
 }

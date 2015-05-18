@@ -9,13 +9,13 @@ class algorithm_type : public QThread
 {
     Q_OBJECT
     public:
-        algorithm_type(problem_type const& _problem);
+        //algorithm_type(problem_type const& _problem);
         virtual ~algorithm_type() = 0;
 
         //virtual field_type get() = 0;
         //virtual bool is_continuable() = 0;
         //void run()
-    private:
+    protected:
         problem_type problem;
     signals:
         void answer_ready(field_type);
