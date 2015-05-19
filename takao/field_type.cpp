@@ -34,7 +34,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31) continue;
         else if(stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.get_nth()+1;
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
     processes.emplace_back(stone, point_type{y, x});
@@ -75,6 +75,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
+    //if(is_connection == false) std::cout << "This stone cannot put here becase there is not connection." << std::endl;
     return is_connection;
 }
 
