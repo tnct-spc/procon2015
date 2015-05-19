@@ -6,6 +6,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Slave w;
     w.show();
-
+    a.processEvents();
     return a.exec();
 }

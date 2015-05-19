@@ -1,13 +1,6 @@
 #ifndef TENGU_HPP
 #define TENGU_HPP
 
-#include "tengu_global.h"
-
-class TENGUSHARED_EXPORT Tengu
-{
-
-public:
-    Tengu();
-};
+#include "algorithm/simple_algorithm.hpp"
 
 #endif // TENGU_HPP

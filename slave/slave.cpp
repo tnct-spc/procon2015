@@ -3,9 +3,8 @@
 #include <QUrl>
 #include <string>
 #include "takao.hpp"
-
-#include <algorithm/simple_algorithm.hpp>
-
+#include "muen_zuka.hpp"
+#include "algorithm_manager.hpp"
 //#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
@@ -42,11 +41,10 @@ void Slave::clicked_run_button(){
     problem_type problem(str);
 
     //solve
-    simple_algorithm algorithm(problem);
+    algo_manager = new algorithm_manager(problem);
+    connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    algo_manager->run();
 
-    connect(&algorithm,&simple_algorithm::answer_ready,this,&Slave::answer_send);
-
-    algorithm.run();
 }
 void Slave::answer_send(field_type answer){
     //std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
