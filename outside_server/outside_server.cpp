@@ -202,7 +202,7 @@ void OutsideServer::loadbutton_clicked()
             game_stage_[m].MakeStageData(/*g_stage_state_,g_stone_state_,g_stone_num_*/);
         }
         //Reset answer
-        ResetFolder(AnswerFolderName);
+        g_user_data.clear();
         //Copy file to problemfolder (Name is "problem[problem_number_spin_button_value_].txt")
         QFile::copy(problem_file_name,ProblemFolderName+"problem"+problem_number_spin_button_value_+".txt");
     }
