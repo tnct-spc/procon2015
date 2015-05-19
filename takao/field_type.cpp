@@ -231,7 +231,6 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
-    result.append("\r\n");
     return result;
 }
 
