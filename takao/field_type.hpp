@@ -44,7 +44,7 @@ class field_type
         size_t get_score();
 
         //石を置く  自身への参照を返す   失敗したら例外を出す
-        field_type& put_stone(stone_type const& stone, int y, int x);
+        field_type& put_stone(const stone_type stone, int y, int x);
 
         //指定された場所に指定された石が置けるかどうかを返す
         bool is_puttable(stone_type const& stone, int y, int x);

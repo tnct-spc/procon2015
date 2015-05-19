@@ -25,6 +25,7 @@ public:
     ~net();
     std::string get();
     std::string send(field_type answer);
+    bool is_error();
 signals:
 
 public slots:

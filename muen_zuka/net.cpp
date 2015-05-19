@@ -37,7 +37,6 @@ std::string net::get()
 }
 
 std::string net::send(field_type answer){
-    std::cout << "in send ()" << std::endl;
     QEventLoop eventloop;
     QUrlQuery postData;
     postData.addQueryItem("id",_id.c_str());
@@ -71,4 +70,7 @@ void net::networkerror(QNetworkReply::NetworkError e){
     int code = e;
     std::cout << "network error code " << code  << std::endl;
     network_error_flag = true;
+}
+bool net::is_error(){
+    return network_error_flag;
 }

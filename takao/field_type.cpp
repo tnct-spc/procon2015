@@ -24,7 +24,7 @@ size_t field_type::get_score()
 }
 
 //石を置く  自身への参照を返す   失敗したら例外を出す
-field_type& field_type::put_stone(stone_type const& stone, int y, int x)
+field_type& field_type::put_stone(stone_type const stone, int y, int x)
 {
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
@@ -37,7 +37,8 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
-    processes.emplace_back(stone, point_type{y, x});
+    //processes.emplace_back(stone, point_type{y, x});
+    processes.push_back({stone,point_type{y,x}});
     return *this;
 }
 
@@ -92,7 +93,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     }
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
     {
-        if(raw_data.at(i).at(j) == stone.get_nth())raw_data.at(i).at(j) = 0;
+        if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
     }
     processes.erase(std::remove_if(processes.begin(), processes.end(),
                                    [& stone](auto const & process) { return process.stone == stone; }),
@@ -108,13 +109,17 @@ bool field_type::is_removable(stone_type const& stone)
      if(is_placed(stone) == false) return false;
      if(processes.size() == 1)return true;
      //継ぎ目を検出
-     for(size_t i = 0; i < 31; ++i) for(size_t j = 0; j < 31; ++j)
+     for(size_t i = 0; i < 32; ++i) for(size_t j = 0; j < 32; ++j)
      {
          int const c = raw_data.at(i).at(j);
-         int const d = raw_data.at(i+1).at(j);
-         int const r = raw_data.at(i).at(j+1);
-         if(c != d) pair_list.push_back(pair_type{c,d});
-         if(c != r) pair_list.push_back(pair_type{c,r});
+         if(i!=31){
+             int const d = raw_data.at(i+1).at(j);
+             if(c != d) pair_list.push_back(pair_type{c,d});
+         }
+         if(j!=31){
+             int const r = raw_data.at(i).at(j+1);
+             if(c != r) pair_list.push_back(pair_type{c,r});
+         }
      }
      //取り除きたい石に隣接している石リストを作りながら、取り除きたい石を含む要素を消す
      for(std::vector<pair_type>::iterator it = pair_list.begin();it != pair_list.end();)

@@ -2,10 +2,11 @@
 #include "ui_slave.h"
 #include <QUrl>
 #include <string>
-#include <simple_algorithm.hpp>
 #include "takao.hpp"
 
-#define _DEBUG
+#include <algorithm/simple_algorithm.hpp>
+
+//#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
     #include <iostream>
@@ -25,21 +26,31 @@ Slave::~Slave()
 
 void Slave::clicked_run_button(){
 
-    //set url
-    QUrl gethost("http://localhost:8080/files/problem1.txt");
-    QUrl posthost("http://localhost:8080/answer");
-
     //get problem
-    net network(gethost,posthost,"testman",1);
-    std::string problem_data = network.get();
+    //net network(gethost,posthost,"testman",1);
+    network = new net(ui->get_line_edit->text(),
+                      ui->post_line_edit->text(),
+                      std::string(ui->token_line_edit->text().toLocal8Bit()),
+                      ui->prob_num_line_edit->text().toInt()
+                      );
+    auto str = network->get();
+    if(network->is_error()){
+        ui->net_label->setText("ネットが死んでる");
+        return;
+    }
+    ui->net_label->setText("ネットは生きてる");
+    problem_type problem(str);
 
     //solve
-    simple_algorithm algorithm;
-    field_type answer = algorithm.run(problem_data);
-#ifdef _DEBUG
-    std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
-#endif
+    simple_algorithm algorithm(problem);
 
-    //send
-    network.send(answer);
+    connect(&algorithm,&simple_algorithm::answer_ready,this,&Slave::answer_send);
+
+    algorithm.run();
+}
+void Slave::answer_send(field_type answer){
+    //std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
+    net_mtx.lock();
+    network->send(answer);
+    net_mtx.unlock();
 }
