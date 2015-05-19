@@ -34,7 +34,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31) continue;
         else if(stone.at(i,j) == 1)
         {
-            raw_data.at(i+y).at(j+x) = stone.get_nth()+1;
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
     processes.emplace_back(stone, point_type{y, x});
@@ -45,53 +45,38 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
     bool is_connection = false;
+    if(processes.size() == 0)
+    {
+        is_connection = true;//始めの石なら繋がりは必要ない
+        //std::cerr << "first stone" << std::endl;
+    }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//置かないならどうでも良い
         {
             continue;
         }
+        else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
+        {
+            //std::cerr << "You try to put the stone on another stone." << std::endl;
+            return false;
+        }
         else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
         {
+            //std::cerr << "You try to put the stone out of range" << std::endl;
             return false;
         }
-        else if(raw_data.at(i+y).at(j+x) == 0)//敷地が0ならいいよ！
-        {
-            if(is_connection == true) continue;
-            else if(stone.get_nth()==0) is_connection = true;
-            else{
-                if(i+y > 0){
-                    if(raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()+1){
-                        is_connection = true;
-                    }
-                }
-                if(i+y < 31){
-                    if(raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()+1){
-                        is_connection = true;
-                    }
-                }
-                if(j+x > 0){
-                    if(raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()+1){
-                        is_connection = true;
-                    }
-                }
-                if(j+x < 31){
-                    if(raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()+1){
-                        is_connection = true;
-                    }
-                }
-            }
-            continue;
-        }
+        if(is_connection == true) continue;
         else
         {
-            return false;
+            if(i+y > 0  && raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
+            if(i+y < 31 && raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
+            if(j+x < 0  && raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
+            if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
-    if(!is_connection){
-        return false;
-    }
-    return true;
+    //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
+    return is_connection;
 }
 
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
@@ -226,15 +211,14 @@ std::string field_type::get_answer() const
     std::string result;
     int prev_nth = 0;
     int process_count=0;
-    for (auto const & process : processes) {
+    for (auto const & process : processes)
+    {
         std::string line;
 
         auto current_nth = process.stone.get_nth();
 
         // スキップ分の改行を挿入する
-        for (int i = prev_nth + 1; i < current_nth; ++i) {
-            result.append("\r\n");
-        }
+        for (int i = prev_nth + 1; i < current_nth; ++i) result.append("\r\n");
         if(process_count!=0) result.append("\r\n");
         line += std::to_string(process.position.x)
                 + " "
