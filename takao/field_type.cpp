@@ -48,7 +48,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     if(processes.size() == 0)
     {
         is_connection = true;//始めの石なら繋がりは必要ない
-        //std::cout << "first stone" << std::endl;
+        //std::cerr << "first stone" << std::endl;
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -58,12 +58,12 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         }
         else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
         {
-            //std::cout << "You try to put the stone on another stone." << std::endl;
+            //std::cerr << "You try to put the stone on another stone." << std::endl;
             return false;
         }
         else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
         {
-            //std::cout << "You try to put the stone out of range" << std::endl;
+            //std::cerr << "You try to put the stone out of range" << std::endl;
             return false;
         }
         if(is_connection == true) continue;
@@ -75,7 +75,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
-    //if(is_connection == false) std::cout << "This stone cannot put here becase there is not connection." << std::endl;
+    //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
     return is_connection;
 }
 
@@ -211,15 +211,14 @@ std::string field_type::get_answer() const
     std::string result;
     int prev_nth = 0;
     int process_count=0;
-    for (auto const & process : processes) {
+    for (auto const & process : processes)
+    {
         std::string line;
 
         auto current_nth = process.stone.get_nth();
 
         // スキップ分の改行を挿入する
-        for (int i = prev_nth + 1; i < current_nth; ++i) {
-            result.append("\r\n");
-        }
+        for (int i = prev_nth + 1; i < current_nth; ++i) result.append("\r\n");
         if(process_count!=0) result.append("\r\n");
         line += std::to_string(process.position.x)
                 + " "
@@ -232,6 +231,7 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
+    result.append("\r\n");
     return result;
 }
 
