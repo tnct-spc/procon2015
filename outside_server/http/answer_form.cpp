@@ -123,7 +123,11 @@ bool AnswerForm::format_check(QString plain_data, QString format_type){
         QRegExp re_num("^\\d$");
         //改行で分割
         QStringList list=d.split("\n");
-        answer_num=list.size();
+        if(list.size()==1 && list[0]==""){
+            answer_num=0;
+        }else{
+            answer_num=list.size();
+        }
         if(answer_num > g_stone_num_){
 #ifdef _DEBUG
             qDebug("***format error*** 解答の石数が問題の石数より多い");
@@ -439,7 +443,7 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
     int pos;
     int flow_count=0;
     QStringList list=d.split("\n");
-    if(list[0]==""){
+    if(list.size()==1 && list[0]==""){
         answer_num_=0;
     }else{
         answer_num_=list.size();
@@ -502,6 +506,10 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 
 bool AnswerForm::PutStone(){
     while(answer_flow_[stone_flow_count_][4]==1)stone_flow_count_++;//パスする
+    //if pass is end of stone flow, finish.
+    if (stone_flow_count_ >= answer_num_){
+        return false;
+    }
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
         bool buff[8][8];
@@ -567,8 +575,5 @@ bool AnswerForm::PutStone(){
     }
     /*後処理*/
     stone_flow_count_++;
-    if (stone_flow_count_ >= answer_num_){
-        return false;
-    }
     return true;
 }
