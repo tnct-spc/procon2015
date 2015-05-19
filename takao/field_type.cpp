@@ -31,8 +31,11 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
     //置く
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
-        if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31) continue;
-        else if(stone.at(i,j) == 1)
+        if(stone.at(i,j) == 0)//石がないならどうでもいい
+        {
+            continue;
+        }
+        else
         {
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
@@ -55,20 +58,21 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     {
         if(stone.at(i,j) == 0)//置かないならどうでも良い
         {
+            //std::cerr <<  "==0" << std::endl;
             continue;
-        }
-        else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
-        {
-            //std::cerr << "You try to put the stone on another stone." << std::endl;
-            return false;
         }
         else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
         {
             //std::cerr << "You try to put the stone out of range" << std::endl;
             return false;
         }
+        else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
+        {
+            //std::cerr << "You try to put the stone on another stone." << std::endl;
+            return false;
+        }
         if(is_connection == true) continue;
-        else
+        else if(0 <= j+x && j+x < 32 && 0 <= i+y && i+y < 32)
         {
             if(i+y > 0  && raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
             if(i+y < 31 && raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
@@ -77,6 +81,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         }
     }
     //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
+    //else std::cerr << "This stone can put here." << std::endl;
     return is_connection;
 }
 
