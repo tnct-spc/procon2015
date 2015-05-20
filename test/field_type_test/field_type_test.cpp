@@ -394,7 +394,7 @@ void field_type_test::get_answer_test()
     auto expected = "3 2 H 0\r\n"
                     "-1 -3 T 90\r\n"
                     "\r\n"
-                    "6 0 H 270\r\n"s;
+                    "6 0 H 270"s;
 
     auto result = field.get_answer();
     //std::cerr << result;
