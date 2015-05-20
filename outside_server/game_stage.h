@@ -25,13 +25,15 @@ public:
     //Intialize
     void IntializeStage(QGraphicsScene *stage,int base_x,int base_y,int block_size);
     //Make
-    void MakeStageData(/*bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
+    void MakeStageData(int user_number/*,bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
     //Start
     void StartAnswer(int answer_flow[256][5],int answer_num,QString userid, int answer_point);
     //
     void update_ranking_tag(int ranking);
 
 private: 
+    //me
+    int user_number_;
     //field
     QGraphicsScene *field_; //Field pointer
     //stage

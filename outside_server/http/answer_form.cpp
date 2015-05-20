@@ -84,6 +84,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
                 user_data_itr=g_user_data.size()-1;
             }
             //解答ファイルを入れる
+            g_user_data[user_data_itr].is_now_animation=false;
             g_user_data[user_data_itr].answer_point=answer_point.toInt();
             g_user_data[user_data_itr].answer_num=answer_num_;
             for(int i=0;i<answer_num_;i++){

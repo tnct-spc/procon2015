@@ -77,17 +77,28 @@ void OutsideServer::ReserveAnswer(){
             }else{
                 stage_max=6;
             }
+            //set ranking
+            int ranking_count=1;
+            int user_ranking[6];
+            for(unsigned long i=0;i<stage_max;i++){
+                if(!(g_user_data[user_sort[i]].is_now_animation)){
+                    user_ranking[user_sort[i]]=ranking_count;
+                    ranking_count++;
+                }
+            }
+            //set
             for(unsigned long i=0;i<stage_max;i++){
                 if(g_user_data[user_sort[i]].append_stage_number >= 0){
                     //すでにステージにある
                     if(g_user_data[user_sort[i]].is_renewal){
                         //[1]更新されているので書き換える
-                        game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData();
+                        game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData(user_sort[i]);
+                        g_user_data[user_sort[i]].is_now_animation=true;
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
-                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
                     }else{
                         //[2]もとのデータのままなので順位を更新して飛ばす
-                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(i+1/*Ranking*/);
+                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
                         continue;
                     }
                 }else{
@@ -106,9 +117,10 @@ void OutsideServer::ReserveAnswer(){
                     }
                     //書き換える
                     g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
-                    game_stage_[append_minimum_stage_num].MakeStageData();
+                    game_stage_[append_minimum_stage_num].MakeStageData(user_sort[i]);
+                    g_user_data[user_sort[i]].is_now_animation=true;
                     game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
-                    if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(i+1/*Ranking*/);
+                    if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(user_ranking[user_sort[i]]);
                 }
             }
             //すべての更新フラグをfalseに
@@ -155,7 +167,7 @@ void OutsideServer::loadbutton_clicked()
 
         //make all gamestage data
         for(int m=0;m<6;m++){
-            game_stage_[m].MakeStageData(/*g_stage_state_,g_stone_state_,g_stone_num_*/);
+            game_stage_[m].MakeStageData(m/*,g_stage_state_,g_stone_state_,g_stone_num_*/);
         }
         //Reset answer
         g_user_data.clear();
