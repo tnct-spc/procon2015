@@ -43,5 +43,6 @@ void simple_algorithm::run(){
     }
 
     //解答の送信
+    std::cout << "simple" << std::endl;
     emit answer_ready(problem.field);
 }
