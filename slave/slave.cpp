@@ -16,6 +16,7 @@ Slave::Slave(QWidget *parent) :
     ui(new Ui::Slave)
 {
     ui->setupUi(this);
+    connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
 }
 
 Slave::~Slave()
@@ -34,10 +35,12 @@ void Slave::clicked_run_button(){
                       );
     auto str = network->get();
     if(network->is_error()){
-        ui->net_label->setText("ネットが死んでる");
+        //ui->net_label->setText(QString("エラーコード ") + QString().setNum(network->what_error()));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("ネットワークエラーコード ") + QString().setNum(network->what_error()) + QString("\n"));
         return;
     }
-    ui->net_label->setText("ネットは生きてる");
+    //ui->net_label->setText("ネットは生きてる");
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("問題を受信しました\n"));
     problem_type problem(str);
 
     //solve
@@ -49,6 +52,11 @@ void Slave::clicked_run_button(){
 void Slave::answer_send(field_type answer){
     //std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
     net_mtx.lock();
-    network->send(answer);
+    std::string res = network->send(answer);
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
     net_mtx.unlock();
+}
+void Slave::text_box_clear(){
+    ui->textBrowser->setPlainText("");
 }

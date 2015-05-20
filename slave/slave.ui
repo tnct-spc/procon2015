@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>378</width>
     <height>300</height>
    </rect>
   </property>
@@ -16,47 +16,21 @@
   <widget class="QPushButton" name="run_button">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>260</y>
-     <width>141</width>
-     <height>21</height>
+     <x>20</x>
+     <y>10</y>
+     <width>81</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
     <string>START!!!</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>やる気を出す</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="checkBox_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>240</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>割と早くなる</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="post_line_edit">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>10</y>
+     <x>70</x>
+     <y>230</y>
      <width>291</width>
      <height>21</height>
     </rect>
@@ -68,8 +42,8 @@
   <widget class="QLineEdit" name="get_line_edit">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>40</y>
+     <x>70</x>
+     <y>250</y>
      <width>291</width>
      <height>21</height>
     </rect>
@@ -81,8 +55,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>40</y>
+     <x>20</x>
+     <y>250</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -94,8 +68,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>10</y>
+     <x>20</x>
+     <y>230</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -107,9 +81,9 @@
   <widget class="QLineEdit" name="token_line_edit">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>70</y>
-     <width>291</width>
+     <x>70</x>
+     <y>270</y>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -120,8 +94,8 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>70</y>
+     <x>20</x>
+     <y>270</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -133,9 +107,9 @@
   <widget class="QLineEdit" name="prob_num_line_edit">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>100</y>
-     <width>291</width>
+     <x>270</x>
+     <y>270</y>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -146,8 +120,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>100</y>
+     <x>210</x>
+     <y>270</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -156,17 +130,27 @@
     <string>問題番号</string>
    </property>
   </widget>
-  <widget class="QLabel" name="net_label">
+  <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>280</y>
-     <width>111</width>
-     <height>17</height>
+     <x>20</x>
+     <y>50</y>
+     <width>341</width>
+     <height>171</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Clear_button">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>10</y>
+     <width>85</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>レディ</string>
+    <string>Clear</string>
    </property>
   </widget>
  </widget>
@@ -180,11 +164,11 @@
    <slot>clicked_run_button()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>268</x>
-     <y>56</y>
+     <x>20</x>
+     <y>10</y>
     </hint>
     <hint type="destinationlabel">
-     <x>562</x>
+     <x>377</x>
      <y>120</y>
     </hint>
    </hints>
@@ -192,5 +176,6 @@
  </connections>
  <slots>
   <slot>clicked_run_button()</slot>
+  <slot>text_box_crear()</slot>
  </slots>
 </ui>

@@ -29,6 +29,7 @@ private:
 private slots:
     void clicked_run_button();
     void answer_send(field_type answer);
+    void text_box_clear();
 };
 
 #endif // SLAVE_H
