@@ -8,7 +8,6 @@
 #include <iostream>
 algorithm_manager::algorithm_manager(QObject *parent) : QObject(parent)
 {
-
 }
 algorithm_manager::algorithm_manager(problem_type _problem)
 {
@@ -21,6 +20,9 @@ algorithm_manager::algorithm_manager(problem_type _problem)
         connect(algo,&algorithm_type::finished,[=](){
             mtx.lock();
             boost::remove_erase(algo_vec,algo);
+            if(algo_vec.size() == 0){
+                emit finished();
+            }
             mtx.unlock();
         });
     }
@@ -43,4 +45,7 @@ void algorithm_manager::get_answer(field_type ans){
         emit answer_ready(ans);
     }
     mtx.unlock();
+}
+int algorithm_manager::run_thread_num(){
+    return algo_vec.size();
 }

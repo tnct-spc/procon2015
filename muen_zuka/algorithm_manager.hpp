@@ -14,7 +14,7 @@ public:
     explicit algorithm_manager(QObject *parent = 0);
     algorithm_manager(problem_type _problem);
     ~algorithm_manager();
-
+    int run_thread_num();
     void run();
 
 private:
@@ -25,6 +25,7 @@ private:
 
 signals:
     void answer_ready(field_type ans);
+    void finished();
 
 public slots:
     void get_answer(field_type ans);

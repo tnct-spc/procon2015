@@ -32,6 +32,5 @@ void poor_algo::run(){
     }
 
     //解答の送信
-    std::cout << "poor" << std::endl;
     emit answer_ready(problem.field);
 }

@@ -5,6 +5,7 @@
 #include "takao.hpp"
 #include "muen_zuka.hpp"
 #include "algorithm_manager.hpp"
+#include <iostream>
 //#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
@@ -46,6 +47,7 @@ void Slave::clicked_run_button(){
     //solve
     algo_manager = new algorithm_manager(problem);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    //connect(algo_manager,&algorithm_manager::finished,[&](){delete algo_manager;std::cout << "manager殺した" << std::endl;});
     algo_manager->run();
 
 }
@@ -54,6 +56,7 @@ void Slave::answer_send(field_type answer){
     net_mtx.lock();
     std::string res = network->send(answer);
     ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
     ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
     net_mtx.unlock();
 }
