@@ -1,12 +1,12 @@
-#include "outside_server.h"
-#include <QApplication>
-
 #include <QCoreApplication>
+#include <QApplication>
 #include <QSettings>
+#include <QString>
 #include <QFile>
 #include <QDir>
-#include <QString>
+
 #include <http/request_mapper.h>
+#include <outside_server.h>
 
 #include <global.h>
 //GLOBAL VAR
@@ -21,16 +21,15 @@ int main(int argc, char *argv[])
 {
     //mkdir
     QDir().mkdir("docroot");
-    QDir().mkdir("docroot/files");
-    QDir().mkdir("etc");
-    QDir().mkdir("etc/answer");
+    QDir().mkdir("docroot/problem");
 
     QApplication app(argc, argv);
+
+    //Screen
     OutsideServer w;
-    w.showFullScreen();
-
+    w.show();
+    //Server
     RequestMapper request_mapper;
-
 
     return app.exec();
 }

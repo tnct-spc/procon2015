@@ -2,14 +2,15 @@
 #define OUTSIDESERVER_H
 
 #include <QWidget>
-#include<QMatrix>
+#include <QMatrix>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
+#include <QGraphicsTextItem>
 #include <QTimer>
 #include <QFile>
 #include <QFileDialog>
+
 #include <interior/uma.h>
-#include <QGraphicsTextItem>
 #include <game_stage.h>
 //only use SimulateAnswerPoint
 #include <http/answer_form.h>
@@ -23,26 +24,26 @@ public:
     ~OutsideServer();
 
 public slots:
-    //ui
+    //ui_func
     void loadbutton_clicked();
     void uisizebutton_clicked();
     void pnspinbutton_changed(QString num);
-    //in class
+    //func
     void ReserveAnswer();
 
 private:
     //UMA
     UMA uma;
 
-    //
+    //only use get_point
     AnswerForm pointer;
 
-    //return answer num
-    int ConvertAnswer(QString filename_answer,int answer_flow[256][5]);
     //reset folder
     bool ResetFolder(const QString & dirName);
     //
     void resizeEvent(QResizeEvent *event);
+    //
+    void Decode_problem_and_set(QString problem_file_name);
 
 
 
@@ -52,15 +53,14 @@ private:
     QString problem_number_spin_button_value_;
 
     //stage class
-    GameStage game_stage_[6];//If error,change "[6]" to "[7]".
+    GameStage game_stage_[6];
 
     //answer allocation
     int answer_points_[6];//-1 is Empty.
     QString answer_players_[6];
 
     //pass
-    QString ProblemFolderName=QCoreApplication::applicationDirPath()+"/docroot/files/";
-    QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/etc/answer/";
+    QString ProblemFolderName=QCoreApplication::applicationDirPath()+"/docroot/problem/";
 
     //problem ok flag
     bool problem_flag; 

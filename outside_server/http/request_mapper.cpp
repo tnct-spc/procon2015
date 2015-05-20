@@ -16,7 +16,7 @@ void RequestMapper::service(QHttpRequest* request, QHttpResponse* response) {
     else if (path=="/answer") {
         P_answer_page.Service(request, response);
     }
-    else if (path.startsWith("/files")) {
+    else if (path.startsWith("/problem")) {
         P_output_problem_page.Service(request, response);
     }
     else {
@@ -25,4 +25,3 @@ void RequestMapper::service(QHttpRequest* request, QHttpResponse* response) {
         response->end();
     }
 }
-

@@ -49,7 +49,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>http://localhost:8080/files/problem1.txt</string>
+    <string>http://localhost:8080/problem/problem1.txt</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">

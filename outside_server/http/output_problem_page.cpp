@@ -2,7 +2,7 @@
 
 OutputProblemPage::OutputProblemPage(QObject *parent) : QObject(parent)
 {
-    //empty
+
 }
 
 void OutputProblemPage::Service(QHttpRequest *request, QHttpResponse *response){
