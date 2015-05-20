@@ -30,6 +30,8 @@ public:
     void StartAnswer(int answer_flow[256][5],int answer_num,QString userid, int answer_point);
     //
     void update_ranking_tag(int ranking);
+    //
+    void stop_animation_timer();
 
 private: 
     //me

@@ -217,3 +217,7 @@ void GameStage::update_ranking_tag(int ranking){
         break;
     }
 }
+
+void GameStage::stop_animation_timer(){
+    if(answer_animation_timer_->isActive()) answer_animation_timer_->stop();
+}

@@ -159,6 +159,11 @@ void OutsideServer::loadbutton_clicked()
     {
         //TODO: need mutex
 
+        //stop animation
+        for(int i=0;i<6;i++){
+            game_stage_[i].stop_animation_timer();
+        }
+
         //Reset problem_folder
         ResetFolder(ProblemFolderName);
 
