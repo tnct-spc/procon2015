@@ -116,6 +116,12 @@ bool AnswerForm::FormatCheck(QString plain_data){
     if(list.size()==1 && list[0]==""){
         answer_num=0;
     }else{
+        if(list[list.size()-1]==""){
+#ifdef _DEBUG
+            qDebug("***format error*** 最後の行が空");
+#endif
+            return false;
+        }
         answer_num=list.size();
     }
     if(answer_num > g_stone_num_){
