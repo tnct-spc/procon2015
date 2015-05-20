@@ -93,12 +93,12 @@ void OutsideServer::ReserveAnswer(){
                     if(g_user_data[user_sort[i]].is_renewal){
                         //[1]更新されているので書き換える
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].MakeStageData(user_sort[i]);
-                        g_user_data[user_sort[i]].is_now_animation=true;
                         game_stage_[g_user_data[user_sort[i]].append_stage_number].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
-                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
+                        if(g_need_rankingtag_updated && g_user_data[user_sort[i]].is_now_animation==false) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
+                        g_user_data[user_sort[i]].is_now_animation=true;
                     }else{
                         //[2]もとのデータのままなので順位を更新して飛ばす
-                        if(g_need_rankingtag_updated) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
+                        if(g_need_rankingtag_updated && g_user_data[user_sort[i]].is_now_animation==false) game_stage_[g_user_data[user_sort[i]].append_stage_number].update_ranking_tag(user_ranking[user_sort[i]]);
                         continue;
                     }
                 }else{
@@ -118,9 +118,9 @@ void OutsideServer::ReserveAnswer(){
                     //書き換える
                     g_user_data[user_sort[i]].append_stage_number=append_minimum_stage_num;
                     game_stage_[append_minimum_stage_num].MakeStageData(user_sort[i]);
-                    g_user_data[user_sort[i]].is_now_animation=true;
                     game_stage_[append_minimum_stage_num].StartAnswer(g_user_data[user_sort[i]].answer_flow,g_user_data[user_sort[i]].answer_num,g_user_data[user_sort[i]].userid,g_user_data[user_sort[i]].answer_point);
-                    if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(user_ranking[user_sort[i]]);
+                    if(g_need_rankingtag_updated && g_user_data[user_sort[i]].is_now_animation==false) game_stage_[append_minimum_stage_num].update_ranking_tag(user_ranking[user_sort[i]]);
+                    g_user_data[user_sort[i]].is_now_animation=true;
                 }
             }
             //すべての更新フラグをfalseに
