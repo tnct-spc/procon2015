@@ -95,7 +95,6 @@ void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString useri
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
         for(int j=0;j<5;j++){
-            //qDebug("%s",qPrintable(QString::number(answer_flow[i][j])));
             answer_flow_[i][j]=answer_flow[i][j];
         }
     }

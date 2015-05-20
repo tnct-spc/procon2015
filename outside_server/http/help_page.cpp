@@ -1,7 +1,7 @@
 #include "help_page.h"
 
 HelpPage::HelpPage(QObject *parent) : QObject(parent) {
-    // empty
+
 }
 
 void HelpPage::Service(/*QHttpRequest *request,*/ QHttpResponse *response) {
@@ -12,7 +12,7 @@ void HelpPage::Service(/*QHttpRequest *request,*/ QHttpResponse *response) {
                 "\n   <body>"
                 "\n       TNCT-SPC PROCON26 SERVER<br>"
                 "\n       ------------------------<br>"
-                "\n       If you want to get the problem. Please access \"/files/problem(problemnumber).txt\".<br>"
+                "\n       If you want to get the problem. Please access \"/problem/problem(problemnumber).txt\".<br>"
                 "\n       If you want to send the answer. Please access \"/answer\".<br>"
                 "\n   </body>"
                 "\n</html>"

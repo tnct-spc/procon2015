@@ -6,17 +6,17 @@ OutsideServer::OutsideServer(QWidget *parent) : QWidget(parent),ui(new Ui::proco
 {
     //ui
     ui->setupUi(this);
-    mainstage = new QGraphicsScene(0, 0, 1719, 1079);
+    mainstage = new QGraphicsScene(0, 0, 1720, 1080);
     ui->graphicsView->setScene(mainstage);
 
     //UMA
     uma.StartUp(mainstage,0.2);
 
-    //Answer reserve interval timer set
+    //Set answer reserve interval timer
     QTimer *reserve_answer_timer;
     reserve_answer_timer = new QTimer();
     connect(reserve_answer_timer, SIGNAL(timeout()), this, SLOT(ReserveAnswer()));
-    reserve_answer_timer->start(1/*interval 1*/);
+    reserve_answer_timer->start(1/*interval 1ms*/);
 
     //intialize
     problem_flag=false;
@@ -48,12 +48,12 @@ OutsideServer::~OutsideServer()
     delete ui;
 }
 
-//1ミリ秒間隔で画面に表示する解答の更新を行う
+//呼ばれるごとに画面に表示する解答の更新を行う
 void OutsideServer::ReserveAnswer(){
 
     if (problem_flag){
+        //TODO: need_mutex
         if(g_need_rankingtag_updated || g_user_data_updated){
-            g_user_data_updated=false;
             //user_sortを介してg_user_dataを得点が高い順にソート
             std::vector<int> user_sort;
             for(unsigned long i=0;i<g_user_data.size();i++){
@@ -111,15 +111,16 @@ void OutsideServer::ReserveAnswer(){
                     if(g_need_rankingtag_updated) game_stage_[append_minimum_stage_num].update_ranking_tag(i+1/*Ranking*/);
                 }
             }
-            //すべての更新フラグ(renewal)をfalseに
+            //すべての更新フラグをfalseに
             for(unsigned long i=0;i<g_user_data.size();i++) g_user_data[i].is_renewal=false;
+            g_user_data_updated=false;
             g_need_rankingtag_updated=false;
         }
     }
 }
 
 void OutsideServer::uisizebutton_clicked(){
-    static bool toggleuisize=1;
+    static bool toggleuisize=0;
     if(toggleuisize==1){
         toggleuisize=0;
         this->showNormal();
@@ -140,62 +141,17 @@ void OutsideServer::loadbutton_clicked()
     QString strSelectedFilter;
 
     //問題ファイルを開く
-    QString problem_file_name = QFileDialog::getOpenFileName(this, "", "./etc/", "*.txt",&strSelectedFilter, options);
+    QString problem_file_name = QFileDialog::getOpenFileName(this, "", "./", "*.txt",&strSelectedFilter, options);
 
     if (!problem_file_name.isEmpty())
     {
-        problem_flag = true;
+        //TODO: need mutex
 
-        QFile problem_file(problem_file_name);
-        problem_file.open(QIODevice::ReadOnly);
-        QString line;
-        //フィールド情報を配列に格納,フィールドの更新
-        for (int y = 0; y < 32; y++){
-            for (int x = 0; x < 32; x++){
-                line = problem_file.read(1);
-                //フィールドに置く
-                bool state=line.toInt();
-                g_stage_state_[y+8][x+8]=state;
-            }
-            problem_file.read(2);//改行分
-        }
-        problem_file.read(2);//改行分
-        //ストーンの個数を取得
-        QString s1,s2,s3;
-        s1 = problem_file.read(1);
-        s2 = problem_file.read(1);
-        s3 = problem_file.read(1);
-        if(s3=="0" || s3=="1" || s3=="2" || s3=="3" || s3=="4" || s3=="5" || s3=="6" || s3=="7" || s3=="8" || s3=="9"){
-            //3keta
-            g_stone_num_=s1.toInt()*100 + s2.toInt()*10 + s3.toInt();
-            problem_file.read(2);//改行分
-        }else if(s2=="0" || s2=="1" || s2=="2" || s2=="3" || s2=="4" || s2=="5" || s2=="6" || s2=="7" || s2=="8" || s2=="9"){
-            //2keta
-            g_stone_num_=s1.toInt()*10 + s2.toInt();
-            problem_file.read(1);
-        }else{
-            //1keta
-            g_stone_num_=s1.toInt();
-        }
-        //それぞれのストーンを取得
-        for (int n = 0; n < g_stone_num_; n++){
-            if(n!=0) problem_file.read(2);//改行分
-            for (int y = 0; y < 8; y++){
-                for (int x = 0; x < 8; x++){
-                    line = problem_file.read(1);
-                    if (line == "0"){
-                        //置かれていない
-                        g_stone_state_[n][y][x] = false;
-                    }
-                    else if (line == "1"){
-                        //置かれている
-                        g_stone_state_[n][y][x] = true;
-                    }
-                }
-                problem_file.read(2);//改行分
-            }
-        }
-        problem_file.close();
+        //Reset problem_folder
+        ResetFolder(ProblemFolderName);
+
+        //get problem
+        Decode_problem_and_set(problem_file_name);
 
         //make all gamestage data
         for(int m=0;m<6;m++){
@@ -203,52 +159,67 @@ void OutsideServer::loadbutton_clicked()
         }
         //Reset answer
         g_user_data.clear();
+
         //Copy file to problemfolder (Name is "problem[problem_number_spin_button_value_].txt")
         QFile::copy(problem_file_name,ProblemFolderName+"problem"+problem_number_spin_button_value_+".txt");
+
+        //unlock
+        problem_flag = true;
     }
 }
 
-/*アンサー情報のロード*/
-int OutsideServer::ConvertAnswer(QString filename_answer,int answer_flow[256][5]){
+void OutsideServer::Decode_problem_and_set(QString problem_file_name){
+    QFile rawdata(problem_file_name);
+    rawdata.open(QIODevice::ReadOnly);
 
-    QFile answer_file(filename_answer);
-    answer_file.open(QIODevice::ReadOnly);
-    QString line,line2;
-
-    //ファイル解析
+    QString line;
     //フィールド情報を配列に格納,フィールドの更新
-    int i=0;
-    while(1){
-        if(answer_file.atEnd()){
-            answer_file.close();
-            return i;
+    for (int y = 0; y < 32; y++){
+        for (int x = 0; x < 32; x++){
+            line = rawdata.read(1);
+            //フィールドに置く
+            bool state=line.toInt();
+            g_stage_state_[y+8][x+8]=state;
         }
-        //左右
-        line = answer_file.read(1);
-        line2 = answer_file.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = answer_file.read(1);
-        }
-        answer_flow[i][0] = line.toInt();
-        //上下
-        line = answer_file.read(1);
-        line2 = answer_file.read(1);
-        if (line2 != " "){
-            line = line + line2;
-            line2 = answer_file.read(1);
-        }
-        answer_flow[i][1] = line.toInt();
-        //裏表
-        line = answer_file.read(1);
-        if (line == "H") answer_flow[i][2] = 0;
-        if (line == "T") answer_flow[i][2] = 1;
-        line = answer_file.read(1);//空白分
-        //角度
-        line = answer_file.readLine(8);
-        answer_flow[i][3] = line.toInt();
-        i++;
+        rawdata.read(2);//改行分
     }
+    rawdata.read(2);//改行分
+    //ストーンの個数を取得
+    QString s1,s2,s3;
+    s1 = rawdata.read(1);
+    s2 = rawdata.read(1);
+    s3 = rawdata.read(1);
+    if(s3=="0" || s3=="1" || s3=="2" || s3=="3" || s3=="4" || s3=="5" || s3=="6" || s3=="7" || s3=="8" || s3=="9"){
+        //3keta
+        g_stone_num_=s1.toInt()*100 + s2.toInt()*10 + s3.toInt();
+        rawdata.read(2);//改行分
+    }else if(s2=="0" || s2=="1" || s2=="2" || s2=="3" || s2=="4" || s2=="5" || s2=="6" || s2=="7" || s2=="8" || s2=="9"){
+        //2keta
+        g_stone_num_=s1.toInt()*10 + s2.toInt();
+        rawdata.read(1);
+    }else{
+        //1keta
+        g_stone_num_=s1.toInt();
+    }
+    //それぞれのストーンを取得
+    for (int n = 0; n < g_stone_num_; n++){
+        if(n!=0) rawdata.read(2);//改行分
+        for (int y = 0; y < 8; y++){
+            for (int x = 0; x < 8; x++){
+                line = rawdata.read(1);
+                if (line == "0"){
+                    //置かれていない
+                    g_stone_state_[n][y][x] = false;
+                }
+                else if (line == "1"){
+                    //置かれている
+                    g_stone_state_[n][y][x] = true;
+                }
+            }
+            rawdata.read(2);//改行分
+        }
+    }
+    rawdata.close();
 }
 
 bool OutsideServer::ResetFolder(const QString &dir_name)

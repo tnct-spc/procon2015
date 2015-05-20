@@ -2,12 +2,13 @@
 #define GAMESTAGE_H
 
 #include <QWidget>
-#include "ui_outside_server.h"
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QGraphicsItem>
 #include <QFile>
 #include <QTimer>
+
+#include "ui_outside_server.h"
 #include <global.h>
 
 struct point{
@@ -23,9 +24,9 @@ public:
     explicit GameStage(QObject *parent = 0);
     //Intialize
     void IntializeStage(QGraphicsScene *stage,int base_x,int base_y,int block_size);
-    //Intialize stage
+    //Make
     void MakeStageData(/*bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
-    //Read Answer(answer.txt)
+    //Start
     void StartAnswer(int answer_flow[256][5],int answer_num,QString userid, int answer_point);
     //
     void update_ranking_tag(int ranking);
