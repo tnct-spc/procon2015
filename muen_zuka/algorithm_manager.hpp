@@ -4,6 +4,7 @@
 #include <QObject>
 #include <string>
 #include <mutex>
+#include <limits>
 #include "takao.hpp"
 #include "tengu.hpp"
 Q_DECLARE_METATYPE(field_type)
@@ -21,7 +22,7 @@ private:
     std::vector<algorithm_type*> algo_vec;
     std::mutex mtx;
     problem_type problem;
-    u_int64_t best_zk = 0;
+    u_int64_t best_zk = std::numeric_limits<u_int64_t>::max();
 
 signals:
     void answer_ready(field_type ans);

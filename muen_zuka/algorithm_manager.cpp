@@ -40,7 +40,7 @@ void algorithm_manager::run(){
 }
 void algorithm_manager::get_answer(field_type ans){
     mtx.lock();
-    if(best_zk < ans.get_score()){
+    if(best_zk > ans.get_score()){
         best_zk = ans.get_score();
         emit answer_ready(ans);
     }
