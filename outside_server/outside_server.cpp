@@ -190,6 +190,7 @@ void OutsideServer::loadbutton_clicked()
         QFile::copy(problem_file_name,ProblemFolderName+"problem"+problem_number_spin_button_value_+".txt");
 
         //unlock
+        g_problem_number=problem_number_spin_button_value_.toInt();
         problem_flag = true;
     }
 }

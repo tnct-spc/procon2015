@@ -19,6 +19,7 @@ struct user_data_type{
 };
 
 //GLOBAL VAR
+extern int g_problem_number;
 extern bool g_stage_state_[48][48];
 extern bool g_stone_state_[256][8][8];
 extern int g_stone_num_;

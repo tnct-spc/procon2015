@@ -38,6 +38,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     QUrlQuery url_query(lowdata);
     QString plaintext_user_id=url_query.queryItemValue("id");
     QString plaintext_answer_data=url_query.queryItemValue("answer");
+    int plaintext_problem_number=url_query.queryItemValue("quest_number").toInt();
 
     //Decode request data
     plaintext_user_id.replace("+"," ");
@@ -51,7 +52,13 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     response->writeHead(200);
 
 
-    if (user_id.isEmpty()) {
+    if(g_problem_number < 0){
+        response->write("error quest not set.");
+    }
+    else if(plaintext_problem_number != g_problem_number){
+        response->write("error there are no quest with this number.");
+    }
+    else if (user_id.isEmpty()) {
         response->write("error userid is empty.");
     }else{
         if(!FormatCheck(plaintext_answer_data)){
