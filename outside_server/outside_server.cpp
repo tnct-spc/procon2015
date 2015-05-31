@@ -117,7 +117,7 @@ void OutsideServer::ReserveAnswer(){
                         append_minimum_stage_num=g_user_data.size()-1;
                     }else{
                         for(unsigned long j=g_user_data.size();j>0;j--){
-                            if(g_user_data[user_sort[j-1]].append_stage_number > 0){
+                            if(g_user_data[user_sort[j-1]].append_stage_number >= 0){
                                 append_minimum_stage_num=g_user_data[user_sort[j-1]].append_stage_number;
                                 g_user_data[user_sort[j-1]].append_stage_number=-1;
                                 break;
