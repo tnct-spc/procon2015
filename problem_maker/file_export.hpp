@@ -8,12 +8,12 @@ class file_export
 {
 private:
     file_export() = default;
-    ~file_export() = default;
 
 public:
     file_export(int const nth,
                 raw_field_type field,
                 std::vector<raw_stone_type> stones);
+    ~file_export() = default;
 };
 
 #endif // FILE_EXPORT_HPP

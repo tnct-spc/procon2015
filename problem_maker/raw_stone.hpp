@@ -1,18 +1,24 @@
 #ifndef RAW_STONE_HPP
 #define RAW_STONE_HPP
 #include "problem_maker.hpp"
+#include <vector>
+#include <array>
 
 class raw_stone
 {
 private:
-    std::array<std::array<bool, STONE_SIZE>, STONE_SIZE> data;
     enum class direction { UP, RIGHT, DOWN, LEFT };
 
 public:
-    raw_stone();
+    std::vector<raw_stone_type> data;
+
+    raw_stone(int const algo,int const field_zk);
     ~raw_stone() = default;
-    void create(int zk);
+
     void create();
+    void create(int const field_zk);
+    void simple_create(int const field_zk);
+    int get_fill_zk(raw_stone_type stone);
 
 };
 

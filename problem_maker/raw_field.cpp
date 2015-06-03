@@ -1,12 +1,16 @@
 #include "raw_field.hpp"
 #include <iostream>
+#include <algorithm>
 #include <random>
 #include <array>
 #include <random>
 
-raw_field::raw_field()
+raw_field::raw_field(int const obstacle,int const col, int const row)
 {
     for(auto each_row : field) each_row.fill(0);
+    fill_row(row);
+    fill_col(col);
+    place_obstacle(obstacle,col,row);
 }
 
 void raw_field::fill_row(int const row)
@@ -31,7 +35,7 @@ void raw_field::fill_col(int const col)
     }
 }
 
-void raw_field::obstacle(int const num_of_obstacle, int const col, int const row)
+void raw_field::place_obstacle(int const num_of_obstacle, int const col, int const row)
 {
     int count = 0;
     std::random_device seed_gen;
@@ -48,4 +52,14 @@ void raw_field::obstacle(int const num_of_obstacle, int const col, int const row
             count++;
         }
     }
+}
+
+int raw_field::get_empty_zk()
+{
+    int sum = 0;
+    for(auto each_row : field)
+    {
+        sum += std::count(each_row.begin(),each_row.end(),0);
+    }
+    return sum;
 }

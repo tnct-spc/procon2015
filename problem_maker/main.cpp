@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include "problem_maker.hpp"
 #include "raw_stone.hpp"
+#include "raw_field.hpp"
+#include "file_export.hpp"
 #include <array>
 #include <random>
 #include <iostream>
@@ -13,7 +15,9 @@ int main(int argc, char **argv)
         ("help,h", "ヘルプを表示")
         ("num-of-problem,n", boost::program_options::value<int>()->default_value(10), "問題数")
         ("cut-row,r", boost::program_options::value<int>()->default_value(-1), "削る横列")
-        ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列");
+        ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列")
+        ("obstacle,o", boost::program_options::value<int>()->default_value(-1), "障害物");
+
 
     boost::program_options::variables_map vm;
     try
@@ -31,14 +35,30 @@ int main(int argc, char **argv)
         std::cout << opt << std::endl;
     }
 
-    const int nop = vm["num-of-problem"].as<int>();
+    std::random_device seed_gen;
+    std::default_random_engine engine(seed_gen());
+    std::uniform_int_distribution<> dist_row(0, FIELD_SIZE);
+    std::uniform_int_distribution<> dist_col(0, FIELD_SIZE);
+    std::uniform_int_distribution<> dist_obs(0, FIELD_SIZE * 2);
+
+    int const nop = vm["num-of-problem"].as<int>();
     std::cout << "num-of-problem = " << nop << std::endl;
 
-    const int row = vm["cut-row"].as<int>();
+    int const row = vm["cut-row"].as<int>() < 1 ? dist_row(engine) : vm["cut-row"].as<int>();
     std::cout << "cut-row = " << row << std::endl;
 
-    const int column = vm["cut-column"].as<int>();
+    int const column = vm["cut-column"].as<int>() < 1 ? dist_col(engine) : vm["cut-column"].as<int>();
     std::cout << "cut-column = " << column << std::endl;
+
+    int const obstacle = vm["obstacle"].as<int>() < 1 ? dist_obs(engine) : vm["obstacle"].as<int>();
+    std::cout << "obstacle = " << obstacle << std::endl;
+
+    for(int i = 1; i <= nop; ++i)
+    {
+        raw_field rf(obstacle,column,row);
+        raw_stone rs(1,rf.get_empty_zk());
+        file_export fe(i,rf.field,rs.data);
+    }
 
     std::cout << "Hello, world" << std::endl;
 

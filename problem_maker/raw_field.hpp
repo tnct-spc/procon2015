@@ -5,15 +5,16 @@
 
 class raw_field
 {
-private:
-    raw_field_type field;
-    ~raw_field() = default;
-
 public:
+    raw_field_type field;
+
     void fill_row(int const row);
     void fill_col(int const col);
-    void obstacle(int const num_of_obstacle, int const col, int const row);
-    raw_field();
+    void place_obstacle(int const num_of_obstacle, int const col, int const row);
+    int get_empty_zk();
+
+    raw_field(int const obstacle,int const col, int const row);
+    ~raw_field() = default;
 };
 
 #endif // RAW_FIELD_HPP
