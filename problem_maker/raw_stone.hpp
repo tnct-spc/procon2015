@@ -20,6 +20,8 @@ public:
     void simple_create(int const field_zk);
     int get_fill_zk(raw_stone_type stone);
     void print_stone(std::size_t const nth);
+    void print_stone(raw_stone_type const& stone);
+    bool is_hole(raw_stone_type& stone, int zk);
 
 };
 

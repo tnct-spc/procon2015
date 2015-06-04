@@ -35,7 +35,7 @@ file_export::file_export(int const nth, raw_field_type field, std::vector<raw_st
             }
             output_file << std::endl;
         }
-        output_file << std::endl << std::endl;
+        output_file << std::endl;
     }
     output_file.close();
 }
