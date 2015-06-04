@@ -14,7 +14,7 @@ file_export::file_export(int const nth, raw_field_type field, std::vector<raw_st
     file << nth << ".txt";
 
     std::ofstream output_file(file.str());
-    std::cout << "file output" << std::endl;
+    std::cout << "file output" << std::endl << "---------------------------" << std::endl;
     for(auto const& cell_row : field)
     {
         for(auto const& cell : cell_row)

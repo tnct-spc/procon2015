@@ -73,7 +73,6 @@ void raw_stone::simple_create(int const field_zk)
         {
             data.push_back(stone);
             total_zk += count;
-            print_stone(data.size()-1);
         }
     }
     std::cout << "stone make complete" << std::endl;

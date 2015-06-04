@@ -53,13 +53,12 @@ int main(int argc, char **argv)
     int const obstacle = vm["obstacle"].as<int>() < 1 ? dist_obs(engine) : vm["obstacle"].as<int>();
     std::cout << "obstacle = " << obstacle << std::endl;
 
-    //for(int i = 1; i <= nop; ++i)
-    //{
+    for(int i = 1; i <= nop; ++i)
+    {
         raw_field rf(obstacle,column,row);
         raw_stone rs(1,rf.get_empty_zk());
-        //std::cout << "after stone make in main" << std::endl;
-        file_export fe(1,rf.field,rs.data);
-    //}
+        file_export fe(i,rf.field,rs.data);
+    }
     std::cout << "Completion" << std::endl;
 
     return 0;
