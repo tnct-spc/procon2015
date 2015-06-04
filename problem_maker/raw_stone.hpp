@@ -19,6 +19,7 @@ public:
     void create(int const field_zk);
     void simple_create(int const field_zk);
     int get_fill_zk(raw_stone_type stone);
+    void print_stone(std::size_t const nth);
 
 };
 
