@@ -21,9 +21,9 @@ file_export::file_export(int const nth, raw_field_type field, std::vector<raw_st
         {
             cell == 0 ? output_file << '0' : output_file << '1';
         }
-        output_file << std::endl;
+        output_file << "\r\n";
     }
-    output_file << std::endl << stones.size() << std::endl;
+    output_file << "\r\n" << stones.size() << "\r\n";
 
     for(auto const& each_stone : stones)
     {
@@ -33,9 +33,9 @@ file_export::file_export(int const nth, raw_field_type field, std::vector<raw_st
             {
                 cell == 0 ? output_file << '0' : output_file << '1';
             }
-            output_file << std::endl;
+            output_file << "\r\n";
         }
-        output_file << std::endl;
+        output_file << "\r\n";
     }
     output_file.close();
 }
