@@ -17,7 +17,7 @@ public:
 
 private:
     //pass
-    QString ProblemFolderName=QCoreApplication::applicationDirPath()+"/docroot/files/";
+    QString ProblemFolderName=QCoreApplication::applicationDirPath()+"/docroot/problem/";
 };
 
 #endif // OUTPUTPROBLEMPAGE_H

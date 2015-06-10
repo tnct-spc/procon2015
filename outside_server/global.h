@@ -4,11 +4,13 @@
 #include <QString>
 #include <vector>
 #include <algorithm>
+#include <mutex>
 
 struct user_data_type{
     QString userid;
     int append_stage_number;
     bool is_renewal;
+    bool is_now_animation;
     //answer
     int answer_flow[256][5];
     int answer_num;

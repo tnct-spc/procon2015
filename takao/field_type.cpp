@@ -76,7 +76,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         {
             if(i+y > 0  && raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
             if(i+y < 31 && raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
-            if(j+x < 0  && raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
+            if(j+x > 0  && raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }

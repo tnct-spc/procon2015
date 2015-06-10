@@ -70,7 +70,11 @@ void net::networkerror(QNetworkReply::NetworkError e){
     int code = e;
     std::cout << "network error code " << code  << std::endl;
     network_error_flag = true;
+    net_error_num = e;
 }
 bool net::is_error(){
     return network_error_flag;
+}
+int net::what_error(){
+    return net_error_num;
 }
