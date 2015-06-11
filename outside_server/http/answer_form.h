@@ -26,13 +26,14 @@ private slots:
 
 private:
     QHttpResponse *new_response_;
+
+    //decode answer
+    void DecodeAnswer(QString rawdata);
     //put a stone on stage
     bool PutStone();
-    //
-    bool format_check(QString plain_data,QString format_type);
 
-    //pass
-    QString AnswerFolderName=QCoreApplication::applicationDirPath()+"/etc/answer/";
+    //Important function.
+    bool FormatCheck(QString plain_data);
 
     //stage data
     int stage_state_[48][48];//0=empty;1=block;2=answer_block
@@ -41,6 +42,7 @@ private:
     //answer data
     int answer_flow_[256][5];
     int answer_num_;
+    int answer_putstone_num_;
     int stone_flow_count_;
 
 };

@@ -9,6 +9,7 @@
 #include "takao.hpp"
 #include "muen_zuka.hpp"
 namespace Ui {
+
 class Slave;
 }
 
@@ -23,10 +24,12 @@ public:
 private:
     Ui::Slave *ui;
     net *network;
+    algorithm_manager *algo_manager;
     std::mutex net_mtx;
 private slots:
     void clicked_run_button();
     void answer_send(field_type answer);
+    void text_box_clear();
 };
 
 #endif // SLAVE_H

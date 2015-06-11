@@ -26,6 +26,7 @@ public:
     std::string get();
     std::string send(field_type answer);
     bool is_error();
+    int what_error();
 signals:
 
 public slots:
@@ -40,6 +41,7 @@ private:
     std::string _id;
     int _problem_num;
     bool network_error_flag =false;
+    enum QNetworkReply::NetworkError net_error_num = QNetworkReply::NoError;
 };
 
 #endif // NET_H

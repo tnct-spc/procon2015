@@ -14,7 +14,7 @@ class placed_stone_type
 
         friend bool operator== (placed_stone_type const& lhs, placed_stone_type const& rhs);
 
-        stone_type const & stone;
+        stone_type const stone;
         point_type p_in_field;
         point_type p_in_stone;
 };

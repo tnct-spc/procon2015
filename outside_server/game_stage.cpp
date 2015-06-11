@@ -48,7 +48,8 @@ void GameStage::IntializeStage(QGraphicsScene *field,int base_x,int base_y,int b
     QObject::connect(answer_animation_timer_, SIGNAL(timeout()), this, SLOT(AnswerAnimation()));
 }
 
-void GameStage::MakeStageData(/*bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/){
+void GameStage::MakeStageData(int user_number/*,bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/){
+    user_number_=user_number;
     //Set stage
     for (int y = 0; y < 48; y++){
         for (int x = 0; x < 48; x++){
@@ -95,7 +96,6 @@ void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString useri
     answer_num_=answer_num;
     for (int i = 0; i < answer_num; i++){
         for(int j=0;j<5;j++){
-            //qDebug("%s",qPrintable(QString::number(answer_flow[i][j])));
             answer_flow_[i][j]=answer_flow[i][j];
         }
     }
@@ -109,6 +109,7 @@ void GameStage::AnswerAnimation(){
         //show point
         tag_point_->setPlainText(QString::number(answer_point_));
         //flag update rankingtag
+        g_user_data[user_number_].is_now_animation=false;
         g_need_rankingtag_updated=true;
         //stop timer
         answer_animation_timer_->stop();
@@ -215,4 +216,8 @@ void GameStage::update_ranking_tag(int ranking){
         qDebug("***error*** in GameStage::update_ranking_tag, ranking_str(int) value is invalid");
         break;
     }
+}
+
+void GameStage::stop_animation_timer(){
+    if(answer_animation_timer_->isActive()) answer_animation_timer_->stop();
 }
