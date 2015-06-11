@@ -13,10 +13,15 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        master.cpp
+        master.cpp \
+    server.cpp
 
-HEADERS  += master.h
+HEADERS  += master.h \
+    server.h \
+    global.h
 
 FORMS    += master.ui
 
 QMAKE_CXXFLAGS += -std=c++14
+
+include(../lib/qhttpserver/qhttpserver.pri)

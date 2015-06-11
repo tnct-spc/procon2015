@@ -5,20 +5,17 @@ net::net(QUrl server_url)
 {
     _server_url = server_url;
     _master_url = server_url;
-    _id = "0";
     _problem_num = 1;
 }
 net::net(QUrl server_url,QUrl master_url)
 {
     _server_url = server_url;
     _master_url = master_url;
-    _id = "0";
     _problem_num = 1;
 }
-net::net(QUrl server_url,QUrl master_url,std::string id,int problem_num){
+net::net(QUrl server_url,QUrl master_url,int problem_num){
     _server_url = server_url;
     _master_url = master_url;
-    _id = id;
     _problem_num = problem_num;
 }
 
@@ -39,7 +36,7 @@ std::string net::get()
 std::string net::send(field_type answer){
     QEventLoop eventloop;
     QUrlQuery postData;
-    postData.addQueryItem("id",_id.c_str());
+    postData.addQueryItem("point",QString::number(answer.get_score()));
     postData.addQueryItem("quest_number",QString::number(_problem_num));
     postData.addQueryItem("answer",answer.get_answer().c_str());
     QNetworkRequest req(_master_url);

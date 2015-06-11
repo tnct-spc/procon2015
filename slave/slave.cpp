@@ -31,7 +31,6 @@ void Slave::clicked_run_button(){
     //net network(gethost,posthost,"testman",1);
     network = new net(ui->get_line_edit->text(),
                       ui->post_line_edit->text(),
-                      std::string(ui->token_line_edit->text().toLocal8Bit()),
                       ui->prob_num_line_edit->text().toInt()
                       );
     auto str = network->get();

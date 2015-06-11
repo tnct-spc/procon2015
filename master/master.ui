@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Master</class>
- <widget class="QWidget" name="Master" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Master">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,12 +10,57 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Master</string>
   </property>
+  <widget class="QLineEdit" name="token_name_box">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>271</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>名無し</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Token</string>
+   </property>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>token_name_box</sender>
+   <signal>editingFinished()</signal>
+   <receiver>Master</receiver>
+   <slot>change_token_box()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>211</x>
+     <y>106</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>change_token_box()</slot>
+ </slots>
 </ui>

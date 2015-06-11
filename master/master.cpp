@@ -12,3 +12,7 @@ Master::~Master()
 {
     delete ui;
 }
+
+void Master::change_token_box(){
+    g_token_name = ui->token_name_box->text();
+}

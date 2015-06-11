@@ -36,7 +36,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>http://localhost:8080/answer</string>
+    <string>http://localhost:8081</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="get_line_edit">
@@ -78,36 +78,10 @@
     <string>送信先</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="token_line_edit">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>270</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>testman</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>270</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>トークン</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="prob_num_line_edit">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>80</x>
      <y>270</y>
      <width>91</width>
      <height>21</height>
@@ -120,9 +94,9 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>210</x>
+     <x>20</x>
      <y>270</y>
-     <width>51</width>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>

@@ -2,6 +2,7 @@
 #define MASTER_H
 
 #include <QWidget>
+#include "global.h"
 
 namespace Ui {
 class Master;
@@ -17,6 +18,9 @@ public:
 
 private:
     Ui::Master *ui;
+
+private slots:
+    void change_token_box();
 };
 
 #endif // MASTER_H
