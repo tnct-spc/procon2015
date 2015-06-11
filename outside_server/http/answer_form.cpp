@@ -38,6 +38,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     QUrlQuery url_query(lowdata);
     QString plaintext_user_id=url_query.queryItemValue("id");
     QString plaintext_answer_data=url_query.queryItemValue("answer");
+    int plaintext_problem_number=url_query.queryItemValue("quest_number").toInt();
 
     //Decode request data
     plaintext_user_id.replace("+"," ");
@@ -51,7 +52,13 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
     response->writeHead(200);
 
 
-    if (user_id.isEmpty()) {
+    if(g_problem_number < 0){
+        response->write("error quest not set.");
+    }
+    else if(plaintext_problem_number != g_problem_number){
+        response->write("error there are no quest with this number.");
+    }
+    else if (user_id.isEmpty()) {
         response->write("error userid is empty.");
     }else{
         if(!FormatCheck(plaintext_answer_data)){
@@ -87,6 +94,7 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
             g_user_data[user_data_itr].is_now_animation=false;
             g_user_data[user_data_itr].answer_point=answer_point.toInt();
             g_user_data[user_data_itr].answer_num=answer_num_;
+            g_user_data[user_data_itr].answer_putstone_num=answer_putstone_num_;
             for(int i=0;i<answer_num_;i++){
                 for(int j=0;j<5;j++){
                     g_user_data[user_data_itr].answer_flow[i][j]=answer_flow_[i][j];
@@ -432,6 +440,7 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
     //フィールド情報を配列に格納,フィールドの更新
     DecodeAnswer(plaintext_answer_data);
 
+    stone_flow_count_=0;
     //put a stone on stage
     while(PutStone());
 
@@ -452,6 +461,7 @@ QString AnswerForm::SimulateAnswerPoint(QString plaintext_answer_data){
 void AnswerForm::DecodeAnswer(QString rawdata){
     int pos;
     int flow_count=0;
+    int flow_stone_count=0;
     QStringList list=rawdata.split("\n");
     if(list.size()==1 && list[0]==""){
         answer_num_=0;
@@ -491,8 +501,9 @@ void AnswerForm::DecodeAnswer(QString rawdata){
         //角度
         answer_flow_[flow_count][3] = list[flow_count].mid(pos).toInt();
         flow_count++;
+        flow_stone_count++;
     }
-    stone_flow_count_=0;
+    answer_putstone_num_=flow_stone_count;
 }
 
 bool AnswerForm::PutStone(){

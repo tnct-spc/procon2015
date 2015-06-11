@@ -10,6 +10,7 @@
 
 #include <global.h>
 //GLOBAL VAR
+int g_problem_number=-1;
 bool g_stage_state_[48][48];
 bool g_stone_state_[256][8][8];
 int g_stone_num_;

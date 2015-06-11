@@ -62,7 +62,16 @@ void OutsideServer::ReserveAnswer(){
             int buff;
             //bubble sort
             for(unsigned long i=0;i<g_user_data.size();i++){
-                for(unsigned long j=1;j<g_user_data.size();j++){
+                for(unsigned long j=1;j<g_user_data.size()-i;j++){
+                    if(g_user_data[user_sort[j-1]].answer_putstone_num > g_user_data[user_sort[j]].answer_putstone_num){
+                        buff=user_sort[j];
+                        user_sort[j]=user_sort[j-1];
+                        user_sort[j-1]=buff;
+                    }
+                }
+            }
+            for(unsigned long i=0;i<g_user_data.size();i++){
+                for(unsigned long j=1;j<g_user_data.size()-i;j++){
                     if(g_user_data[user_sort[j-1]].answer_point > g_user_data[user_sort[j]].answer_point){
                         buff=user_sort[j];
                         user_sort[j]=user_sort[j-1];
@@ -108,7 +117,7 @@ void OutsideServer::ReserveAnswer(){
                         append_minimum_stage_num=g_user_data.size()-1;
                     }else{
                         for(unsigned long j=g_user_data.size();j>0;j--){
-                            if(g_user_data[user_sort[j-1]].append_stage_number > 0){
+                            if(g_user_data[user_sort[j-1]].append_stage_number >= 0){
                                 append_minimum_stage_num=g_user_data[user_sort[j-1]].append_stage_number;
                                 g_user_data[user_sort[j-1]].append_stage_number=-1;
                                 break;
@@ -181,6 +190,7 @@ void OutsideServer::loadbutton_clicked()
         QFile::copy(problem_file_name,ProblemFolderName+"problem"+problem_number_spin_button_value_+".txt");
 
         //unlock
+        g_problem_number=problem_number_spin_button_value_.toInt();
         problem_flag = true;
     }
 }

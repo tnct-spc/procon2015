@@ -15,9 +15,11 @@ struct user_data_type{
     int answer_flow[256][5];
     int answer_num;
     int answer_point;
+    int answer_putstone_num;
 };
 
 //GLOBAL VAR
+extern int g_problem_number;
 extern bool g_stage_state_[48][48];
 extern bool g_stone_state_[256][8][8];
 extern int g_stone_num_;

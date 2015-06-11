@@ -42,6 +42,7 @@ private:
     //answer data
     int answer_flow_[256][5];
     int answer_num_;
+    int answer_putstone_num_;
     int stone_flow_count_;
 
 };
