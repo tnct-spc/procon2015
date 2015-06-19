@@ -34,7 +34,8 @@ private slots:
 private:
     QHttpResponse *new_response_;
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    QString _master_url="http://localhost:8080/answer";
+    QString _master_url="http://172.16.0.66:8080/answer";
+    //QString _master_url="http://localhost:8080/answer";
 };
 
 #endif // SERVER_H

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     std::default_random_engine engine(seed_gen());
     std::uniform_int_distribution<> dist_row(0, FIELD_SIZE / 2);
     std::uniform_int_distribution<> dist_col(0, FIELD_SIZE / 2);
-    std::uniform_int_distribution<> dist_obs(0, FIELD_SIZE * 2);
+    std::uniform_int_distribution<> dist_obs(0, 1023);
 
     int const nop = vm["num-of-problem"].as<int>();
     //std::cout << "num-of-problem = " << nop << std::endl;

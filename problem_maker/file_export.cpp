@@ -8,7 +8,7 @@
 file_export::file_export(int const nth, raw_field_type field, std::vector<raw_stone_type> stones)
 {
     std::ostringstream file;
-    file << "prob";
+    file << "quest";
     file.width(2);
     file.fill('0');
     file << nth << ".txt";

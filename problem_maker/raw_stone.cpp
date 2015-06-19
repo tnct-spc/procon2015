@@ -34,7 +34,7 @@ void raw_stone::simple_create(int const field_zk)
 {
     std::random_device seed_gen;
     std::default_random_engine engine(seed_gen());
-    std::uniform_int_distribution<> dist_zk(8, 16);
+    std::uniform_int_distribution<> dist_zk(1, 16);
     std::uniform_int_distribution<> dist_need_zk(field_zk * 0.8, field_zk * 1.2);
     std::uniform_int_distribution<> dist_x(0, STONE_SIZE - 1);
     std::uniform_int_distribution<> dist_y(0, STONE_SIZE - 1);
