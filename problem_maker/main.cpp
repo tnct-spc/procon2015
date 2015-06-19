@@ -49,7 +49,9 @@ int main(int argc, char **argv)
     int const column = vm["cut-column"].as<int>() < 1 ? dist_col(engine) : vm["cut-column"].as<int>();
     std::cout << "cut-column = " << column << std::endl;
 
-    std::uniform_int_distribution<> dist_obs(0, 1023-row-column);
+    //ルール上はこうだけどあまりに多いので
+    //std::uniform_int_distribution<> dist_obs(0, 1023-row-column);
+    std::uniform_int_distribution<> dist_obs(0, 50);
     int const obstacle = vm["obstacle"].as<int>() < 1 ? dist_obs(engine) : vm["obstacle"].as<int>();
     std::cout << "obstacle = " << obstacle << std::endl;
 
