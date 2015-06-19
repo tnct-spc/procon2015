@@ -55,16 +55,17 @@ void raw_stone::simple_create(int const field_zk)
         {
             int const x = dist_x(engine);
             int const y = dist_y(engine);
-            if(stone.at(y).at(x) == 1) continue;
             count++;
-            if(0 <= y-1 && stone.at(y-1).at(x) == 1)
+            if((0 < y && stone.at(y-1).at(x) == 1) || (y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1) || (0 < x && stone.at(y).at(x-1) == 1) || (x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1))
                 stone.at(y).at(x) = 1;
+            /*
             else if(y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1)
                 stone.at(y).at(x) = 1;
-            else if(0 <= x-1 && stone.at(y).at(x-1) == 1)
+            else if(0 < x && stone.at(y).at(x-1) == 1)
                 stone.at(y).at(x) = 1;
             else if(x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1)
                 stone.at(y).at(x) = 1;
+                */
             else count--;
             if(insrance++ > FIELD_SIZE * FIELD_SIZE * FIELD_SIZE) break;
         }

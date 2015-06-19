@@ -39,7 +39,6 @@ int main(int argc, char **argv)
     std::default_random_engine engine(seed_gen());
     std::uniform_int_distribution<> dist_row(0, FIELD_SIZE / 2);
     std::uniform_int_distribution<> dist_col(0, FIELD_SIZE / 2);
-    std::uniform_int_distribution<> dist_obs(0, 1023);
 
     int const nop = vm["num-of-problem"].as<int>();
     //std::cout << "num-of-problem = " << nop << std::endl;
@@ -50,6 +49,7 @@ int main(int argc, char **argv)
     int const column = vm["cut-column"].as<int>() < 1 ? dist_col(engine) : vm["cut-column"].as<int>();
     std::cout << "cut-column = " << column << std::endl;
 
+    std::uniform_int_distribution<> dist_obs(0, 1023-row-column);
     int const obstacle = vm["obstacle"].as<int>() < 1 ? dist_obs(engine) : vm["obstacle"].as<int>();
     std::cout << "obstacle = " << obstacle << std::endl;
 
