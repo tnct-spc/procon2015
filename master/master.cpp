@@ -83,8 +83,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     }
 
     //Send
-    //if(upload_flag){
-    if(1==1){
+    if(upload_flag){
         QEventLoop eventloop;
         QUrlQuery postData;
         postData.addQueryItem("id",token_name_);
