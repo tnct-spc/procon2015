@@ -13,12 +13,9 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        master.cpp \
-    server.cpp
+        master.cpp
 
-HEADERS  += master.h \
-    server.h \
-    global.h
+HEADERS  += master.h
 
 FORMS    += master.ui
 
