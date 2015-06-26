@@ -34,41 +34,35 @@ void raw_stone::simple_create(int const field_zk)
 {
     std::random_device seed_gen;
     std::default_random_engine engine(seed_gen());
-    std::uniform_int_distribution<> dist_zk(8, 16);
-    std::uniform_int_distribution<> dist_need_zk(field_zk * 0.8, field_zk * 1.2);
+    std::uniform_int_distribution<> dist_zk(1, 16);
+    //std::uniform_int_distribution<> dist_need_zk(field_zk * 0.8, field_zk * 1.2);
     std::uniform_int_distribution<> dist_x(0, STONE_SIZE - 1);
     std::uniform_int_distribution<> dist_y(0, STONE_SIZE - 1);
 
 
-    int total_zk = 0;
-    int const need_zk = dist_need_zk(engine);
-    while(total_zk < need_zk)
+    int volatile total_zk = 0;
+    //int const need_zk = dist_need_zk(engine);
+    while(total_zk < /*need_zk*/field_zk)
     {
         raw_stone_type stone;
         for(auto &each_raw : stone) each_raw.fill(0);
-        int const zk = dist_zk(engine);
-        int count = 0;
+        int const volatile zk = dist_zk(engine);
+        int volatile count = 0;
         int insrance = 0;
         stone.at(dist_x(engine)).at(dist_y(engine)) = 1;
 
         while(count < zk)
         {
-            int const x = dist_x(engine);
-            int const y = dist_y(engine);
-            if(stone.at(y).at(x) == 1) continue;
-            count++;
-            if(0 <= y-1 && stone.at(y-1).at(x) == 1)
+            //std::cout << total_zk << std::endl;
+            int const volatile x = dist_x(engine);
+            int const volatile y = dist_y(engine);
+            if((0 < y && stone.at(y-1).at(x) == 1) || (y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1) || (0 < x && stone.at(y).at(x-1) == 1) || (x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1))
+            {
+                count++;
                 stone.at(y).at(x) = 1;
-            else if(y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1)
-                stone.at(y).at(x) = 1;
-            else if(0 <= x-1 && stone.at(y).at(x-1) == 1)
-                stone.at(y).at(x) = 1;
-            else if(x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1)
-                stone.at(y).at(x) = 1;
-            else count--;
-            if(insrance++ > FIELD_SIZE * FIELD_SIZE * FIELD_SIZE) break;
+            }
+            if(insrance++ > FIELD_SIZE * FIELD_SIZE) break;
         }
-        if(++count < 7) continue;
         if(is_hole(stone,count) == false)
         {
             data.push_back(stone);
