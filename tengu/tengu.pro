@@ -12,12 +12,14 @@ TEMPLATE = lib
 DEFINES += TENGU_LIBRARY
 
 SOURCES += algorithm/simple_algorithm.cpp \
-    algorithm/poor_algo.cpp
+    algorithm/poor_algo.cpp \
+    algorithm/yrange.cpp
 
 HEADERS += tengu.hpp\
         tengu_global.h \
     algorithm/simple_algorithm.hpp \
-    algorithm/poor_algo.hpp
+    algorithm/poor_algo.hpp \
+    algorithm/yrange.hpp
 
 unix {
     target.path = /usr/lib
