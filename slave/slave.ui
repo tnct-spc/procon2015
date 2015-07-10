@@ -127,6 +127,19 @@
     <string>Clear</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="discharge">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>10</y>
+     <width>88</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>排出モード</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

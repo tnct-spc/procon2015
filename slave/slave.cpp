@@ -6,6 +6,7 @@
 #include "muen_zuka.hpp"
 #include "algorithm_manager.hpp"
 #include <iostream>
+#include <fstream>
 //#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
@@ -51,13 +52,20 @@ void Slave::clicked_run_button(){
 
 }
 void Slave::answer_send(field_type answer){
-    //std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
-    net_mtx.lock();
-    std::string res = network->send(answer);
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
-    net_mtx.unlock();
+    if(ui->discharge->isChecked()){
+        std::ofstream fp("../greatest_answer.txt");
+        fp<<answer.get_answer()<<std::endl;
+        fp.close();
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+    }else{
+        net_mtx.lock();
+        std::string res = network->send(answer);
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
+        net_mtx.unlock();
+    }
 }
 void Slave::text_box_clear(){
     ui->textBrowser->setPlainText("");
