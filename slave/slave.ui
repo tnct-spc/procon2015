@@ -6,18 +6,36 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>300</height>
+    <width>468</width>
+    <height>388</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Slave</string>
   </property>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>471</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>ファイル</string>
+    </property>
+    <addaction name="problem_load_action"/>
+    <addaction name="answer_save_action"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
   <widget class="QPushButton" name="run_button">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
+     <x>40</x>
+     <y>60</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -29,8 +47,8 @@
   <widget class="QLineEdit" name="post_line_edit">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>230</y>
+     <x>90</x>
+     <y>280</y>
      <width>291</width>
      <height>21</height>
     </rect>
@@ -42,8 +60,8 @@
   <widget class="QLineEdit" name="get_line_edit">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>250</y>
+     <x>90</x>
+     <y>300</y>
      <width>291</width>
      <height>21</height>
     </rect>
@@ -55,8 +73,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>250</y>
+     <x>40</x>
+     <y>300</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -68,8 +86,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>230</y>
+     <x>40</x>
+     <y>280</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -81,8 +99,8 @@
   <widget class="QLineEdit" name="prob_num_line_edit">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>270</y>
+     <x>100</x>
+     <y>320</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -94,8 +112,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>270</y>
+     <x>40</x>
+     <y>320</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -107,8 +125,8 @@
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>50</y>
+     <x>40</x>
+     <y>100</y>
      <width>341</width>
      <height>171</height>
     </rect>
@@ -117,8 +135,8 @@
   <widget class="QPushButton" name="Clear_button">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>10</y>
+     <x>130</x>
+     <y>60</y>
      <width>85</width>
      <height>31</height>
     </rect>
@@ -130,8 +148,8 @@
   <widget class="QCheckBox" name="discharge">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>10</y>
+     <x>280</x>
+     <y>60</y>
      <width>88</width>
      <height>23</height>
     </rect>
@@ -140,19 +158,16 @@
     <string>排出モード</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>280</y>
-     <width>85</width>
-     <height>27</height>
-    </rect>
-   </property>
+  <action name="problem_load_action">
    <property name="text">
-    <string>PushButton</string>
+    <string>問題読み込み</string>
    </property>
-  </widget>
+  </action>
+  <action name="answer_save_action">
+   <property name="text">
+    <string>回答保存</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

@@ -21,7 +21,8 @@ Slave::Slave(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
-    connect(ui->pushButton,&QPushButton::clicked,this,&Slave::problem_load_from_file);
+    connect(ui->answer_save_action,&QAction::triggered,this,&Slave::answer_save_to_file);
+    connect(ui->problem_load_action,&QAction::triggered,this,&Slave::problem_load_from_file);
 }
 
 Slave::~Slave()
@@ -88,5 +89,5 @@ void Slave::problem_load_from_file(){
     if(!file.open(QIODevice::ReadOnly))return;
     QTextStream in(&file);
     _problem = problem_type(in.readAll().toStdString());
-    std::cout << _problem.stones.size() << std::endl;
+    //std::cout << _problem.stones.size() << std::endl;
 }
