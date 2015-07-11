@@ -2,6 +2,8 @@
 #include "ui_slave.h"
 #include <QUrl>
 #include <string>
+#include <QFileDialog>
+#include <QFile>
 #include "takao.hpp"
 #include "muen_zuka.hpp"
 #include "algorithm_manager.hpp"
@@ -19,6 +21,7 @@ Slave::Slave(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
+    connect(ui->pushButton,&QPushButton::clicked,this,&Slave::problem_load_from_file);
 }
 
 Slave::~Slave()
@@ -69,4 +72,21 @@ void Slave::answer_send(field_type answer){
 }
 void Slave::text_box_clear(){
     ui->textBrowser->setPlainText("");
+}
+void Slave::answer_save_to_file(){
+    auto filename = QFileDialog::getOpenFileName(this);
+    if(filename.isEmpty())return;
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << _answer.field.get_answer().c_str() << endl;
+}
+void Slave::problem_load_from_file(){
+    auto filename = QFileDialog::getOpenFileName(this);
+    if(filename.isEmpty())return;
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly))return;
+    QTextStream in(&file);
+    _problem = problem_type(in.readAll().toStdString());
+    std::cout << _problem.stones.size() << std::endl;
 }

@@ -26,10 +26,14 @@ private:
     net *network;
     algorithm_manager *algo_manager;
     std::mutex net_mtx;
+    problem_type _problem;
+    problem_type _answer;
 private slots:
     void clicked_run_button();
     void answer_send(field_type answer);
     void text_box_clear();
+    void answer_save_to_file();
+    void problem_load_from_file();
 };
 
 #endif // SLAVE_H
