@@ -6,7 +6,7 @@
 
 yrange::yrange(problem_type _problem)
 {
-    pre_problem = _problem;
+    problem = _problem;
 }
 
 yrange::~yrange()
@@ -16,6 +16,8 @@ yrange::~yrange()
 
 void yrange::run()
 {
+    problem = pre_problem;
+    qDebug("yrange start");
     /*
     //障害物情報　事前収集
     int const row_obstacle = 0;
@@ -50,8 +52,10 @@ void yrange::run()
     //始めの一つを置く
     for(int m = 1-STONE_SIZE; m < FIELD_SIZE; ++m)for(int n = 1-STONE_SIZE; n  < FIELD_SIZE; ++n)
     {
-        if(problem.field.is_puttable(problem.stones.at(0),m,n) == true)
+        std::cout << "m = " << m << " n = " << n << std::endl;
+        if(problem.field.is_puttable(problem.stones.at(0),0,-1) == true)
         {
+            std::cout << "okeru" << std::endl;
             field_type field = problem.field;
             field.put_stone(problem.stones.at(0),m,n);
 
@@ -70,7 +74,7 @@ void yrange::run()
                     {
                         for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j)
                         {
-
+                            std::cout << "k = " << k << " l = " << l << " i = " << i << " j = " << j << std::endl;
                             problem.stones.at(stone_num).flip();
                             if(field.is_puttable(problem.stones.at(stone_num),i,j)== true)
                             {
@@ -154,6 +158,7 @@ void yrange::run()
             emit answer_ready(field);
         }
     }
+
 }
 
 double yrange::evaluate(yrange_type const& one)const

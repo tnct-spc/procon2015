@@ -82,6 +82,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     }
     //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
     //else std::cerr << "This stone can put here." << std::endl;
+
     return is_connection;
 }
 
