@@ -2,10 +2,13 @@
 #include "ui_slave.h"
 #include <QUrl>
 #include <string>
+#include <QFileDialog>
+#include <QFile>
 #include "takao.hpp"
 #include "muen_zuka.hpp"
 #include "algorithm_manager.hpp"
 #include <iostream>
+#include <fstream>
 //#define _DEBUG
 #ifdef _DEBUG
     #include <QDebug>
@@ -18,6 +21,8 @@ Slave::Slave(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
+    connect(ui->answer_save_action,&QAction::triggered,this,&Slave::answer_save_to_file);
+    connect(ui->problem_load_action,&QAction::triggered,this,&Slave::problem_load_from_file);
 }
 
 Slave::~Slave()
@@ -51,14 +56,38 @@ void Slave::clicked_run_button(){
 
 }
 void Slave::answer_send(field_type answer){
-    //std::cout<<"answer=\n\""<<answer.get_answer()<<"\""<<std::endl;
-    net_mtx.lock();
-    std::string res = network->send(answer);
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
-    net_mtx.unlock();
+    if(ui->discharge->isChecked()){
+        std::ofstream fp("../greatest_answer.txt");
+        fp<<answer.get_answer()<<std::endl;
+        fp.close();
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+    }else{
+        net_mtx.lock();
+        std::string res = network->send(answer);
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
+        net_mtx.unlock();
+    }
 }
 void Slave::text_box_clear(){
     ui->textBrowser->setPlainText("");
+}
+void Slave::answer_save_to_file(){
+    auto filename = QFileDialog::getOpenFileName(this);
+    if(filename.isEmpty())return;
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << _answer.field.get_answer().c_str() << endl;
+}
+void Slave::problem_load_from_file(){
+    auto filename = QFileDialog::getOpenFileName(this);
+    if(filename.isEmpty())return;
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly))return;
+    QTextStream in(&file);
+    _problem = problem_type(in.readAll().toStdString());
+    //std::cout << _problem.stones.size() << std::endl;
 }
