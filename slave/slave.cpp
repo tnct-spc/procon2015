@@ -62,6 +62,7 @@ void Slave::answer_send(field_type answer){
         fp.close();
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+
     }else{
         net_mtx.lock();
         std::string res = network->send(answer);

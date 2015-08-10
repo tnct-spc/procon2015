@@ -4,15 +4,20 @@
 #include <string>
 #include <QObject>
 #include <QUrl>
+#include <QVariant>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkCookie>
+#include <QtNetwork/QNetworkCookieJar>
+#include <QtNetwork/QHttpMultiPart>
 #include <QByteArray>
 #include <QEventLoop>
 #include <QUrlQuery>
 #include <iostream>
 #include <stdexcept>
 #include <QSharedPointer>
+
 //コンストラクタでURL指定してね
 class net : public QObject
 {
@@ -33,10 +38,11 @@ public slots:
 
 private slots:
     void networkerror(QNetworkReply::NetworkError);
+    void replyfinished(QNetworkReply* reply);
 private:
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     //std::shared_ptr<QNetworkAccessManager> manager;
-
+    QNetworkCookieJar CJ;
     QUrl _server_url,_master_url;
     int _problem_num;
     bool network_error_flag =false;

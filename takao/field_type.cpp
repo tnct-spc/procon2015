@@ -243,8 +243,6 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
-    auto n = processes.size();
-    size_t b = provided_stones;
     for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
     result.append("\r\n");
     return result;
