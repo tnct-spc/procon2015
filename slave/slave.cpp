@@ -58,7 +58,7 @@ void Slave::clicked_run_button(){
 void Slave::answer_send(field_type answer){
     if(ui->discharge->isChecked()){
         std::ofstream fp("../greatest_answer.txt");
-        fp<<answer.get_answer()<<std::endl;
+        fp<<answer.get_answer();
         fp.close();
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));

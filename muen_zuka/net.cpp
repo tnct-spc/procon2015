@@ -36,11 +36,11 @@ std::string net::get()
 std::string net::send(field_type answer){
     QEventLoop eventloop;
     QUrlQuery postData;
-    postData.addQueryItem("point",QString::number(answer.get_score()));
-    postData.addQueryItem("quest_number",QString::number(_problem_num));
-    postData.addQueryItem("answer",answer.get_answer().c_str());
+    postData.addQueryItem("utf8","&#x2713;");
+    postData.addQueryItem("authenticity_token","CBvSfAe+i7p8EnW100civC2UdGEL2jYRlFMydvzQ2YFDQx/9mbMmJKzvL+jtOQ+WkQYZReG4btBkuj31Ua/m5A==");
+    postData.addQueryItem("answer[text]",answer.get_answer().c_str());
     QNetworkRequest req(_master_url);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
     QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));

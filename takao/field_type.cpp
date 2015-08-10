@@ -190,8 +190,9 @@ bool field_type::is_removable(stone_type const& stone)
 }
 
  //コメント書こう
-field_type::field_type(std::string const & raw_field_text)
+field_type::field_type(std::string const & raw_field_text, size_t stones)
 {
+    provided_stones = stones;
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
@@ -223,6 +224,7 @@ std::string field_type::get_answer() const
     int process_count=0;
     for (auto const & process : processes)
     {
+
         std::string line;
 
         auto current_nth = process.stone.get_nth();
@@ -241,6 +243,10 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
+    auto n = processes.size();
+    size_t b = provided_stones;
+    for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    result.append("\r\n");
     return result;
 }
 

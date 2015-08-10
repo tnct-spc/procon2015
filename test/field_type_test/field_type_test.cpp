@@ -82,7 +82,7 @@ class field_type_test : public QObject
             "11111111111111111111111111111111\r\n"
             "11111111111111111111111111111111"s;
 
-        field_type const default_field = field_type(default_field_text);
+        field_type const default_field = field_type(default_field_text,0);
 
         field_type::raw_field_type const default_raw_field = {{
             {{ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
@@ -173,7 +173,7 @@ void field_type_test::construct_test()
     QFETCH(std::string, field_text);
     QFETCH(field_type::raw_field_type, raw_field);
 
-    QCOMPARE(field_type(field_text).get_raw_data(), raw_field);
+    QCOMPARE(field_type(field_text,0).get_raw_data(), raw_field);
 }
 
 void field_type_test::get_score_test_data()
@@ -212,7 +212,7 @@ void field_type_test::put_stone_test_data()
            "01000000\r\n"
            "01110000\r\n"
            "00000000"s, 1)
-        << field_type(default_field_text)
+        << field_type(default_field_text,0)
         << 0
         << -1
         << field_type::raw_field_type{{
