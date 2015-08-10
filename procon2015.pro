@@ -7,4 +7,5 @@ SUBDIRS += \
     tengu\
     muen_zuka \
     slave \
-    master
+    master \
+    problem_maker
