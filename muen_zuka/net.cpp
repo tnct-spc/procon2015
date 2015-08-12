@@ -3,20 +3,17 @@
 //コンストラクタでURL指定してね
 net::net(QUrl server_url)
 {
-    manager->setCookieJar(&CJ);
     _server_url = server_url;
     _master_url = server_url;
     _problem_num = 1;
 }
 net::net(QUrl server_url,QUrl master_url)
 {
-    manager->setCookieJar(&CJ);
     _server_url = server_url;
     _master_url = master_url;
     _problem_num = 1;
 }
 net::net(QUrl server_url,QUrl master_url,int problem_num){
-    manager->setCookieJar(&CJ);
     _server_url = server_url;
     _master_url = master_url;
     _problem_num = problem_num;
@@ -35,42 +32,21 @@ std::string net::get()
     if(network_error_flag)return std::string("");
     return std::string(reply->readAll().constData());
 }
-/*
-void net::login(){
-    QUrlQuery postData;
-    postData.addQueryItem("utf8","&#x2713;");
-    postData.addQueryItem("utf8","&#x2713;");
-    QNetworkRequest req(_master_url);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data");
-}
-*/
+
 std::string net::send(field_type answer){
-    /*
+    QEventLoop eventloop;
     QUrlQuery postData;
-    postData.addQueryItem("utf8","&#x2713;");
-    postData.addQueryItem("authenticity_token","CBvSfAe+i7p8EnW100civC2UdGEL2jYRlFMydvzQ2YFDQx/9mbMmJKzvL+jtOQ+WkQYZReG4btBkuj31Ua/m5A==");
-    postData.addQueryItem("answer[text]",answer.get_answer().c_str());
-    */
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QHttpPart textPart;
-    textPart.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"answer[text]\"; filename=\"Ramen_jiro.txt\""));
-    textPart.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("text/plain"));
-    textPart.setBody(answer.get_answer().c_str());
-    multiPart->append(textPart);
+    postData.addQueryItem("point",QString::number(answer.get_score()));
+    postData.addQueryItem("quest_number",QString::number(_problem_num));
+    postData.addQueryItem("answer",answer.get_answer().c_str());
     QNetworkRequest req(_master_url);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data");
-    connect(manager,&QNetworkAccessManager::finished,this,&net::replyfinished);
-    QNetworkReply *reply = manager->post(req,multiPart);
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+    QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
     if(network_error_flag)return std::string("");
-    return "sent";
-}
-void net::replyfinished(QNetworkReply* reply){
-    std::cout << std::string(reply->readAll().constData()) << std::endl;
-    QList<QByteArray> headerList = reply->rawHeaderList();
-    foreach(QByteArray head, headerList) {
-        qDebug() << head << ":" << reply->rawHeader(head);
-    }
+    return std::string(reply->readAll().constData());
 }
 
 //デストラクタ書いてないからメモリリークするよ
