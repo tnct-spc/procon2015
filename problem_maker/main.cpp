@@ -13,6 +13,8 @@ int main(int argc, char **argv)
     boost::program_options::options_description opt("オプション");
     opt.add_options()
         ("help,h", "ヘルプを表示")
+        ("with-answer,w", "答え付きの問題を生成")
+        ("ansfile,a", boost::program_options::value<std::string>()->default_value("ans.txt"), "解答ファイル名")
         ("num-of-problem,n", boost::program_options::value<int>()->default_value(1), "問題数")
         ("cut-row,r", boost::program_options::value<int>()->default_value(-1), "削る横列")
         ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列")
