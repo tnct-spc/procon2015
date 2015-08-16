@@ -244,7 +244,6 @@ std::string field_type::get_answer() const
         process_count++;
     }
     for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
-    result.append("\r\n");
     return result;
 }
 
