@@ -8,7 +8,7 @@
 bool field_type::is_placed(stone_type const& stone)
 {
     return std::find_if(processes.begin(), processes.end(),
-                        [& stone](auto const & process) { return process.stone == stone; }
+                        [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }
            ) != processes.end();
 }
 
