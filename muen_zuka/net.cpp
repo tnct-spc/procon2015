@@ -1,4 +1,5 @@
 #include <QObject>
+#include <iostream>
 #include "net.hpp"
 //コンストラクタでURL指定してね
 net::net(QUrl server_url)
@@ -26,7 +27,8 @@ std::string net::get()
     QEventLoop eventloop;
 
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-    QNetworkReply *reply = manager->get(QNetworkRequest(_server_url));
+    QUrl requrl=_server_url.toString()+"/problem"+QString::number(_problem_num)+".txt";
+    QNetworkReply *reply = manager->get(QNetworkRequest(requrl));
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
     if(network_error_flag)return std::string("");

@@ -19,6 +19,7 @@
 #include <src/qhttpserver.h>
 #include <src/qhttprequest.h>
 #include <src/qhttpresponse.h>
+#include <QSettings>
 
 namespace Ui {
 class Master;
@@ -46,8 +47,18 @@ private:
     QString token_name_;
     std::vector<answer_data_type> answer_data_;
 
+    QString get_sendurl();
+    QSettings* settings;
+
 private slots:
     void change_token_box();
+    void reset_point();
+    void select_send_1();
+    void select_send_2();
+    void select_send_3();
+    void change_url_1();
+    void change_url_2();
+    void change_url_3();
     void Service(QHttpRequest *request, QHttpResponse *response);
     void ServiceRequestCompleted(QByteArray lowdata);
 };

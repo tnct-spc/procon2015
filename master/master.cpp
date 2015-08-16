@@ -11,6 +11,31 @@ Master::Master(QWidget *parent) :
     QObject::connect(server, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(Service(QHttpRequest*,QHttpResponse*)));
 
     server->listen(8081);
+
+    //setting load
+    settings = new QSettings("setting.ini",QSettings::IniFormat);
+    settings->beginGroup("SETTING");
+    if(!QFile::exists("setting.ini")){
+        //init
+        settings->setValue("SELECT_SEND",1);
+        settings->setValue("CHANGE_URL_1","http://127.0.0.1:8080/answer");
+        settings->setValue("CHANGE_URL_2","http://127.0.0.1:8080/answer");
+        settings->setValue("CHANGE_URL_3","http://127.0.0.1:8080/answer");
+    }
+    switch(settings->value("SELECT_SEND").toInt()){
+    case 1:
+        ui->selecturl_button_1->setChecked(true);
+        break;
+    case 2:
+        ui->selecturl_button_2->setChecked(true);
+        break;
+    case 3:
+        ui->selecturl_button_3->setChecked(true);
+        break;
+    }
+    ui->send_url_1->setText(settings->value("CHANGE_URL_1").toString());
+    ui->send_url_2->setText(settings->value("CHANGE_URL_2").toString());
+    ui->send_url_3->setText(settings->value("CHANGE_URL_3").toString());
 }
 
 Master::~Master()
@@ -20,6 +45,10 @@ Master::~Master()
 
 void Master::change_token_box(){
     token_name_ = ui->token_name_box->text();
+}
+
+void Master::reset_point(){
+    answer_data_.clear();
 }
 
 void Master::Service(QHttpRequest *request, QHttpResponse *response) {
@@ -89,7 +118,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
         postData.addQueryItem("id",token_name_);
         postData.addQueryItem("quest_number",post_problem_number);
         postData.addQueryItem("answer",post_raw_answer_data);
-        QNetworkRequest req(ui->send_url->text());
+        QNetworkRequest req(get_sendurl());
         req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
         connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
         QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
@@ -105,4 +134,30 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
         response->write("no send\n");
     }
     response->end();
+}
+
+QString Master::get_sendurl(){
+    if(ui->selecturl_button_1->isChecked()) return ui->send_url_1->text();
+    if(ui->selecturl_button_2->isChecked()) return ui->send_url_2->text();
+    if(ui->selecturl_button_3->isChecked()) return ui->send_url_3->text();
+    return "";
+}
+
+void Master::select_send_1(){
+    settings->setValue("SELECT_SEND",1);
+}
+void Master::select_send_2(){
+    settings->setValue("SELECT_SEND",2);
+}
+void Master::select_send_3(){
+    settings->setValue("SELECT_SEND",3);
+}
+void Master::change_url_1(){
+    settings->setValue("CHANGE_URL_1",ui->send_url_1->text());
+}
+void Master::change_url_2(){
+    settings->setValue("CHANGE_URL_2",ui->send_url_2->text());
+}
+void Master::change_url_3(){
+    settings->setValue("CHANGE_URL_3",ui->send_url_3->text());
 }

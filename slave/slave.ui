@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
-    <height>388</height>
+    <width>445</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,37 +44,37 @@
     <string>START!!!</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="post_line_edit">
+  <widget class="QLineEdit" name="post_line_edit_1">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>120</x>
      <y>280</y>
-     <width>291</width>
+     <width>311</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>http://localhost:8081</string>
+    <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="get_line_edit">
+  <widget class="QLineEdit" name="get_line_edit_1">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>300</y>
-     <width>291</width>
+     <x>120</x>
+     <y>340</y>
+     <width>311</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>http://localhost:8080/problem/problem1.txt</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>300</y>
+     <x>10</x>
+     <y>340</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -86,7 +86,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>280</y>
      <width>51</width>
      <height>21</height>
@@ -100,7 +100,7 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>320</y>
+     <y>410</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -113,7 +113,7 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>320</y>
+     <y>410</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -158,6 +158,125 @@
     <string>排出モード</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="post_line_edit_2">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>300</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="post_button_1">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>280</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="post_button_2">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>300</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup</string>
+   </attribute>
+  </widget>
+  <widget class="QLineEdit" name="get_line_edit_2">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>360</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="get_line_edit_3">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>380</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="get_button_1">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>340</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_2</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="get_button_2">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>360</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_2</string>
+   </attribute>
+  </widget>
+  <widget class="QRadioButton" name="get_button_3">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>380</y>
+     <width>21</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <attribute name="buttonGroup">
+    <string notr="true">buttonGroup_2</string>
+   </attribute>
+  </widget>
   <action name="problem_load_action">
    <property name="text">
     <string>問題読み込み</string>
@@ -188,9 +307,183 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>post_line_edit_1</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Slave</receiver>
+   <slot>post_line_edit_1_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>410</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>284</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>post_line_edit_2</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Slave</receiver>
+   <slot>post_line_edit_2_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>405</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>438</x>
+     <y>310</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_line_edit_1</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Slave</receiver>
+   <slot>get_line_edit_1_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>415</x>
+     <y>348</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>440</x>
+     <y>348</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_line_edit_2</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Slave</receiver>
+   <slot>get_line_edit_2_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>404</x>
+     <y>367</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>379</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_line_edit_3</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Slave</receiver>
+   <slot>get_line_edit_3_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>392</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>395</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>post_button_1</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>post_button_1_pushed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>3</x>
+     <y>286</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>post_button_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>post_button_2_pushed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>317</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>311</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_button_1</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>get_button_1_pushed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>359</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>7</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_button_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>get_button_2_pushed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>78</x>
+     <y>368</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>368</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>get_button_3</sender>
+   <signal>clicked()</signal>
+   <receiver>Slave</receiver>
+   <slot>get_button_3_pushed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>385</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>clicked_run_button()</slot>
   <slot>text_box_crear()</slot>
+  <slot>post_line_edit_1_changed()</slot>
+  <slot>post_line_edit_2_changed()</slot>
+  <slot>get_line_edit_1_changed()</slot>
+  <slot>get_line_edit_2_changed()</slot>
+  <slot>get_line_edit_3_changed()</slot>
+  <slot>post_button_1_pushed()</slot>
+  <slot>post_button_2_pushed()</slot>
+  <slot>get_button_1_pushed()</slot>
+  <slot>get_button_2_pushed()</slot>
+  <slot>get_button_3_pushed()</slot>
  </slots>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
+ </buttongroups>
 </ui>
