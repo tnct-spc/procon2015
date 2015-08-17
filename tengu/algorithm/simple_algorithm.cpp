@@ -57,7 +57,7 @@ void simple_algorithm::run(){
         }
     };
 
-    for(int i=0;i<8;i++){
+    for(int i=0;i<1;i++){
         problem=pre_problem;
         //石を設置
         for(auto _stone : problem.stones){

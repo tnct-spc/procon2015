@@ -1,6 +1,6 @@
 #include "answer_form.h"
 #include <http/request_mapper.h>
-//#define _DEBUG
+#define _DEBUG
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
 
@@ -126,7 +126,7 @@ bool AnswerForm::FormatCheck(QString plain_data){
     }else{
         answer_num=list.size();
     }
-    if(answer_num == g_stone_num_){
+    if(answer_num != g_stone_num_){
 #ifdef _DEBUG
         qDebug("***format error*** 解答の石数と問題の石数が異なる");
 #endif

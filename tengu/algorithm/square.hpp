@@ -1,18 +1,21 @@
-#ifndef SIMPLE_ALGORITHM_H
-#define SIMPLE_ALGORITHM_H
+#ifndef SQUARE_H
+#define SQUARE_H
 
 #include <takao.hpp>
 
-class simple_algorithm : public algorithm_type
+class square : public algorithm_type
 {
     Q_OBJECT
 public:
-    simple_algorithm(problem_type _problem);
-    ~simple_algorithm();
+    square(problem_type _problem);
+    ~square();
     void run();
 
 private:
     problem_type pre_problem;
+
+    void solve(int mode,auto stone);
+    void put_stone(auto,int);
 };
 
-#endif // SIMPLE_ALGORITHM_H
+#endif // SQUARE_H
