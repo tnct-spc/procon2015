@@ -38,16 +38,16 @@ void yrange::run()
                         continue;
                     }
                     //２個目以降
-                    search_type next = search(problem.field,each_stone,l,m);
+                    search_type next = search(problem.field,each_stone);
                     if(next.point.y == FIELD_SIZE) continue;
                     if(next.flip == 1) each_stone.flip();
                     each_stone.rotate(next.rotate);
                     problem.field.put_stone(each_stone,next.point.y,next.point.x);
-                    std::cout << each_stone.get_nth() << std::endl;
+                    //std::cout << each_stone.get_nth() << std::endl;
                     l = next.point.y;
                     m = next.point.x;
                 }
-                qDebug("emit starting by %d,%d %d %d",l,m,rotate,flip);
+                qDebug("emit starting by %2d,%2d %2d %2d",l,m,rotate,flip);
                 emit answer_ready(problem.field);
             }
         }
@@ -236,11 +236,10 @@ void yrange::place(field_type& field, int const m, int const n)
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-search_type yrange::search(field_type& _field, stone_type const& _stone, int const x, int const y)
+search_type yrange::search(field_type& _field, stone_type const& _stone)
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
-    //for(int i = x; i < x + STONE_SIZE + 1; ++i) for(int j = y; j < y + STONE_SIZE + 1; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 1; ++flip)
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 1; ++flip)
     {
         if(i == 0 && j == 0)continue;
@@ -253,8 +252,7 @@ search_type yrange::search(field_type& _field, stone_type const& _stone, int con
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数える
             int count = 0;
-            int k = i > 1 - STONE_SIZE ? i - 1 : i;
-            int l = j > 1 - STONE_SIZE ? j - 1 : j;
+            int k = i > 1 - STONE_SIZE ? i - 1 : i, l = j > 1 - STONE_SIZE ? j - 1 : j;
             for(k = k < 0 ? 0 : k; k < (i + STONE_SIZE) && (k + 1 < FIELD_SIZE); ++k) for(l = l < 0 ? 0 : l ; (l < j + STONE_SIZE) && (l + 1 < FIELD_SIZE); ++l)
             {
                 int const n = stone.get_nth();
@@ -262,6 +260,8 @@ search_type yrange::search(field_type& _field, stone_type const& _stone, int con
                 if(field.get_raw_data().at(k).at(l+1) == n && field.get_raw_data().at(k).at(l) < n) count++;
                 if(field.get_raw_data().at(k+1).at(l) == n && field.get_raw_data().at(k).at(l) < n) count++;
                 if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k+1).at(l) < n) count++;
+                if(k == 0 || k == FIELD_SIZE-1) count++;
+                if(l == 0 || l == FIELD_SIZE-1) count++;
             }
             search_vec.push_back(search_type{point_type{i,j},rotate*90,flip,count});
         }
