@@ -48,6 +48,7 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
+    //std::cout << "is_puttable start" << std::endl;
     bool is_connection = false;
     if(processes.size() == 0)
     {
@@ -56,19 +57,21 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
+        //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
         if(stone.at(i,j) == 0)//置かないならどうでも良い
         {
-            //std::cerr <<  "==0" << std::endl;
+            //std::cout <<  "==0" << std::endl;
             continue;
         }
         else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
         {
-            //std::cerr << "You try to put the stone out of range" << std::endl;
+            //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
+            //std::cout << "You tried to put the stone out of range" << std::endl;
             return false;
         }
         else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
         {
-            //std::cerr << "You try to put the stone on another stone." << std::endl;
+            //std::cout << "You try to put the stone on another stone." << std::endl;
             return false;
         }
         if(is_connection == true) continue;

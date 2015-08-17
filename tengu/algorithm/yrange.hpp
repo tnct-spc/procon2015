@@ -15,6 +15,14 @@ struct yrange_type
     point_type first_point;
 };
 
+struct search_type
+{
+    point_type point;
+    int rotate;
+    int flip;
+    int score;
+};
+
 class yrange : public algorithm_type
 {
     Q_OBJECT
@@ -26,6 +34,10 @@ public:
 private:
     problem_type pre_problem;
     double evaluate(yrange_type const& one)const;
+    void place(field_type& field, int const m, int const n);
+    int evaluate(stone_type const stone, int const x, int const y)const;
+    search_type search(field_type& _field, stone_type const& _stone, int const x, int const y);
+
 };
 
 
