@@ -1,4 +1,5 @@
 #include <QObject>
+#include <iostream>
 #include "net.hpp"
 //コンストラクタでURL指定してね
 net::net(QUrl server_url)
@@ -26,7 +27,8 @@ std::string net::get()
     QEventLoop eventloop;
 
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-    QNetworkReply *reply = manager->get(QNetworkRequest(_server_url));
+    QUrl requrl=_server_url.toString()+"/problem"+QString::number(_problem_num)+".txt";
+    QNetworkReply *reply = manager->get(QNetworkRequest(requrl));
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
     if(network_error_flag)return std::string("");
@@ -36,11 +38,11 @@ std::string net::get()
 std::string net::send(field_type answer){
     QEventLoop eventloop;
     QUrlQuery postData;
-    postData.addQueryItem("utf8","&#x2713;");
-    postData.addQueryItem("authenticity_token","CBvSfAe+i7p8EnW100civC2UdGEL2jYRlFMydvzQ2YFDQx/9mbMmJKzvL+jtOQ+WkQYZReG4btBkuj31Ua/m5A==");
-    postData.addQueryItem("answer[text]",answer.get_answer().c_str());
+    postData.addQueryItem("point",QString::number(answer.get_score()));
+    postData.addQueryItem("quest_number",QString::number(_problem_num));
+    postData.addQueryItem("answer",answer.get_answer().c_str());
     QNetworkRequest req(_master_url);
-    req.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data");
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
     QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));

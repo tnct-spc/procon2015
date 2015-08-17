@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>83</height>
+    <width>455</width>
+    <height>143</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,17 +52,101 @@
     <string>送信先</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="send_url">
+  <widget class="QLineEdit" name="send_url_1">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>120</x>
      <y>50</y>
      <width>271</width>
      <height>27</height>
     </rect>
    </property>
    <property name="text">
-    <string>http://localhost:8080/answer</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="resetbutton">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>10</y>
+     <width>51</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Reset</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="send_url_2">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>80</y>
+     <width>271</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="send_url_3">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>110</y>
+     <width>271</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="selecturl_button_1">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>50</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="selecturl_button_2">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>80</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="selecturl_button_3">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>110</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
    </property>
   </widget>
  </widget>
@@ -85,8 +169,143 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>resetbutton</sender>
+   <signal>clicked()</signal>
+   <receiver>Master</receiver>
+   <slot>reset_point()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>393</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>384</x>
+     <y>14</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>token_name_box</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Master</receiver>
+   <slot>reset_point()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>26</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>350</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selecturl_button_1</sender>
+   <signal>clicked()</signal>
+   <receiver>Master</receiver>
+   <slot>select_send_1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>16</x>
+     <y>69</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selecturl_button_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Master</receiver>
+   <slot>select_send_2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>17</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selecturl_button_3</sender>
+   <signal>clicked()</signal>
+   <receiver>Master</receiver>
+   <slot>select_send_3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>15</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>send_url_1</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Master</receiver>
+   <slot>change_url_1()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>231</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>437</x>
+     <y>58</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>send_url_2</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Master</receiver>
+   <slot>change_url_2()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>96</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>88</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>send_url_3</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Master</receiver>
+   <slot>change_url_3()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>379</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>434</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>change_token_box()</slot>
+  <slot>reset_point()</slot>
+  <slot>select_send_1()</slot>
+  <slot>select_send_2()</slot>
+  <slot>select_send_3()</slot>
+  <slot>change_url_1()</slot>
+  <slot>change_url_2()</slot>
+  <slot>change_url_3()</slot>
  </slots>
 </ui>

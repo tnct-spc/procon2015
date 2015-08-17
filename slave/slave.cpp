@@ -23,6 +23,44 @@ Slave::Slave(QWidget *parent) :
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
     connect(ui->answer_save_action,&QAction::triggered,this,&Slave::answer_save_to_file);
     connect(ui->problem_load_action,&QAction::triggered,this,&Slave::problem_load_from_file);
+
+    //setting load
+    settings = new QSettings("setting.ini",QSettings::IniFormat);
+    settings->beginGroup("SETTING");
+    if(!QFile::exists("setting.ini")){
+        //init
+        settings->setValue("POST_BUTTON",1);
+        settings->setValue("GET_BUTTON",1);
+        settings->setValue("POST_LINE_EDIT_1","http://127.0.0.1:8081");
+        settings->setValue("POST_LINE_EDIT_2","http://127.0.0.1:8081");
+        settings->setValue("GET_LINE_EDIT_1","http://127.0.0.1:8080/problem");
+        settings->setValue("GET_LINE_EDIT_2","http://127.0.0.1:8080/problem");
+        settings->setValue("GET_LINE_EDIT_3","http://127.0.0.1:8080/problem");
+    }
+    switch(settings->value("POST_BUTTON").toInt()){
+    case 1:
+        ui->post_button_1->setChecked(true);
+        break;
+    case 2:
+        ui->post_button_2->setChecked(true);
+        break;
+    }
+    switch(settings->value("GET_BUTTON").toInt()){
+    case 1:
+        ui->get_button_1->setChecked(true);
+        break;
+    case 2:
+        ui->get_button_2->setChecked(true);
+        break;
+    case 3:
+        ui->get_button_3->setChecked(true);
+        break;
+    }
+    ui->post_line_edit_1->setText(settings->value("POST_LINE_EDIT_1").toString());
+    ui->post_line_edit_2->setText(settings->value("POST_LINE_EDIT_2").toString());
+    ui->get_line_edit_1->setText(settings->value("GET_LINE_EDIT_1").toString());
+    ui->get_line_edit_2->setText(settings->value("GET_LINE_EDIT_2").toString());
+    ui->get_line_edit_3->setText(settings->value("GET_LINE_EDIT_3").toString());
 }
 
 Slave::~Slave()
@@ -34,8 +72,8 @@ void Slave::clicked_run_button(){
 
     //get problem
     //net network(gethost,posthost,"testman",1);
-    network = new net(ui->get_line_edit->text(),
-                      ui->post_line_edit->text(),
+    network = new net(get_geturl(),
+                      get_posturl(),
                       ui->prob_num_line_edit->text().toInt()
                       );
     auto str = network->get();
@@ -62,6 +100,7 @@ void Slave::answer_send(field_type answer){
         fp.close();
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
         ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+
     }else{
         net_mtx.lock();
         std::string res = network->send(answer);
@@ -91,3 +130,28 @@ void Slave::problem_load_from_file(){
     _problem = problem_type(in.readAll().toStdString());
     //std::cout << _problem.stones.size() << std::endl;
 }
+
+
+QString Slave::get_posturl(){
+    if(ui->post_button_1->isChecked()) return ui->post_line_edit_1->text();
+    if(ui->post_button_2->isChecked()) return ui->post_line_edit_2->text();
+    return "";
+}
+
+QString Slave::get_geturl(){
+    if(ui->get_button_1->isChecked()) return ui->get_line_edit_1->text();
+    if(ui->get_button_2->isChecked()) return ui->get_line_edit_2->text();
+    if(ui->get_button_3->isChecked()) return ui->get_line_edit_3->text();
+    return "";
+}
+
+void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}
+void Slave::post_button_2_pushed(){settings->setValue("POST_BUTTON",2);}
+void Slave::get_button_1_pushed(){settings->setValue("GET_BUTTON",1);}
+void Slave::get_button_2_pushed(){settings->setValue("GET_BUTTON",2);}
+void Slave::get_button_3_pushed(){settings->setValue("GET_BUTTON",3);}
+void Slave::post_line_edit_1_changed(){settings->setValue("POST_LINE_EDIT_1",ui->post_line_edit_1->text());}
+void Slave::post_line_edit_2_changed(){settings->setValue("POST_LINE_EDIT_2",ui->post_line_edit_2->text());}
+void Slave::get_line_edit_1_changed(){settings->setValue("GET_LINE_EDIT_1",ui->get_line_edit_1->text());}
+void Slave::get_line_edit_2_changed(){settings->setValue("GET_LINE_EDIT_2",ui->get_line_edit_2->text());}
+void Slave::get_line_edit_3_changed(){settings->setValue("GET_LINE_EDIT_3",ui->get_line_edit_3->text());}
