@@ -11,7 +11,8 @@ HEADERS += $$PWD/takao_global.hpp \
         $$PWD/placed_stone_type.hpp \
         $$PWD/field_type.hpp \
         $$PWD/algorithm_type.hpp \
-        $$PWD/problem_type.hpp
+        $$PWD/problem_type.hpp \
+    $$PWD/answer_type.hpp
 
 SOURCES += \
     $$PWD/algorithm_type.cpp \
@@ -20,4 +21,5 @@ SOURCES += \
     $$PWD/point_type.cpp \
     $$PWD/problem_type.cpp \
     $$PWD/stone_type.cpp \
-    $$PWD/utils.cpp
+    $$PWD/utils.cpp \
+    $$PWD/answer_type.cpp
