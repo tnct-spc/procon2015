@@ -240,7 +240,8 @@ search_type yrange::search(field_type& _field, stone_type const& _stone, int con
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
-    for(int i = x; i < x + STONE_SIZE + 1; ++i) for(int j = y; j < y + STONE_SIZE + 1; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 1; ++flip)
+    //for(int i = x; i < x + STONE_SIZE + 1; ++i) for(int j = y; j < y + STONE_SIZE + 1; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 1; ++flip)
+    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 1; ++flip)
     {
         if(i == 0 && j == 0)continue;
         stone_type stone = _stone;
