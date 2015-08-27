@@ -2,6 +2,7 @@
 #define SLAVE_H
 
 #include <QWidget>
+#include <QScrollBar>
 #include <QString>
 #include <QUrl>
 #include <net.hpp>
@@ -32,6 +33,9 @@ private:
 
     QString get_posturl();
     QString get_geturl();
+    //本当はQtTextBrowserの派生クラス作るのがいいんだろうけど面倒くさい
+    void print_text(QString str);
+    QScrollBar* br;
     QSettings* settings;
 private slots:
     void clicked_run_button();

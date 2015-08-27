@@ -14,9 +14,9 @@ algorithm_manager::algorithm_manager(problem_type _problem)
     qRegisterMetaType<field_type>();
     qRegisterMetaType<std::string>();
     problem = _problem;
-    //lgo_vec.push_back(new simple_algorithm(problem));
+    algo_vec.push_back(new simple_algorithm(problem));
     algo_vec.push_back(new sticky_algo(problem));
-    //algo_vec.push_back(new poor_algo(problem));
+    algo_vec.push_back(new poor_algo(problem));
     for(auto algo : algo_vec){
         connect(algo,&algorithm_type::answer_ready,this,&algorithm_manager::get_answer);
         connect(algo,&algorithm_type::send_text,this,&algorithm_manager::get_text);

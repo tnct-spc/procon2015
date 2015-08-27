@@ -60,6 +60,7 @@ Slave::Slave(QWidget *parent) :
     ui->get_line_edit_1->setText(settings->value("GET_LINE_EDIT_1").toString());
     ui->get_line_edit_2->setText(settings->value("GET_LINE_EDIT_2").toString());
     ui->get_line_edit_3->setText(settings->value("GET_LINE_EDIT_3").toString());
+    br = ui->textBrowser->verticalScrollBar();
 }
 
 Slave::~Slave()
@@ -78,11 +79,11 @@ void Slave::clicked_run_button(){
     auto str = network->get();
     if(network->is_error()){
         //ui->net_label->setText(QString("エラーコード ") + QString().setNum(network->what_error()));
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("ネットワークエラーコード ") + QString().setNum(network->what_error()) + QString("\n"));
+        print_text(QString("🍣ネットワークエラーコード ") + QString::number(network->what_error()));
         return;
     }
     //ui->net_label->setText("ネットは生きてる");
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("問題を受信しました\n"));
+    print_text("問題を受信しました");
     problem_type problem(str);
 
     //solve
@@ -98,17 +99,17 @@ void Slave::answer_send(field_type answer){
         std::ofstream fp("../greatest_answer.txt");
         fp<<answer.get_answer();
         fp.close();
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答をoutputしました\n"));
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
+        print_text("回答をoutputしました\n");
+        print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));
 
     }else{
         net_mtx.lock();
 
         std::string res = network->send(answer);
 
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("回答を送信しました\n"));
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString("動作中アルゴリズム数 ") + QString().setNum(algo_manager->run_thread_num()) + QString("\n"));
-        ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(res.c_str()) + QString("\n"));
+        print_text("回答を送信しました");
+        print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));
+
         net_mtx.unlock();
     }
 }
@@ -133,6 +134,10 @@ void Slave::problem_load_from_file(){
     //std::cout << _problem.stones.size() << std::endl;
 }
 
+void Slave::print_text(QString str){
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + str + QString("\n"));
+    br->setValue(br->maximum());
+}
 
 QString Slave::get_posturl(){
     if(ui->post_button_1->isChecked()) return ui->post_line_edit_1->text();
@@ -147,7 +152,7 @@ QString Slave::get_geturl(){
     return "";
 }
 void Slave::print_algorithm_message(std::string str){
-    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(str.c_str()));
+    print_text(QString(str.c_str()));
 }
 
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}

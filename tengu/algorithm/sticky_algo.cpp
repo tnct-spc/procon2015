@@ -47,10 +47,9 @@ void sticky_algo::run(){
     for(auto _stone : problem.stones){
                 put_a_stone(_stone);
                 std::ostringstream oss;
-                oss << (1-(double)count / (double)problem.stones.size()) *100 << "%完了\n";
+                oss << (1-(double)count / (double)problem.stones.size()) *100 << "%完了";
                 print_text(oss.str());
                 count --;
     }
-    print_text("うどん店丸亀\n");
     emit answer_ready(problem.field);
 }
