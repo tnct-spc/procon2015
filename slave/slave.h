@@ -39,6 +39,7 @@ private slots:
     void text_box_clear();
     void answer_save_to_file();
     void problem_load_from_file();
+    void print_algorithm_message(std::string str);
     void post_button_1_pushed();
     void post_button_2_pushed();
     void get_button_1_pushed();

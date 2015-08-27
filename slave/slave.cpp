@@ -23,7 +23,6 @@ Slave::Slave(QWidget *parent) :
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
     connect(ui->answer_save_action,&QAction::triggered,this,&Slave::answer_save_to_file);
     connect(ui->problem_load_action,&QAction::triggered,this,&Slave::problem_load_from_file);
-
     //setting load
     settings = new QSettings("setting.ini",QSettings::IniFormat);
     settings->beginGroup("SETTING");
@@ -89,6 +88,7 @@ void Slave::clicked_run_button(){
     //solve
     algo_manager = new algorithm_manager(problem);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
     //connect(algo_manager,&algorithm_manager::finished,[&](){delete algo_manager;std::cout << "manager殺した" << std::endl;});
     algo_manager->run();
 
@@ -143,6 +143,9 @@ QString Slave::get_geturl(){
     if(ui->get_button_2->isChecked()) return ui->get_line_edit_2->text();
     if(ui->get_button_3->isChecked()) return ui->get_line_edit_3->text();
     return "";
+}
+void Slave::print_algorithm_message(std::string str){
+    ui->textBrowser->setPlainText( ui->textBrowser->toPlainText() + QString(str.c_str()));
 }
 
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}

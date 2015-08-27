@@ -1,10 +1,11 @@
 #include "sticky_algo.hpp"
 #include <limits>
+#include <sstream>
 #include "QDebug"
 #include "QString"
 sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),problem(_problem)
 {
-
+    algorithm_name = "sticky";
 }
 sticky_algo::~sticky_algo(){
 
@@ -42,11 +43,14 @@ void sticky_algo::run(){
         if(best_score >= 0)problem.field.put_stone(best_stone,best_y,best_x);
         return;
     };
-    int count = 0;
+    int count = problem.stones.size();
     for(auto _stone : problem.stones){
                 put_a_stone(_stone);
-                qDebug() << count;
-                count ++;
+                std::ostringstream oss;
+                oss << (1-(double)count / (double)problem.stones.size()) *100 << "%完了\n";
+                print_text(oss.str());
+                count --;
     }
+    print_text("うどん店丸亀\n");
     emit answer_ready(problem.field);
 }
