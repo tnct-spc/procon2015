@@ -66,6 +66,8 @@ class field_type
 
         std::string get_answer() const;
 
+        void print_field();
+
     private:
         raw_field_type raw_data;
         std::vector<process_type> processes;
@@ -80,8 +82,6 @@ class field_type
 
         //石が置かれているか否かを返す
         bool is_placed(stone_type const& stone);
-
-        void print_field();
 };
 
 #endif // FIELD_TYPE
