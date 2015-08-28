@@ -32,6 +32,7 @@ public:
     void run();
 
 private:
+    int threshold_zk;
     problem_type pre_problem;
     double evaluate(yrange_type const& one)const;
     void place(field_type& field, int const m, int const n);

@@ -7,8 +7,13 @@
 yrange::yrange(problem_type _problem)
 {
     pre_problem = _problem;
-    int const row_obstacle = 0;
-    int const col_obstacle = 0;
+    std::vector<int> areas;
+    for(auto const& each_stone : _problem.stones)
+    {
+        areas.push_back(each_stone.get_area());
+    }
+    std::sort(areas.begin(),areas.end());
+    threshold_zk = areas.at(areas.size()/10);
 }
 
 yrange::~yrange()
@@ -29,6 +34,7 @@ void yrange::run()
 
             if(problem.field.is_puttable(stone,l,m) == true)
             {
+                std::vector<stone_type> small_stones;
                 for(auto& each_stone : problem.stones)
                 {
                     //1個目
@@ -37,7 +43,27 @@ void yrange::run()
                         problem.field.put_stone(each_stone,l,m);
                         continue;
                     }
-                    //２個目以降
+                    //２個目以降threshold_zkより大きい物
+                    small_stones.clear();
+                    if(each_stone.get_area() > threshold_zk)
+                    {
+                        search_type next = search(problem.field,each_stone);
+                        if(next.point.y == FIELD_SIZE) continue;
+                        if(next.flip == 1) each_stone.flip();
+                        each_stone.rotate(next.rotate);
+                        problem.field.put_stone(each_stone,next.point.y,next.point.x);
+                        //std::cout << each_stone.get_nth() << std::endl;
+                        l = next.point.y;
+                        m = next.point.x;
+                    }
+                    else
+                    {
+                        small_stones.push_back(each_stone);
+                    }
+                }
+                //threshold_zkより小さい石
+                for(auto& each_stone : small_stones)
+                {
                     search_type next = search(problem.field,each_stone);
                     if(next.point.y == FIELD_SIZE) continue;
                     if(next.flip == 1) each_stone.flip();
