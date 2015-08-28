@@ -11,7 +11,7 @@ sticky_algo::~sticky_algo(){
 
 }
 
-int sticky_algo::eval(field_type field, stone_type stone, int pos_y, int pos_x){
+int sticky_algo::eval(field_type& field, stone_type& stone, int pos_y, int pos_x){
     int score = 0;
     int neighbors = 0;
     if(!field.is_puttable(stone,pos_y,pos_x))return -1;
@@ -44,12 +44,13 @@ void sticky_algo::run(){
         return;
     };
     int count = problem.stones.size();
-    for(auto _stone : problem.stones){
+    for(auto& _stone : problem.stones){
                 put_a_stone(_stone);
-                std::ostringstream oss;
-                oss << (1-(double)count / (double)problem.stones.size()) *100 << "%完了";
-                print_text(oss.str());
+                //std::ostringstream oss;
+                //oss << (1-(double)count / (double)problem.stones.size()) *100 << "%完了";
+                //print_text(oss.str());
                 count --;
     }
+    print_text("そうっすね");
     emit answer_ready(problem.field);
 }

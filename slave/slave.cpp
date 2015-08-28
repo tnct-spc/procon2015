@@ -88,6 +88,7 @@ void Slave::clicked_run_button(){
 
     //solve
     algo_manager = new algorithm_manager(problem);
+    //algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
     //connect(algo_manager,&algorithm_manager::finished,[&](){delete algo_manager;std::cout << "manager殺した" << std::endl;});
@@ -106,7 +107,7 @@ void Slave::answer_send(field_type answer){
         net_mtx.lock();
 
         std::string res = network->send(answer);
-
+        print_text(QString(res.c_str()));
         print_text("回答を送信しました");
         print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));
 

@@ -41,7 +41,7 @@ std::string net::send(field_type answer){
     postData.addQueryItem("point",QString::number(answer.get_score()));
     postData.addQueryItem("quest_number",QString::number(_problem_num));
     postData.addQueryItem("answer",answer.get_answer().c_str());
-    postData.addQueryItem("id",QString::number(1));
+    postData.addQueryItem("id",QString::number(3));
     QNetworkRequest req(_master_url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
