@@ -198,6 +198,44 @@ field_type::field_type(std::string const & raw_field_text, size_t stones)
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
+
+    //edges
+    //upper
+    upper_edge = [&]
+    {
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return i;
+        }
+        return FIELD_SIZE;
+    }();
+    //right
+    right_edge = [&]
+    {
+        for(int i = FIELD_SIZE - 1; i >= 0; --i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(j).at(i) != -1) return FIELD_SIZE - i - 1;
+        }
+        return FIELD_SIZE;
+    }();
+    //buttom
+    buttom_edge = [&]
+    {
+        for(int i = FIELD_SIZE - 1; i >= 0; --i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return FIELD_SIZE - i - 1;
+        }
+        return FIELD_SIZE;
+    }();
+    //left
+    left_edge = [&]
+    {
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return i;
+        }
+        return FIELD_SIZE;
+    }();
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const

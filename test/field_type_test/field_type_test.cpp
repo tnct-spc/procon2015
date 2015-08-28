@@ -152,6 +152,11 @@ class field_type_test : public QObject
              "00000110\r\n"
              "00000011"s, 4}
         };
+
+        int upper_edge = 0; //上方から数えた障害物しかない行の数
+        int right_edge = 0; //右方から数えた障害物しかない列の数
+        int buttom_edge = 0;//下方から数えた障害物しかない行の数
+        int left_edge = 0;  //左方から数えた障害物しかない列の数
 };
 
 field_type_test::field_type_test()
@@ -162,10 +167,19 @@ void field_type_test::construct_test_data()
 {
     QTest::addColumn<std::string>("field_text");
     QTest::addColumn<field_type::raw_field_type>("raw_field");
+    QTest::addColumn<int>("upper_edge");
+    QTest::addColumn<int>("right_edge");
+    QTest::addColumn<int>("buttom_edge");
+    QTest::addColumn<int>("left_edge");
+
 
     QTest::newRow("1")
         << default_field_text
-        << default_raw_field;
+        << default_raw_field
+        << upper_edge
+        << right_edge
+        << buttom_edge
+        << left_edge;
 }
 
 void field_type_test::construct_test()
@@ -174,6 +188,11 @@ void field_type_test::construct_test()
     QFETCH(field_type::raw_field_type, raw_field);
 
     QCOMPARE(field_type(field_text,0).get_raw_data(), raw_field);
+    QCOMPARE(field_type(field_text,0).upper_edge,0);
+    QCOMPARE(field_type(field_text,0).right_edge,16);
+    QCOMPARE(field_type(field_text,0).buttom_edge,20);
+    QCOMPARE(field_type(field_text,0).left_edge,0);
+
 }
 
 void field_type_test::get_score_test_data()
