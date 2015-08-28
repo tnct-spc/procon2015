@@ -8,7 +8,7 @@
 bool field_type::is_placed(stone_type const& stone)
 {
     return std::find_if(processes.begin(), processes.end(),
-                        [& stone](auto const & process) { return process.stone == stone; }
+                        [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }
            ) != processes.end();
 }
 
@@ -80,6 +80,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
+    if(is_placed(stone)==true) is_connection=false;
     //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
     //else std::cerr << "This stone can put here." << std::endl;
     return is_connection;
@@ -282,7 +283,6 @@ std::string field_type::get_answer() const
         process_count++;
     }
     for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
-    result.append("\r\n");
     return result;
 }
 

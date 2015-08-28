@@ -5,6 +5,7 @@
 simple_algorithm::simple_algorithm(problem_type _problem)
 {
     pre_problem = _problem;
+    algorithm_name = "simple";
 }
 
 simple_algorithm::~simple_algorithm()

@@ -8,6 +8,7 @@
 #include "takao.hpp"
 #include "tengu.hpp"
 Q_DECLARE_METATYPE(field_type)
+Q_DECLARE_METATYPE(std::string)
 class algorithm_manager : public QObject
 {
     Q_OBJECT
@@ -26,10 +27,12 @@ private:
 
 signals:
     void answer_ready(field_type ans);
+    void send_text(std::string str);
     void finished();
 
 public slots:
     void get_answer(field_type ans);
+    void get_text(std::string str);
 };
 
 #endif // ALGORITHM_MANAGER_H
