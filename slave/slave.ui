@@ -145,19 +145,6 @@
     <string>Clear</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="discharge">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>60</y>
-     <width>88</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>排出モード</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="post_line_edit_2">
    <property name="geometry">
     <rect>
@@ -276,6 +263,19 @@
    <attribute name="buttonGroup">
     <string notr="true">buttonGroup_2</string>
    </attribute>
+  </widget>
+  <widget class="QCheckBox" name="ofline_mode_check_box">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>40</y>
+     <width>121</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>オフラインモード</string>
+   </property>
   </widget>
   <action name="problem_load_action">
    <property name="text">
@@ -483,7 +483,7 @@
   <slot>get_button_3_pushed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
