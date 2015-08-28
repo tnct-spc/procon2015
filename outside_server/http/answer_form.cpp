@@ -1,6 +1,6 @@
 #include "answer_form.h"
 #include <http/request_mapper.h>
-//#define _DEBUG
+#define _DEBUG
 
 AnswerForm::AnswerForm(QObject *parent) : QObject(parent) {
 
