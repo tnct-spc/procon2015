@@ -14,7 +14,6 @@ simple_algorithm::~simple_algorithm()
 }
 
 void simple_algorithm::run(){
-    int temp;
     //端から置ける場所を探して石を挿入していく関数
     auto put_a_stone = [&](stone_type stone){
         //設置可能範囲は左上座標(-7,-7)から左上座標(31,31)まで
@@ -40,9 +39,8 @@ void simple_algorithm::run(){
 
     //石を設置
     for(auto _stone : problem.stones){
-        put_a_stone(_stone,i);
+        put_a_stone(_stone);
     }
     //解答の送信
-    qDebug("emit %d",i);
     emit answer_ready(problem.field);
 }
