@@ -1,5 +1,4 @@
 #include <QCoreApplication>
-#include "problem_maker.hpp"
 #include "raw_stone.hpp"
 #include "raw_field.hpp"
 #include "file_export.hpp"
@@ -14,7 +13,7 @@ int main(int argc, char **argv)
     opt.add_options()
         ("help,h", "ヘルプを表示")
         ("with-answer,w", "答え付きの問題を生成")
-        ("ansfile,a", boost::program_options::value<std::string>()->default_value("ans.txt"), "解答ファイル名")
+        ("ansfile,a", boost::program_options::value<std::string>()->default_value("answer.txt"), "解答ファイル名")
         ("num-of-problem,n", boost::program_options::value<int>()->default_value(1), "問題数")
         ("cut-row,r", boost::program_options::value<int>()->default_value(-1), "削る横列")
         ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列")
@@ -42,10 +41,12 @@ int main(int argc, char **argv)
     int const nop = vm["num-of-problem"].as<int>();
     //std::cout << "num-of-problem = " << nop << std::endl;
 
-    int const row = vm["cut-row"].as<int>() < 1 ? dist_row(engine) : vm["cut-row"].as<int>();
+    int const row = vm["cut-row"].as<int>() < 1 ?
+                dist_row(engine) : vm["cut-row"].as<int>();
     std::cout << "cut-row = " << row << std::endl;
 
-    int const column = vm["cut-column"].as<int>() < 1 ? dist_col(engine) : vm["cut-column"].as<int>();
+    int const column = vm["cut-column"].as<int>() < 1 ?
+                dist_col(engine) : vm["cut-column"].as<int>();
     std::cout << "cut-column = " << column << std::endl;
 
     //ルール上はこうだけどあまりに多いので
@@ -55,13 +56,19 @@ int main(int argc, char **argv)
         dist_obs(engine) : vm["obstacle"].as<int>();
     std::cout << "obstacle = " << obstacle << std::endl;
 
-    for(int i = 1; i <= nop; ++i)
-    {
-        raw_field rf(obstacle,column,row);
-        raw_stone rs(1,rf.get_empty_zk());
-        file_export fe(i,rf.field,rs.data);
+    int const create_answer = vm.count("with-answer");
+
+    for(int i = 1; i <= nop; ++i) {
+        if(create_answer) {
+            std::cerr << "not implemented yet" << std::endl;
+            raw_field rf(obstacle, column, row);
+        } else {
+            raw_field rf(obstacle,column,row);
+            raw_stone rs(1,rf.get_empty_zk());
+            file_export fe(i,rf.field,rs.data);
+        }
     }
-    std::cout << "Completion" << std::endl;
+    std::cout << "Complete" << std::endl;
 
     return 0;
 }

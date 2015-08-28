@@ -1,6 +1,7 @@
 #ifndef FILE_EXPORT_HPP
 #define FILE_EXPORT_HPP
-#include "problem_maker.hpp"
+#include "raw_stone.hpp"
+#include "raw_field.hpp"
 #include <array>
 #include <vector>
 

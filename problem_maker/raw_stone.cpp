@@ -1,4 +1,5 @@
 #include "raw_stone.hpp"
+#include "raw_field.hpp"
 #include <QDebug>
 #include <algorithm>
 #include <functional>
@@ -15,6 +16,7 @@ raw_stone::raw_stone(int const algo, int const field_zk)
     }
 }
 
+/* 最大field_zk[zk]で構成される石を作る */
 void raw_stone::simple_create(int const field_zk)
 {
     std::random_device seed_gen;
@@ -28,9 +30,10 @@ void raw_stone::simple_create(int const field_zk)
     //int const need_zk = dist_need_zk(engine);
     while(total_zk < /*need_zk*/field_zk) {
         raw_stone_type stone;
-        for(auto &each_raw : stone)
-            each_raw.fill(0);
-        int const volatile zk = dist_zk(engine);
+        for(auto &each_row : stone)
+            each_row.fill(0);
+
+        int const volatile zk = dist_zk(engine); /* 実際のzk */
         int volatile count = 0;
         int insrance = 0;
         stone.at(dist_x(engine)).at(dist_y(engine)) = 1;
@@ -39,10 +42,10 @@ void raw_stone::simple_create(int const field_zk)
             //std::cout << total_zk << std::endl;
             int const volatile x = dist_x(engine);
             int const volatile y = dist_y(engine);
-            if((0 < y && stone.at(y-1).at(x) == 1)
-                || (y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1)
-                || (0 < x && stone.at(y).at(x-1) == 1)
-                || (x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1)) {
+            if((0 < y && stone.at(y-1).at(x) == 1) /* 上に石が隣接 */
+                || (y+1 < STONE_SIZE - 1 && stone.at(y+1).at(x) == 1) /* 下に石が隣接 */
+                || (0 < x && stone.at(y).at(x-1) == 1) /* 左に石が隣接 */
+                || (x+1 < STONE_SIZE - 1 && stone.at(y).at(x+1) == 1)) /* 右に石が隣接 */ {
                 count++;
                 stone.at(y).at(x) = 1;
             }

@@ -1,7 +1,9 @@
 #ifndef RAW_FIELD_HPP
 #define RAW_FIELD_HPP
-#include "problem_maker.hpp"
 #include <array>
+
+int static constexpr FIELD_SIZE = 32;
+typedef std::array<std::array<int,FIELD_SIZE>,FIELD_SIZE> raw_field_type;
 
 class raw_field
 {

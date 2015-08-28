@@ -1,8 +1,10 @@
 #ifndef RAW_STONE_HPP
 #define RAW_STONE_HPP
-#include "problem_maker.hpp"
 #include <vector>
 #include <array>
+
+int static constexpr STONE_SIZE = 8;
+typedef std::array<std::array<int,STONE_SIZE>,STONE_SIZE> raw_stone_type;
 
 class raw_stone
 {
@@ -23,4 +25,4 @@ public:
 
 };
 
-#endif // RAW_STONE_H
+#endif // RAW_STONE_HPP
