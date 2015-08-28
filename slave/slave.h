@@ -29,7 +29,7 @@ private:
     algorithm_manager *algo_manager;
     std::mutex net_mtx;
     problem_type _problem;
-    problem_type _answer;
+    field_type _answer;
 
     QString get_posturl();
     QString get_geturl();

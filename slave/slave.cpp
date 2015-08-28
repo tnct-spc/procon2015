@@ -69,25 +69,23 @@ Slave::~Slave()
 }
 
 void Slave::clicked_run_button(){
-
-    //get problem
-    //net network(gethost,posthost,"testman",1);
-    network = new net(get_geturl(),
-                      get_posturl(),
-                      ui->prob_num_line_edit->text().toInt()
-                      );
-    auto str = network->get();
-    if(network->is_error()){
-        //ui->net_label->setText(QString("エラーコード ") + QString().setNum(network->what_error()));
-        print_text(QString("🍣ネットワークエラーコード ") + QString::number(network->what_error()));
-        return;
+    if(!ui->ofline_mode_check_box->isChecked()){
+        network = new net(get_geturl(),
+                          get_posturl(),
+                          ui->prob_num_line_edit->text().toInt()
+                          );
+        auto str = network->get();
+        if(network->is_error()){
+            print_text(QString("🍣ネットワークエラーコード ") + QString::number(network->what_error()));
+            return;
+        }
+        //ui->net_label->setText("ネットは生きてる");
+        print_text("問題を受信しました");
+        problem_type problem(str);
+        _problem = problem;
     }
-    //ui->net_label->setText("ネットは生きてる");
-    print_text("問題を受信しました");
-    problem_type problem(str);
-
     //solve
-    algo_manager = new algorithm_manager(problem);
+    algo_manager = new algorithm_manager(_problem);
     //algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
@@ -96,11 +94,8 @@ void Slave::clicked_run_button(){
 
 }
 void Slave::answer_send(field_type answer){
-    if(ui->discharge->isChecked()){
-        std::ofstream fp("../greatest_answer.txt");
-        fp<<answer.get_answer();
-        fp.close();
-        print_text("回答をoutputしました\n");
+    _answer = answer;
+    if(ui->ofline_mode_check_box->isChecked()){
         print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));
 
     }else{
@@ -123,7 +118,7 @@ void Slave::answer_save_to_file(){
     QFile file(filename);
     if(!file.open(QIODevice::WriteOnly))return;
     QTextStream out(&file);
-    out << _answer.field.get_answer().c_str() << endl;
+    out << _answer.get_answer().c_str() << endl;
 }
 void Slave::problem_load_from_file(){
     auto filename = QFileDialog::getOpenFileName(this);
