@@ -33,7 +33,7 @@ public:
 
 private:
     problem_type pre_problem;
-    int evaluate(field_type const& field, stone_type stone)const;
+    int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     search_type search(field_type& _field, stone_type const& _stone);
 };
 

@@ -57,13 +57,14 @@ void yrange::run()
 }
 
 //評価関数
-int yrange::evaluate(field_type const& field, stone_type stone)const
+int yrange::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
 {
     int const n = stone.get_nth();
     int count = 0;
     //int k = i > 1 - STONE_SIZE ? i - 1 : i, l = j > 1 - STONE_SIZE ? j - 1 : j;
     //for(k = k < 0 ? 0 : k; k < (i + STONE_SIZE) && (k + 1 < FIELD_SIZE); ++k) for(l = l < 0 ? 0 : l ; (l < j + STONE_SIZE) && (l + 1 < FIELD_SIZE); ++l)
-    for(int k = 0; k < FIELD_SIZE-1; ++k) for(int l = 0; l < FIELD_SIZE-1; ++l)
+    //std::cout << i << " " << j << std::endl;
+    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
         if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n)
         {
@@ -129,7 +130,7 @@ search_type yrange::search(field_type& _field, stone_type const& _stone)
             field_type field = _field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数える
-            search_vec.push_back(search_type{point_type{i,j},rotate*90,flip,evaluate(field,stone)});
+            search_vec.push_back(search_type{point_type{i,j},rotate*90,flip,evaluate(field,stone,i,j)});
         }
     }
     if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,0,0};
