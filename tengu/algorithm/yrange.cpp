@@ -61,11 +61,21 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
 {
     int const n = stone.get_nth();
     int count = 0;
-    //int k = i > 1 - STONE_SIZE ? i - 1 : i, l = j > 1 - STONE_SIZE ? j - 1 : j;
-    //for(k = k < 0 ? 0 : k; k < (i + STONE_SIZE) && (k + 1 < FIELD_SIZE); ++k) for(l = l < 0 ? 0 : l ; (l < j + STONE_SIZE) && (l + 1 < FIELD_SIZE); ++l)
-    //std::cout << i << " " << j << std::endl;
     for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
+
+        if(field.get_raw_data().at(k).at(l) == n)
+        {
+            count += (kl1 + k1l);
+            if(k == 0 || k == FIELD_SIZE - 1) count++;
+            if(l == 0 || l == FIELD_SIZE - 1) count++;
+        }
+        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
+        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
+/*
         if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n)
         {
             //std::cout << "1";
@@ -97,6 +107,7 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
             count++;
         }
         //std::cout << std::endl;
+        */
     }
     return count;
 /*
