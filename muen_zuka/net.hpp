@@ -24,7 +24,7 @@ public:
     net(QUrl server_url, QUrl master_url, int problem_num);
     ~net();
     std::string get();
-    std::string send(field_type answer);
+    std::string send(field_type answer, QString playerid);
     bool is_error();
     int what_error();
 signals:
