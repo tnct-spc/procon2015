@@ -32,13 +32,9 @@ public:
     void run();
 
 private:
-    int threshold_zk;
     problem_type pre_problem;
-    double evaluate(yrange_type const& one)const;
-    void place(field_type& field, int const m, int const n);
-    int evaluate(stone_type const stone, int const x, int const y)const;
+    int evaluate(field_type const& field, stone_type stone)const;
     search_type search(field_type& _field, stone_type const& _stone);
-
 };
 
 
