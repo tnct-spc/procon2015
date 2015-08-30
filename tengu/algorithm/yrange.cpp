@@ -68,7 +68,7 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-search_type yrange::search(field_type& _field, stone_type const& _stone)
+yrange::search_type yrange::search(field_type& _field, stone_type const& _stone)
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる

@@ -6,4 +6,6 @@
 #include "algorithm/yrange.hpp"
 #include "algorithm/sticky_algo.hpp"
 #include "algorithm/square.hpp"
+#include "algorithm/yrange.hpp"
+#include "algorithm/read_ahead.hpp"
 #endif // TENGU_HPP
