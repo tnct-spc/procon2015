@@ -21,6 +21,7 @@ public:
 
 private:
     problem_type pre_problem;
+    void one_try(problem_type problem, int x, int y, std::size_t const rotate);
     int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     search_type search(field_type& _field, stone_type& stone);
 };

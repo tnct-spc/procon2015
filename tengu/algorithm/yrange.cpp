@@ -18,30 +18,36 @@ yrange::~yrange()
 void yrange::run()
 {
     qDebug("yrange start");
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 2; ++flip)
+    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        problem = pre_problem;
-        problem.stones.at(0).rotate(rotate * 90);
-        if(flip == 1) problem.stones.at(0).flip();
-
-        if(problem.field.is_puttable(problem.stones.at(0),l,m) == true)
-        {
-            //1個目
-            problem.field.put_stone(problem.stones.at(0),l,m);
-            problem.stones.erase(problem.stones.begin());
-            //２個目以降
-            for(auto& each_stone : problem.stones)
-            {
-                search_type next = std::move(search(problem.field,each_stone));
-                if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-                if(next.flip != each_stone.get_side()) each_stone.flip();
-                each_stone.rotate(next.rotate);
-                problem.field.put_stone(each_stone,next.point.y,next.point.x);
-            }
-            qDebug("emit starting by %2d,%2d %2d %2d",l,m,rotate,flip);
-            emit answer_ready(problem.field);
-        }
+        one_try(pre_problem, l, m, rotate);
     }
+}
+
+void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotate)
+{
+    problem.stones.at(0).rotate(rotate / 2  * 90);
+    if(rotate %2 == 1) problem.stones.at(0).flip();
+
+    if(problem.field.is_puttable(problem.stones.at(0),x,y) == true)
+    {
+        //1個目
+        problem.field.put_stone(problem.stones.at(0),x,y);
+        problem.stones.erase(problem.stones.begin());
+        //２個目以降
+        for(auto& each_stone : problem.stones)
+        {
+            search_type next = std::move(search(problem.field,each_stone));
+            if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
+            if(next.flip != each_stone.get_side()) each_stone.flip();
+            each_stone.rotate(next.rotate);
+            problem.field.put_stone(each_stone,next.point.y,next.point.x);
+        }
+        std::string const flip = problem.stones.at(0).get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+        qDebug("emit starting by %2d,%2d %2lu %s",x,y,rotate / 2,flip.c_str());
+        emit answer_ready(problem.field);
+    }
+
 }
 
 //評価関数
