@@ -34,7 +34,7 @@ void yrange::run()
             {
                 search_type next = std::move(search(problem.field,each_stone));
                 if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-                if(next.flip == 1) each_stone.flip();
+                if(next.flip != each_stone.get_side()) each_stone.flip();
                 each_stone.rotate(next.rotate);
                 problem.field.put_stone(each_stone,next.point.y,next.point.x);
             }
@@ -68,25 +68,23 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-search_type yrange::search(field_type& _field, stone_type const& _stone)
+search_type yrange::search(field_type& _field, stone_type& stone)
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
-    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 2; ++flip)
+    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
     {
-        if(i == 0 && j == 0)continue;
-        stone_type stone = _stone;
-        if(flip == 1) stone.flip();
-        stone.rotate(rotate * 90);
+        if(rotate % 2 == 0) stone.rotate(90);
+        else stone.flip();
         if(_field.is_puttable(stone,i,j) == true)
         {
             field_type field = _field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
-            search_vec.push_back(search_type{point_type{i,j},rotate*90,flip,evaluate(field,stone,i,j)});
+            search_vec.push_back(search_type{point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j)});
         }
     }
-    if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,0,0};
+    if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,0};
     std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
     return std::move(search_vec.at(0));
 }

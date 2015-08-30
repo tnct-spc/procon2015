@@ -2,24 +2,12 @@
 #define YRANGE_HPP
 #include <takao.hpp>
 #include <array>
-int constexpr FIELD_SIZE = 32;
-
-struct yrange_type
-{
-    field_type field;
-    stone_type stone;
-    point_type point;
-    double value;
-    int angle;
-    int flip;
-    point_type first_point;
-};
 
 struct search_type
 {
     point_type point;
-    int rotate;
-    int flip;
+    std::size_t rotate;
+    stone_type::Sides flip;
     int score;
 };
 
@@ -34,7 +22,7 @@ public:
 private:
     problem_type pre_problem;
     int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
-    search_type search(field_type& _field, stone_type const& _stone);
+    search_type search(field_type& _field, stone_type& stone);
 };
 
 
