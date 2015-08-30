@@ -33,7 +33,7 @@ private:
     bool PutStone();
 
     //Important function.
-    bool FormatCheck(QString plain_data);
+    bool FormatCheck(QString plain_data, QString &errormesage);
 
     //stage data
     int stage_state_[48][48];//0=empty;1=block;2=answer_block

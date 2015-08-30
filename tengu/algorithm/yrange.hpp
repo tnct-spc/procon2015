@@ -2,7 +2,6 @@
 #define YRANGE_HPP
 #include <takao.hpp>
 #include <array>
-int constexpr FIELD_SIZE = 32;
 
 struct yrange_type
 {

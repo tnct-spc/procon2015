@@ -13,21 +13,17 @@ DEFINES += TENGU_LIBRARY
 
 SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/poor_algo.cpp \
-<<<<<<< HEAD
-    algorithm/yrange.cpp
-=======
-    algorithm/sticky_algo.cpp
->>>>>>> develop
+    algorithm/sticky_algo.cpp \
+    algorithm/square.cpp
+    algorithm/square.cpp
 
 HEADERS += tengu.hpp\
         tengu_global.h \
     algorithm/simple_algorithm.hpp \
     algorithm/poor_algo.hpp \
-<<<<<<< HEAD
-    algorithm/yrange.hpp
-=======
-    algorithm/sticky_algo.hpp
->>>>>>> develop
+    algorithm/sticky_algo.hpp \
+    algorithm/square.hpp
+    algorithm/square.hpp
 
 unix {
     target.path = /usr/lib
