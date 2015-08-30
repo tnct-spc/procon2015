@@ -8,7 +8,7 @@
 bool field_type::is_placed(stone_type const& stone)
 {
     return std::find_if(processes.begin(), processes.end(),
-                        [& stone](auto const & process) { return process.stone == stone; }
+                        [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }
            ) != processes.end();
 }
 
@@ -83,6 +83,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
+    if(is_placed(stone)==true) is_connection=false;
     //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
     //else std::cerr << "This stone can put here." << std::endl;
 
@@ -194,13 +195,52 @@ bool field_type::is_removable(stone_type const& stone)
 }
 
  //コメント書こう
-field_type::field_type(std::string const & raw_field_text)
+field_type::field_type(std::string const & raw_field_text, size_t stones)
 {
+    provided_stones = stones;
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
+
+    //edges
+    //upper
+    upper_edge = [&]
+    {
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return i;
+        }
+        return FIELD_SIZE;
+    }();
+    //right
+    right_edge = [&]
+    {
+        for(int i = FIELD_SIZE - 1; i >= 0; --i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(j).at(i) != -1) return FIELD_SIZE - i - 1;
+        }
+        return FIELD_SIZE;
+    }();
+    //buttom
+    buttom_edge = [&]
+    {
+        for(int i = FIELD_SIZE - 1; i >= 0; --i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return FIELD_SIZE - i - 1;
+        }
+        return FIELD_SIZE;
+    }();
+    //left
+    left_edge = [&]
+    {
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(raw_data.at(i).at(j) != -1) return i;
+        }
+        return FIELD_SIZE;
+    }();
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const
@@ -227,6 +267,7 @@ std::string field_type::get_answer() const
     int process_count=0;
     for (auto const & process : processes)
     {
+
         std::string line;
 
         auto current_nth = process.stone.get_nth();
@@ -245,6 +286,7 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
+    for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
     return result;
 }
 

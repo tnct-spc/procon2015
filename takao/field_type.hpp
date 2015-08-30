@@ -6,6 +6,9 @@
 #include <array>
 #include <string>
 #include <vector>
+
+int constexpr FIELD_SIZE = 32;
+
 // 解答データの手順ひとつ分
 class process_type
 {
@@ -38,7 +41,12 @@ class field_type
         field_type() = default;
         ~field_type() = default;
 
-        field_type(std::string const & raw_field_text);
+        int upper_edge = 0; //上方から数えた障害物しかない行の数
+        int right_edge = 0; //右方から数えた障害物しかない列の数
+        int buttom_edge = 0;//下方から数えた障害物しかない行の数
+        int left_edge = 0;  //左方から数えた障害物しかない列の数
+
+        field_type(std::string const & raw_field_text, size_t stones);
 
         //現在の状態における得点を返す
         size_t get_score();
@@ -69,7 +77,8 @@ class field_type
     private:
         raw_field_type raw_data;
         std::vector<process_type> processes;
-
+        //渡された石の総数.get_answerで必要
+        size_t provided_stones;
         //is_removableで必要
         struct pair_type
         {

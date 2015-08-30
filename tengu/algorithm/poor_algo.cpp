@@ -3,6 +3,7 @@
 poor_algo::poor_algo(problem_type _problem)
 {
     problem = _problem;
+    algorithm_name = "poor";
 }
 
 poor_algo::~poor_algo()
