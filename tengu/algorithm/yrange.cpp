@@ -1,8 +1,8 @@
 #include "yrange.hpp"
-#include <queue>
 #include <algorithm>
+#include <array>
 #include <vector>
-#include <cmath>
+#include <thread>
 #include <QFile>
 #include <QIODevice>
 
@@ -18,10 +18,13 @@ yrange::~yrange()
 void yrange::run()
 {
     qDebug("yrange start");
+    std::vector<std::thread> threads ((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        one_try(pre_problem, l, m, rotate);
+        //threads.push_back(one_try, pre_problem, l, m, rotate);
+        one_try(pre_problem,l,m,rotate);
     }
+    for (std::thread &th : threads) th.join();
 }
 
 void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotate)
