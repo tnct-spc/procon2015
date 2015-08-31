@@ -305,7 +305,7 @@ std::string field_type::get_answer() const
 void field_type::make_bit()
 {
     //make bit plain field
-    for(int i=0;i<36;i++){
+    for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
     }
     for(int y=0;y<32;y++){
@@ -314,18 +314,18 @@ void field_type::make_bit()
         }
     }
     //make bit sides field
-    for(int i=0;i<36;i++){
+    for(int i=0;i<64;i++){
         bit_sides_field[i] = 0;
     }
 
 #ifdef _DEBUG
     std::cout<<"bit plain field"<<std::endl;
-    for(int i=0;i<36;i++){
+    for(int i=0;i<64;i++){
         std::cout<<static_cast<std::bitset<64>>(bit_plain_field[i]);
         std::cout<<std::endl;
     }
     std::cout<<"bit sides field"<<std::endl;
-    for(int i=0;i<36;i++){
+    for(int i=0;i<64;i++){
         std::cout<<static_cast<std::bitset<64>>(bit_sides_field[i]);
         std::cout<<std::endl;
     }
