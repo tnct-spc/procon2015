@@ -1,4 +1,4 @@
-#define _DEBUG
+//#define _DEBUG
 
 #ifdef _DEBUG
 #include <QDebug>
