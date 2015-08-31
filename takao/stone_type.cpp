@@ -55,12 +55,20 @@ stone_type& stone_type::rotate(int angle)
     current_angle = (current_angle + angle) % 360;
     return *this;
 }
+stone_type& stone_type::set_angle(int angle){
+    current_angle = angle;
+    return *this;
+}
 
 //左右に反転する
 //自身への参照を返す
 stone_type& stone_type::flip()
 {
     current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
+    return *this;
+}
+stone_type& stone_type::set_side(stone_type::Sides side){
+    current_side = side;
     return *this;
 }
 

@@ -30,6 +30,8 @@ class stone_type
         raw_stone_type const & get_raw_data() const;
         stone_type& rotate(int angle);
         stone_type& flip();
+        stone_type& set_angle(int angle);
+        stone_type& set_side(stone_type::Sides side);
         size_t get_area() const;
         stone_type::Sides get_side() const;
         std::size_t get_angle() const;

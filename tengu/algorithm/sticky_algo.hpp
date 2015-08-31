@@ -14,6 +14,12 @@ private:
     const problem_type origin_problem;
     problem_type problem;
     int eval(field_type &field, stone_type &stone, int pos_y, int pos_x);
+    typedef struct stone_status {
+        stone_type::Sides side;
+        int angle;
+        int x;
+        int y;
+    };
 };
 
 #endif // STICKY_ALGO_HPP
