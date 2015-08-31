@@ -51,7 +51,7 @@ class stone_type
         raw_stone_type _flip(raw_stone_type stone);
 
         //#BitSystem
-        //石のマスク(int64_t bit_stones[256][39][2][4][8];)
+        //石のマスク(int64_t bit_stones[39][2][4][8];)
         std::vector<std::vector<std::vector<std::vector<uint64_t>>>> bit_plain_stones = std::vector<std::vector<std::vector<std::vector<uint64_t>>>>(39,std::vector<std::vector<std::vector<uint64_t>>>(2,std::vector<std::vector<uint64_t>>(4,std::vector<uint64_t>(8))));
 
         //bitデータの作成
