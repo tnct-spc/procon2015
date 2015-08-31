@@ -36,9 +36,9 @@ int const & stone_type::at(size_t y,size_t x) const
     return get_raw_data().at(y).at(x);
 }
 
-int & stone_type::at(size_t y,size_t x)
+int stone_type::at(size_t y,size_t x)
 {
-    return const_cast<int &>(at(y, x));
+    return get_raw_data().at(y).at(x);
 }
 
 //石へのアクセサ
