@@ -241,12 +241,6 @@ void stone_type::make_bit()
                         bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << ((64-10-x)-bit_c);
                     }
                 }
-                for(int y=0;y<10;y++){//縦に一行ごと
-                    bit_side_stones[x][flip_c][angle][y]=0;
-                    for(int bit_c=0;bit_c<10;bit_c++){
-                        bit_side_stones[x][flip_c][angle][y] += (uint64_t)is_side(y,bit_c) << ((64-10-x)-bit_c);
-                    }
-                }
                 rotate(90);
             }
             flip();
@@ -258,13 +252,6 @@ void stone_type::make_bit()
     //for(int x=0;x<39;x++){//マイケルの動き
         for(int y=0;y<8;y++){//縦に一行ごと
             std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[0][0][0][y])<<std::endl;
-        }
-        std::cout<<std::endl;
-    //}
-    std::cout<<"bit side stones"<<std::endl;
-    //for(int x=0;x<39;x++){//マイケルの動き
-        for(int y=0;y<10;y++){//縦に一行ごと
-            std::cout<<static_cast<std::bitset<64>>(bit_side_stones[0][0][0][y])<<std::endl;
         }
         std::cout<<std::endl;
     //}

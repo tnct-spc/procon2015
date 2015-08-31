@@ -53,8 +53,6 @@ class stone_type
         //#BitSystem
         //石のマスク(int64_t bit_stones[256][39][2][4][8];)
         std::vector<std::vector<std::vector<std::vector<uint64_t>>>> bit_plain_stones = std::vector<std::vector<std::vector<std::vector<uint64_t>>>>(39,std::vector<std::vector<std::vector<uint64_t>>>(2,std::vector<std::vector<uint64_t>>(4,std::vector<uint64_t>(8))));
-        //石の枠のマスク(int64_t bit_stones[256][39][2][4][10];)
-        std::vector<std::vector<std::vector<std::vector<uint64_t>>>> bit_side_stones = std::vector<std::vector<std::vector<std::vector<uint64_t>>>>(39,std::vector<std::vector<std::vector<uint64_t>>>(2,std::vector<std::vector<uint64_t>>(4,std::vector<uint64_t>(10))));
 
         //bitデータの作成
         void make_bit();
