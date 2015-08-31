@@ -48,6 +48,7 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(1))emit send_text("poor動作");
     if(enable_algorithm_list.at(2))emit send_text("sticky動作");
     if(enable_algorithm_list.at(3))emit send_text("square動作");
+    if(enable_algorithm_list.at(4))emit send_text("yrange動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();

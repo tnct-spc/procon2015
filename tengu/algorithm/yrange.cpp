@@ -44,7 +44,7 @@ void yrange::run()
         data,
         [this](auto& tup)
         {
-            //one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
+            this->one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
         });
     threads.waitForFinished();
 }
