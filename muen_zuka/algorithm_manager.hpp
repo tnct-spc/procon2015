@@ -14,13 +14,14 @@ class algorithm_manager : public QObject
     Q_OBJECT
 public:
     explicit algorithm_manager(QObject *parent = 0);
-    algorithm_manager(problem_type _problem);
+    algorithm_manager(problem_type _problem, std::vector<bool> enable_algo);
     ~algorithm_manager();
     int run_thread_num();
     void run();
 
 private:
     std::vector<algorithm_type*> algo_vec;
+    std::vector<bool> enable_algorithm_list;
     std::mutex mtx;
     problem_type problem;
     u_int64_t best_zk = std::numeric_limits<u_int64_t>::max();

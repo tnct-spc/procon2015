@@ -93,7 +93,16 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
 field_type& field_type::remove_stone(stone_type const& stone)
 {
-    if (is_placed(stone) == false)
+    if(stone.get_nth() == processes.back().stone.get_nth())
+    {
+        int const y = processes.back().position.y;
+        int const x = processes.back().position.x;
+        for(int i = y; i < 32 && i < y + 8; ++i) for(int j = x; j < 32 && j < x + 8; ++j)
+        {
+            if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
+        }
+    }
+    else if (is_placed(stone) == false)
     {
         throw std::runtime_error("The stone isn't placed...in remove_stone");
     }
@@ -101,9 +110,12 @@ field_type& field_type::remove_stone(stone_type const& stone)
     {
         throw std::runtime_error("The stone can't remove.");
     }
-    for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
+    else
     {
-        if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
+        for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
+        {
+            if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
+        }
     }
     processes.erase(std::remove_if(processes.begin(), processes.end(),
                                    [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }),
