@@ -1,6 +1,7 @@
 #include "yrange.hpp"
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <vector>
 #include <thread>
 #include <QFile>
@@ -21,8 +22,7 @@ void yrange::run()
     std::vector<std::thread> threads ((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        //threads.push_back(one_try, pre_problem, l, m, rotate);
-        one_try(pre_problem,l,m,rotate);
+        threads.emplace_back(std::bind(&yrange::one_try, this, pre_problem,l,m,rotate));
     }
     for (std::thread &th : threads) th.join();
 }
