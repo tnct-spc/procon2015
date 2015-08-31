@@ -152,7 +152,6 @@ void stone_type::_set_random(int const zk)
         int x = dist_pos(engine);
         int y = dist_pos(engine);
         candidate.at(y).at(x) = 1;
-        std::cerr << "start x: " << x << ", y: " << y << std::endl;
         for(int count = 1; count < zk; ) {
             x = dist_pos(engine);
             y = dist_pos(engine);
@@ -162,7 +161,6 @@ void stone_type::_set_random(int const zk)
                  (_is_in_stone(x - 1) && candidate.at(y).at(x - 1)) ||
                  (_is_in_stone(x + 1) && candidate.at(y).at(x + 1)))
                     ) {
-                std::cerr << "x: " << x << ", y: " << y << std::endl;
                 count++;
                 candidate.at(y).at(x) = 1;
             }

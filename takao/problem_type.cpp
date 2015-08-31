@@ -3,6 +3,7 @@
 #include "field_type.hpp"
 #include "utils.hpp"
 #include <sstream>
+#include <iostream>
 
 problem_type::problem_type(std::string const & problem_text)
 {

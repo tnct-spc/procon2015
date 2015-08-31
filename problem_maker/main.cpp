@@ -74,19 +74,18 @@ int main(int argc, char **argv)
             for(int total_zk = 0; total_zk < minimum_zk; ) {
                 std::uniform_int_distribution<int> dist_zk(1, 16);
                 int const stone_zk = dist_zk(engine);
-                std::cerr << stone_zk << " zk" << std::endl;
                 stone_type stone(stone_zk);
-                std::cerr << stone.get_area() << " zk comp" << std::endl;
                 total_zk += stone.get_area();
                 stones.push_back(stone);
             }
-            std::cerr << "stone comp" << std::endl;
             problem_type problem(field, stones);
             std::ofstream ofs("quest" + std::to_string(i) + ".txt");
+            if(ofs.fail()) {
+                std::cerr << "failed to open file" << std::endl;
+                return -1;
+            }
             ofs << problem.str();
         }
     }
-    std::cout << "Complete" << std::endl;
-
     return 0;
 }
