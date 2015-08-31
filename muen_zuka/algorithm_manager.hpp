@@ -29,6 +29,7 @@ private:
 signals:
     void answer_ready(field_type ans);
     void send_text(std::string str);
+    void finished();
 
 public slots:
     void get_answer(field_type ans);
