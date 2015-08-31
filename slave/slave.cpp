@@ -88,7 +88,12 @@ void Slave::clicked_run_button(){
         _problem = problem;
     }
     //solve
-    algo_manager = new algorithm_manager(_problem);
+    std::vector<bool> enable_algo(4);
+    ui->checkBox_0->isChecked() ? enable_algo.at(0) = true : enable_algo.at(0) = false;
+    ui->checkBox_1->isChecked() ? enable_algo.at(1) = true : enable_algo.at(1) = false;
+    ui->checkBox_2->isChecked() ? enable_algo.at(2) = true : enable_algo.at(2) = false;
+    ui->checkBox_3->isChecked() ? enable_algo.at(3) = true : enable_algo.at(3) = false;
+    algo_manager = new algorithm_manager(_problem,enable_algo);
     algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
