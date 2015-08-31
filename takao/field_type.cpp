@@ -1,16 +1,9 @@
-//#define _DEBUG
-
-#ifdef _DEBUG
-#include <QDebug>
-#include <iostream>
-#endif
 
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
 #include "field_type.hpp"
 #include "utils.hpp"
-
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
@@ -203,16 +196,14 @@ bool field_type::is_removable(stone_type const& stone)
 }
 
  //コメント書こう
-field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
+field_type::field_type(std::string const & raw_field_text, size_t stones)
 {
-    provided_stones = stone_nth;
+    provided_stones = stones;
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
-
-    make_bit();
 
     //edges
     //upper
@@ -300,34 +291,3 @@ std::string field_type::get_answer() const
     return result;
 }
 
-//#BitSystem
-//bitデータの作成
-void field_type::make_bit()
-{
-    //make bit plain field
-    for(int i=0;i<36;i++){
-        bit_plain_field[i] = 0xffffffffffffffff;
-    }
-    for(int y=0;y<32;y++){
-        for(int x=0;x<32;x++){
-            bit_plain_field[y+2] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
-        }
-    }
-    //make bit sides field
-    for(int i=0;i<36;i++){
-        bit_sides_field[i] = 0;
-    }
-
-#ifdef _DEBUG
-    std::cout<<"bit plain field"<<std::endl;
-    for(int i=0;i<36;i++){
-        std::cout<<static_cast<std::bitset<64>>(bit_plain_field[i]);
-        std::cout<<std::endl;
-    }
-    std::cout<<"bit sides field"<<std::endl;
-    for(int i=0;i<36;i++){
-        std::cout<<static_cast<std::bitset<64>>(bit_sides_field[i]);
-        std::cout<<std::endl;
-    }
-#endif
-}
