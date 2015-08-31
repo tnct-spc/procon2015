@@ -88,7 +88,7 @@ void OutsideServer::ReserveAnswer(){
             }
             //set ranking
             int ranking_count=1;
-            int user_ranking[6];
+            std::vector<int> user_ranking(g_user_data.size());
             for(unsigned long i=0;i<stage_max;i++){
                 if(!(g_user_data[user_sort[i]].is_now_animation)){
                     user_ranking[user_sort[i]]=ranking_count;

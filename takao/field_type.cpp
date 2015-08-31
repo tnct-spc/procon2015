@@ -106,7 +106,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
         if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
     }
     processes.erase(std::remove_if(processes.begin(), processes.end(),
-                                   [& stone](auto const & process) { return process.stone == stone; }),
+                                   [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }),
                     processes.end());
     return *this;
  }
@@ -116,6 +116,7 @@ bool field_type::is_removable(stone_type const& stone)
  {
      std::vector<pair_type> pair_list;
      std::vector<pair_type> remove_list;
+     if(processes[processes.size()-1].stone.get_nth()==stone.get_nth()) return true;
      if(is_placed(stone) == false) return false;
      if(processes.size() == 1)return true;
      //継ぎ目を検出

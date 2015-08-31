@@ -12,7 +12,7 @@ public:
     void run();
 
 private:
-    problem_type pre_problem;
+    problem_type problem;
 };
 
 #endif // SIMPLE_ALGORITHM_H

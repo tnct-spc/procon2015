@@ -5,5 +5,6 @@
 #include "algorithm/poor_algo.hpp"
 #include "algorithm/yrange.hpp"
 #include "algorithm/sticky_algo.hpp"
+#include "algorithm/square.hpp"
 
 #endif // TENGU_HPP

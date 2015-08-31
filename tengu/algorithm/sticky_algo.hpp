@@ -13,7 +13,7 @@ public:
 private:
     const problem_type origin_problem;
     problem_type problem;
-    int eval(field_type field,stone_type stone,int pos_y,int pos_x);
+    int eval(field_type &field, stone_type &stone, int pos_y, int pos_x);
 };
 
 #endif // STICKY_ALGO_HPP
