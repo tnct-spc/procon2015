@@ -1,7 +1,7 @@
-
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <sstream>
 #include "field_type.hpp"
 #include "utils.hpp"
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
@@ -261,6 +261,11 @@ field_type::raw_field_type const & field_type::get_raw_data() const
     return raw_data;
 }
 
+field_type::raw_field_type& field_type::set_raw_data()
+{
+    return raw_data;
+}
+
 void field_type::print_field()
 {
     for(auto const&each_raw : raw_data)
@@ -299,7 +304,56 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
-    for(int i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    for(int i = prev_nth;i < provided_stones; i++)
+        result.append("\r\n");
+    result.append("\r\n");
     return result;
 }
 
+void field_type::set_random(int const obstacle, int const col, int const row)
+{
+    // fill outer zone
+    for(int i = 0; i < FIELD_SIZE; i++)
+        for(int j = 0; j < FIELD_SIZE; j++)
+            raw_data[i][j] = col <= j || row <= i;
+
+    int count = 0;
+    int insurance = 0;
+    std::random_device seed_gen;
+    std::default_random_engine engine(seed_gen());
+    std::uniform_int_distribution<> dist_x(0, col - 1);
+    std::uniform_int_distribution<> dist_y(0, row - 1);
+
+    while (count < obstacle) {
+        int x = dist_x(engine);
+        int y = dist_y(engine);
+        if(raw_data.at(y).at(x) == 0) {
+            raw_data.at(y).at(x) = 1;
+            count++;
+            if(insurance++ > FIELD_SIZE * FIELD_SIZE)
+                return;
+        }
+    }
+}
+
+int field_type::empty_zk()
+{
+    int sum = 0;
+    for(auto const& each_row : raw_data)
+        sum += std::count(each_row.begin(),each_row.end(),0);
+
+    return sum;
+}
+
+/* 1 new line at end of output */
+std::string field_type::str()
+{
+    std::ostringstream ss;
+    for(auto row : raw_data) {
+        for(auto block : row) {
+            ss << block;
+        }
+        ss << "\r\n";
+    }
+    return std::move(ss.str());
+}

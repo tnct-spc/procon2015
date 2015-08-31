@@ -1,12 +1,12 @@
-#include <QCoreApplication>
-#include "problem_maker.hpp"
-#include "raw_stone.hpp"
-#include "raw_field.hpp"
-#include "file_export.hpp"
+#include <field_type.hpp>
+#include <stone_type.hpp>
+#include <problem_type.hpp>
 #include <array>
 #include <random>
 #include <iostream>
+#include <fstream>
 #include <boost/program_options.hpp>
+#include <limits>
 
 int main(int argc, char **argv)
 {
@@ -14,11 +14,11 @@ int main(int argc, char **argv)
     opt.add_options()
         ("help,h", "ヘルプを表示")
         ("with-answer,w", "答え付きの問題を生成")
-        ("ansfile,a", boost::program_options::value<std::string>()->default_value("ans.txt"), "解答ファイル名")
+        ("ansfile,a", boost::program_options::value<std::string>()->default_value("answer.txt"), "解答ファイル名")
         ("num-of-problem,n", boost::program_options::value<int>()->default_value(1), "問題数")
-        ("cut-row,r", boost::program_options::value<int>()->default_value(-1), "削る横列")
-        ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列")
-        ("obstacle,o", boost::program_options::value<int>()->default_value(-1), "障害物");
+        ("row,r", boost::program_options::value<int>(), "横列")
+        ("column,c", boost::program_options::value<int>(), "縦列")
+        ("obstacle,o", boost::program_options::value<int>(), "障害物");
 
 
     boost::program_options::variables_map vm;
@@ -32,36 +32,60 @@ int main(int argc, char **argv)
 
     if (vm.count("help")) {
         std::cout << opt << std::endl;
+        return 0;
     }
 
     std::random_device seed_gen;
     std::default_random_engine engine(seed_gen());
-    std::uniform_int_distribution<> dist_row(0, FIELD_SIZE / 2);
-    std::uniform_int_distribution<> dist_col(0, FIELD_SIZE / 2);
+    std::uniform_int_distribution<> dist_row(1, FIELD_SIZE);
+    std::uniform_int_distribution<> dist_col(1, FIELD_SIZE);
 
     int const nop = vm["num-of-problem"].as<int>();
-    //std::cout << "num-of-problem = " << nop << std::endl;
+    std::cout << "problems: " << nop << std::endl;
 
-    int const row = vm["cut-row"].as<int>() < 1 ? dist_row(engine) : vm["cut-row"].as<int>();
-    std::cout << "cut-row = " << row << std::endl;
+    int const row = vm.count("row") ?
+                vm["row"].as<int>() : dist_row(engine);
+    std::cout << "row: " << row << std::endl;
 
-    int const column = vm["cut-column"].as<int>() < 1 ? dist_col(engine) : vm["cut-column"].as<int>();
-    std::cout << "cut-column = " << column << std::endl;
+    int const column = vm.count("column") ?
+                vm["column"].as<int>() : dist_col(engine);
+    std::cout << "column: " << column << std::endl;
 
     //ルール上はこうだけどあまりに多いので
     //std::uniform_int_distribution<> dist_obs(0, 1023-row-column);
-    std::uniform_int_distribution<> dist_obs(0, 50);
-    int const obstacle = vm["obstacle"].as<int>() < 1 ?
-        dist_obs(engine) : vm["obstacle"].as<int>();
-    std::cout << "obstacle = " << obstacle << std::endl;
+    std::uniform_int_distribution<> dist_obs(0, std::min(50, row * column));
+    int const obstacle = vm.count("obstacle") ?
+                vm["obstacle"].as<int>() : dist_obs(engine);
+    std::cout << "obstacles: " << obstacle << std::endl;
 
-    for(int i = 1; i <= nop; ++i)
-    {
-        raw_field rf(obstacle,column,row);
-        raw_stone rs(1,rf.get_empty_zk());
-        file_export fe(i,rf.field,rs.data);
+    int const create_answer = vm.count("with-answer");
+
+    for(int i = 1; i <= nop; ++i) {
+        if(create_answer) {
+            std::cerr << "not implemented yet" << std::endl;
+            field_type f;
+            f.set_random(obstacle, column, row);
+        } else {
+            field_type field;
+            field.set_random(obstacle, column, row);
+            std::vector<stone_type> stones;
+            int const minimum_zk = field.empty_zk();
+            std::cout << "empty blocks: " << minimum_zk << std::endl;
+            for(int total_zk = 0; total_zk < minimum_zk; ) {
+                std::uniform_int_distribution<int> dist_zk(1, 16);
+                int const stone_zk = dist_zk(engine);
+                stone_type stone(stone_zk);
+                total_zk += stone.get_area();
+                stones.push_back(stone);
+            }
+            problem_type problem(field, stones);
+            std::ofstream ofs("quest" + std::to_string(i) + ".txt");
+            if(ofs.fail()) {
+                std::cerr << "failed to open file" << std::endl;
+                return -1;
+            }
+            ofs << problem.str();
+        }
     }
-    std::cout << "Completion" << std::endl;
-
     return 0;
 }
