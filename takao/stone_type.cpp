@@ -1,9 +1,17 @@
+//#define _DEBUG
+
+#ifdef _DEBUG
+#include <QDebug>
+#include <iostream>
+#endif
+
 #include "stone_type.hpp"
 #include "utils.hpp"
 #include "point_type.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include <array>
+#include <bitset>
 
 // 石
 
@@ -27,6 +35,8 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
         raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
         raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
     }
+
+    make_bit();
 }
 
 //生配列へのアクセサ
@@ -36,9 +46,9 @@ int const & stone_type::at(size_t y,size_t x) const
     return get_raw_data().at(y).at(x);
 }
 
-int & stone_type::at(size_t y,size_t x)
+int stone_type::at(size_t y,size_t x)
 {
-    return const_cast<int &>(at(y, x));
+    return get_raw_data().at(y).at(x);
 }
 
 //石へのアクセサ
@@ -202,4 +212,61 @@ int stone_type::get_side_length()const
          if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))sum++;
     }
     return sum;
+}
+
+//#BitSystem
+//bitデータの作成
+void stone_type::make_bit()
+{
+    auto is_side = [&](int &y, int &x) -> bool
+    {
+        if(1<=x && x<=8){
+            if(y>=2) if(at(y-1-1,x-1)) return true;
+            if(y<=7) if(at(y-1+1,x-1)) return true;
+        }
+        if(1<=y && y<=8){
+            if(x>=2) if(at(y-1,x-1-1)) return true;
+            if(x<=7) if(at(y-1,x-1+1)) return true;
+        }
+        return false;
+    };
+
+    //make bit stones
+    for(int x=0;x<39;x++){//マイケルの動き
+        for(int flip_c=0;flip_c<2;flip_c++){//flip
+            for(int angle=0;angle<4;angle++){//angle
+                for(int y=0;y<8;y++){//縦に一行ごと
+                    bit_plain_stones[x][flip_c][angle][y]=0;
+                    for(int bit_c=0;bit_c<8;bit_c++){
+                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << ((64-10-x)-bit_c);
+                    }
+                }
+                for(int y=0;y<10;y++){//縦に一行ごと
+                    bit_side_stones[x][flip_c][angle][y]=0;
+                    for(int bit_c=0;bit_c<10;bit_c++){
+                        bit_side_stones[x][flip_c][angle][y] += (uint64_t)is_side(y,bit_c) << ((64-10-x)-bit_c);
+                    }
+                }
+                rotate(90);
+            }
+            flip();
+        }
+    }
+
+#ifdef _DEBUG
+    std::cout<<"bit plain stones"<<std::endl;
+    //for(int x=0;x<39;x++){//マイケルの動き
+        for(int y=0;y<8;y++){//縦に一行ごと
+            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[0][0][0][y])<<std::endl;
+        }
+        std::cout<<std::endl;
+    //}
+    std::cout<<"bit side stones"<<std::endl;
+    //for(int x=0;x<39;x++){//マイケルの動き
+        for(int y=0;y<10;y++){//縦に一行ごと
+            std::cout<<static_cast<std::bitset<64>>(bit_side_stones[0][0][0][y])<<std::endl;
+        }
+        std::cout<<std::endl;
+    //}
+#endif
 }
