@@ -1,6 +1,10 @@
 #include "stone_type.hpp"
 #include "utils.hpp"
+#include "point_type.hpp"
+#include <stdexcept>
 #include <algorithm>
+#include <array>
+
 // 石
 
 bool operator== (stone_type const& lhs, stone_type const& rhs)
@@ -122,6 +126,58 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
     return return_data;
 }
 
+corner_type stone_type::get_corner()
+{
+    int a,l,b,r;
+    for(a = 0; a < STONE_SIZE && count_n_row(a) == 0; ++a);
+    for(l = STONE_SIZE - 1; l >= 0 && count_n_col(l) == 0; --l);
+    for(b = STONE_SIZE - 1; b >= 0 && count_n_row(b) == 0; --b);
+    for(r = 0; r < STONE_SIZE && count_n_col(r) == 0; ++r);
+    std::vector<int> four_corners{
+        count_n_row(--a)+count_n_col(--l),//右上
+        count_n_col(l)+count_n_row(--b),//右下
+        count_n_row(b)+count_n_col(--r),//左下
+        count_n_col(r)+count_n_row(a)//左上
+    };
+    std::vector<int>::iterator iter = std::max_element(four_corners.begin(), four_corners.end());
+    std::size_t const best = std::distance(four_corners.begin(), iter);
+    switch(best)
+    {
+    case 0:
+        rotate(180);
+        return corner_type{four_corners.at(0),point_type{a,r}};
+    case 1:
+        rotate(90);
+        return corner_type{four_corners.at(1),point_type{r,b}};
+    case 2:
+        return corner_type{four_corners.at(2),point_type{b,l}};
+    case 3:
+        rotate(270);
+        return corner_type{four_corners.at(3),point_type{l,a}};
+    default:
+        break;
+    }
+    throw std::runtime_error("error in get_corner"); //ありえない
+    return corner_type{0,point_type{0,0}};
+}
+
+//n列目のブロック数を返す
+int stone_type::count_n_row(int const n)const
+{
+    int const current_data = static_cast<unsigned>(current_side)*4 + current_angle / 90;
+    return std::count(raw_data_set.at(current_data).at(n).begin(),raw_data_set.at(current_data).at(n).end(),1);
+}
+
+//n行目のブロック数を返す
+int stone_type::count_n_col(int const n)const
+{
+    int const current_data = static_cast<unsigned>(current_side)*4 + current_angle / 90;
+    int sum = 0;
+    for(int i = 0;i < STONE_SIZE; ++i) sum += raw_data_set.at(current_data).at(i).at(n);
+    return sum;
+}
+
+
 //左右に反転する
 stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
 {
@@ -135,4 +191,15 @@ stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
 int stone_type::get_nth()const
 {
     return nth;
+}
+
+int stone_type::get_side_length()const
+{
+    int sum = 0;
+    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
+    {
+         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))sum++;
+         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))sum++;
+    }
+    return sum;
 }

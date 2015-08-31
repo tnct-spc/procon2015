@@ -1,7 +1,16 @@
 #ifndef STONE_TYPE
 #define STONE_TYPE
+#include "point_type.hpp"
 #include <array>
+
 int constexpr STONE_SIZE = 8;
+
+struct corner_type
+{
+    int value;
+    point_type point;
+};
+
 // 石
 class stone_type
 {
@@ -25,6 +34,11 @@ class stone_type
         stone_type::Sides get_side() const;
         std::size_t get_angle() const;
         int get_nth()const;
+        int get_side_length()const;
+        corner_type get_corner();
+        int count_n_row(int const n)const;
+        int count_n_col(int const n)const;
+
 
     private:
         int  nth;
@@ -35,5 +49,7 @@ class stone_type
         raw_stone_type _rotate(raw_stone_type const & raw_data, int angle);
         raw_stone_type _flip(raw_stone_type stone);
 };
+
+
 
 #endif // STONE_TYPE

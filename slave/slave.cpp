@@ -19,6 +19,7 @@ Slave::Slave(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Slave)
 {
+    srand((unsigned int)time(NULL));
     ui->setupUi(this);
     connect(ui->Clear_button,&QPushButton::clicked,this,&Slave::text_box_clear);
     connect(ui->answer_save_action,&QAction::triggered,this,&Slave::answer_save_to_file);
@@ -28,9 +29,10 @@ Slave::Slave(QWidget *parent) :
     settings->beginGroup("SETTING");
     if(!QFile::exists("setting.ini")){
         //init
+        settings->setValue("PLAYERID","名無し-"+QString::number(rand()%10000));
         settings->setValue("POST_BUTTON",1);
         settings->setValue("GET_BUTTON",1);
-        settings->setValue("POST_LINE_EDIT_1","http://127.0.0.1:8081");
+        settings->setValue("POST_LINE_EDIT_1","http://127.0.0.1:8080/answer");
         settings->setValue("POST_LINE_EDIT_2","http://127.0.0.1:8081");
         settings->setValue("GET_LINE_EDIT_1","http://127.0.0.1:8080/problem");
         settings->setValue("GET_LINE_EDIT_2","http://127.0.0.1:8080/problem");
@@ -55,6 +57,7 @@ Slave::Slave(QWidget *parent) :
         ui->get_button_3->setChecked(true);
         break;
     }
+    ui->playerid_lineEdit->setText(settings->value("PLAYERID").toString());
     ui->post_line_edit_1->setText(settings->value("POST_LINE_EDIT_1").toString());
     ui->post_line_edit_2->setText(settings->value("POST_LINE_EDIT_2").toString());
     ui->get_line_edit_1->setText(settings->value("GET_LINE_EDIT_1").toString());
@@ -101,7 +104,7 @@ void Slave::answer_send(field_type answer){
     }else{
         net_mtx.lock();
 
-        std::string res = network->send(answer);
+        std::string res = network->send(answer,settings->value("PLAYERID").toString());
         print_text(QString(res.c_str()));
         print_text("回答を送信しました");
         print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));
@@ -161,3 +164,4 @@ void Slave::post_line_edit_2_changed(){settings->setValue("POST_LINE_EDIT_2",ui-
 void Slave::get_line_edit_1_changed(){settings->setValue("GET_LINE_EDIT_1",ui->get_line_edit_1->text());}
 void Slave::get_line_edit_2_changed(){settings->setValue("GET_LINE_EDIT_2",ui->get_line_edit_2->text());}
 void Slave::get_line_edit_3_changed(){settings->setValue("GET_LINE_EDIT_3",ui->get_line_edit_3->text());}
+void Slave::ui_button_playerid_pushed(){settings->setValue("PLAYERID",ui->playerid_lineEdit->text());}
