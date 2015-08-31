@@ -1,8 +1,12 @@
 #include "stone_type.hpp"
+#include "point_type.hpp"
 #include "utils.hpp"
 #include <algorithm>
-// 石
+#include <functional>
+#include <iostream>
+#include <sstream>
 
+// one 石
 bool operator== (stone_type const& lhs, stone_type const& rhs)
 {
     return lhs.get_raw_data() == rhs.get_raw_data();
@@ -23,6 +27,11 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
         raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
         raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
     }
+}
+
+stone_type::stone_type(int const zk)
+{
+    _set_random(zk);
 }
 
 //生配列へのアクセサ
@@ -95,25 +104,19 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
 
         case 1:
             for(int i=0;i<STONE_SIZE;i++) for(int j=0;j<STONE_SIZE;j++)
-            {
                 return_data[i][j] = raw_data[7-j][i];
-            }
             break;
 
         case 2:
             return_data = raw_data;
             for(auto& each_return_data:return_data)
-            {
                 std::reverse(each_return_data.begin(),each_return_data.end());
-            }
             std::reverse(return_data.begin(),return_data.end());
             break;
 
         case 3:
             for(int i = 0;i < STONE_SIZE;i++) for(int j = 0;j < STONE_SIZE;j++)
-            {
                 return_data[i][j] = raw_data[j][7-i];
-            }
             break;
 
         default:
@@ -126,13 +129,105 @@ stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, 
 stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
 {
     for(auto& each_stone:stone)
-    {
         std::reverse(each_stone.begin(),each_stone.end());
-    }
     return stone;
 }
 
 int stone_type::get_nth()const
 {
     return nth;
+}
+
+/* from raw_stone */
+void stone_type::_set_random(int const zk)
+{
+    std::cerr << "creating " << zk << std::endl;
+    raw_stone_type candidate;
+    do {
+        for(auto& row : candidate)
+            std::fill(row.begin(), row.end(), 0);
+
+        std::random_device seed_gen;
+        std::default_random_engine engine(seed_gen());
+        std::uniform_int_distribution<> dist_x(0, STONE_SIZE - 1);
+        std::uniform_int_distribution<> dist_y(0, STONE_SIZE - 1);
+        candidate.at(dist_y(engine)).at(dist_x(engine)) = 1;
+        for(int count = 1; count < zk; ) {
+            int const x = dist_x(engine);
+            int const y = dist_y(engine);
+            if((0 < y && candidate.at(y-1).at(x) == 1)
+                    /* 上にblock */
+                || (y+1 < STONE_SIZE - 1 && candidate.at(y+1).at(x) == 1)
+                    /* 下にblock */
+                || (0 < x && candidate.at(y).at(x-1) == 1)
+                    /* 左にblock */
+                || (x+1 < STONE_SIZE - 1 && candidate.at(y).at(x+1) == 1))
+                    /* 右にblock */ {
+                count++;
+                candidate.at(y).at(x) = 1;
+            }
+//            if(insrance++ > FIELD_SIZE * FIELD_SIZE)
+//                break;
+        }
+    } while(_has_hole(candidate));
+    _set_from_raw(candidate);
+}
+
+void stone_type::_set_from_raw(raw_stone_type raw)
+{
+    for(int i = 0; i < 4; i++)
+        raw_data_set.at(i) = _rotate(raw, i * 90);
+    raw_data_set.at(4) = _flip(raw);
+    for(int i = 5; i < 8; i++)
+        raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
+}
+
+/* no new line at end of output */
+std::string stone_type::str()
+{
+    std::stringstream ss;
+    for(auto each_row : get_raw_data()) {
+        for(auto const& each_block : each_row) {
+            ss << each_block;
+        }
+        ss << "\r\n";
+    }
+    return std::move(ss.str());
+}
+
+/* returns if (y, x) is in stone (valid range) */
+bool inline stone_type::_is_in_stone(int y, int x)
+{
+    return 0 <= x && 0 <= y && x < STONE_SIZE && y < STONE_SIZE;
+}
+
+bool inline stone_type::_is_in_stone(point_type p)
+{
+    return _is_in_stone(p.y, p.x);
+}
+
+/* returns if stone has any hole */
+bool stone_type::_has_hole(raw_stone_type stone)
+{
+    auto stone_ = stone;
+    for (size_t i = 0; i < stone.size(); i++)
+        for (size_t j = 0; j < stone.at(i).size(); j++)
+            if (!stone.at(i).at(j)) {
+                /* set adjacent blocks */
+                if (_is_in_stone(i + 1, j))
+                    stone_.at(i + 1).at(j) = 1;
+                if (_is_in_stone(i - 1, j))
+                    stone_.at(i - 1).at(j) = 1;
+                if (_is_in_stone(i, j + 1))
+                    stone_.at(i).at(j + 1) = 1;
+                if (_is_in_stone(i, j - 1))
+                    stone_.at(i).at(j - 1) = 1;
+            }
+
+    int sum = 0;
+    for(auto i = stone_.begin(); i < stone_.end(); i++)
+        for(auto j = i->begin(); j < i->end(); j++)
+            sum += *j;
+
+    return sum != STONE_SIZE * STONE_SIZE;
 }

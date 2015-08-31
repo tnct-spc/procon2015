@@ -1,4 +1,5 @@
 #include "answer_type.hpp"
+#include <fstream>
 
 /* コンストラクタ(配給された石の数を取る) */
 answer_type::answer_type(int stones)
@@ -30,3 +31,9 @@ std::string answer_type::answer_str()
     return ret;
 }
 
+/* ファイル出力 */
+void answer_type::export_to_file(std::string const& filename)
+{
+    std::ofstream ofs(filename);
+    ofs << answer_str();
+}

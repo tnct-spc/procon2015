@@ -1,5 +1,9 @@
 #include "problem_type.hpp"
+#include "stone_type.hpp"
+#include "field_type.hpp"
 #include "utils.hpp"
+#include <sstream>
+
 problem_type::problem_type(std::string const & problem_text)
 {
     auto && split = _split_problem_text(problem_text);
@@ -12,6 +16,9 @@ problem_type::problem_type(std::string const & problem_text)
          stones.emplace_back(stone_texts[i], i+1/*一つ目の石のnthは1(1st) iつ目でi+1*/);
     }
 }
+
+problem_type::problem_type(field_type const& field_, std::vector<stone_type> const& stones_) : field(field_), stones(stones_)
+{}
 
 std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_text(std::string const & problem_text)
 {
@@ -31,3 +38,15 @@ std::tuple<std::string, std::vector<std::string>> problem_type::_split_problem_t
     return result;
 }
 
+std::string problem_type::str()
+{
+    std::ostringstream ss;
+    ss << field.str() << "\r\n";
+    ss << stones.size() << "\r\n";
+    for(int i = 0; i < stones.size(); i++) {
+        ss << stones[i].str();
+        if(i != stones.size() - 1)
+            ss << "\r\n";
+    }
+    return std::move(ss.str());
+}

@@ -16,15 +16,9 @@ TEMPLATE = app
 
 LIBS += -lboost_system -lboost_program_options
 
-SOURCES += main.cpp \
-    raw_field.cpp \
-    file_export.cpp \
-    raw_stone.cpp
+SOURCES += main.cpp
 
-HEADERS += \
-    raw_field.hpp \
-    file_export.hpp \
-    raw_stone.hpp
+HEADERS +=
 
 QMAKE_CXXFLAGS += -std=c++14
 

@@ -23,6 +23,7 @@ public:
     answer_type(int stones); /* 問題で渡される石の総数 */
     void append(process_type process);
     std::string answer_str();
+    void export_to_file(std::string const& filename);
 };
 
 #endif // ANSWER_TYPE_HPP
