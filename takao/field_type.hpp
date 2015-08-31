@@ -6,6 +6,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <bitset>
 
 int constexpr FIELD_SIZE = 32;
 
@@ -46,7 +47,7 @@ class field_type
         int buttom_edge = 0;//下方から数えた障害物しかない行の数
         int left_edge = 0;  //左方から数えた障害物しかない列の数
 
-        field_type(std::string const & raw_field_text, size_t stones);
+        field_type(std::string const & raw_field_text, size_t stone_nth);
 
         //現在の状態における得点を返す
         size_t get_score();
@@ -90,6 +91,12 @@ class field_type
 
         //石が置かれているか否かを返す
         bool is_placed(stone_type const& stone);
+
+        //#BitSystem
+        uint64_t bit_plain_field[36];//普通のフィールド
+        uint64_t bit_sides_field[36];//石の辺のフィールド
+        //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか
+        void make_bit();//bitデータの作成
 };
 
 #endif // FIELD_TYPE
