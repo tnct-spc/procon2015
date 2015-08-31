@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+QT       -= gui \
+         += concurrent
 
 TARGET = tengu
 TEMPLATE = lib
@@ -23,6 +24,8 @@ HEADERS += tengu.hpp\
     algorithm/poor_algo.hpp \
     algorithm/yrange.hpp
     algorithm/sticky_algo.hpp
+
+LIBS += -lQt5Concurrent
 
 unix {
     target.path = /usr/lib

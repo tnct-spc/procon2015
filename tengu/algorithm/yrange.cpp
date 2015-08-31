@@ -5,6 +5,10 @@
 #include <vector>
 #include <thread>
 #include <QFile>
+#include <QVector>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentMap>
+#include <QFuture>
 #include <QIODevice>
 
 yrange::yrange(problem_type _problem)
@@ -19,12 +23,19 @@ yrange::~yrange()
 void yrange::run()
 {
     qDebug("yrange start");
-    std::vector<std::thread> threads ((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
+    QVector<std::tuple<int,int,std::size_t>> data;
+    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        threads.emplace_back(std::bind(&yrange::one_try, this, pre_problem,l,m,rotate));
+        data.push_back(std::make_tuple(l,m,rotate));
     }
-    for (std::thread &th : threads) th.join();
+    QFuture<void> threads = QtConcurrent::map(
+        data,
+        [this](auto& tup)
+        {
+            one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
+        });
+    threads.waitForFinished();
 }
 
 void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotate)
