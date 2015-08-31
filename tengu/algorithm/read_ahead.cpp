@@ -2,7 +2,7 @@
 #include <queue>
 #include <algorithm>
 #include <vector>
-#include <cmath>
+#include <boost/format.hpp>
 #include <QFile>
 #include <QIODevice>
 
@@ -37,7 +37,7 @@ void read_ahead::run()
             if(sv.at(0).flip == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
             problem.stones.at(ishi).rotate(sv.at(0).rotate);
             problem.field.put_stone(problem.stones.at(ishi), sv.at(0).point.y, sv.at(0).point.x);
-            std::cout << ishi << "th stone puted" << std::endl;
+            print_text((boost::format("%d th stone puted.")%ishi).str());
         }
         qDebug("emit starting by %2d,%2d %2d %2d",l,m,rotate,flip);
         emit answer_ready(problem.field);
@@ -70,7 +70,6 @@ int read_ahead::evaluate(field_type const& field, stone_type stone,int const i, 
 //おける場所の中から評価値の高いものを選んで返す
 void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t const ishi)
 {
-    //std::cout << "rank = " << s.rank << std::endl;
     if(s.rank == 3 || ishi >= problem.stones.size())
     {
         sv.push_back(s);
@@ -90,35 +89,52 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
             field_type field = s.field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
-            search_vec.push_back(search_type{field, point_type{i,j}, stone.get_angle(), stone.get_side(), evaluate(field,stone,i,j)});
+            if(s.rank == 1)
+            {
+                search_vec.push_back(search_type
+                {
+                                         field,
+                                         point_type{i,j},
+                                         stone.get_angle(),
+                                         stone.get_side(),
+                                         s.score + evaluate(field,stone,i,j),
+                                         s.rank + 1
+                                     });
+            }
+            else
+            {
+                search_vec.push_back(search_type
+                {
+                                         field,
+                                         s.point,
+                                         s.rotate,
+                                         s.flip,
+                                         s.score + evaluate(field,stone,i,j),
+                                         s.rank + 1
+                                     });
+            }
         }
         //std::cout << "koko3" << std::endl;
     }
 
     std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
 
-    //std::size_t i;
-    //for(i = 1; i < 4 && search_vec.at(i).score == search_vec.at(i - 1).score; ++i)
-    if(search_vec.size() > 2) search_vec.resize(2);
+    std::size_t i;
+    for(i = 1; i < 10 && i < search_vec.size() && search_vec.at(i).score == search_vec.at(i - 1).score; ++i);
+    if(search_vec.size() > i) search_vec.resize(i);
 
-    //std::cout << "search_vec.size() = " << search_vec.size() << std::endl;
-
-    if(s.rank == 1)
+    if(s.rank == 2 || ishi >= problem.stones.size())
     {
         for(auto& each_ele : search_vec)
         {
-            each_ele.rank++;
-            each_ele.t_score = each_ele.score;
-            search(sv, each_ele,ishi+1);
+            sv.push_back(each_ele);
         }
     }
     else
     {
-        s.rank++;
         for(auto& each_ele : search_vec)
         {
-            s.t_score += each_ele.score;
-            search(sv, s, ishi+1);
+            search(sv, each_ele, ishi+1);
         }
     }
 }

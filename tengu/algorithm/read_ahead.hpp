@@ -21,7 +21,6 @@ private:
         std::size_t rotate;
         stone_type::Sides flip;
         int score = 0;
-        int t_score = 0;
         int rank = 1;
     };
 
