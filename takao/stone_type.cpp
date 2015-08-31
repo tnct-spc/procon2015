@@ -1,4 +1,4 @@
-//#define _DEBUG
+#define _DEBUG
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -218,19 +218,6 @@ int stone_type::get_side_length()const
 //bitデータの作成
 void stone_type::make_bit()
 {
-    auto is_side = [&](int &y, int &x) -> bool
-    {
-        if(1<=x && x<=8){
-            if(y>=2) if(at(y-1-1,x-1)) return true;
-            if(y<=7) if(at(y-1+1,x-1)) return true;
-        }
-        if(1<=y && y<=8){
-            if(x>=2) if(at(y-1,x-1-1)) return true;
-            if(x<=7) if(at(y-1,x-1+1)) return true;
-        }
-        return false;
-    };
-
     //make bit stones
     for(int x=0;x<39;x++){//マイケルの動き
         for(int flip_c=0;flip_c<2;flip_c++){//flip
