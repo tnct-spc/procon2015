@@ -213,13 +213,18 @@ int stone_type::get_side_length()const
     }
     return sum;
 }
+uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
+{
+    return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
+}
+
 
 //#BitSystem
 //bitデータの作成
 void stone_type::make_bit()
 {
     //make bit stones
-    for(int x=0;x<39;x++){//マイケルの動き
+    for(int x=0;x<41;x++){//マイケルの動き
         for(int flip_c=0;flip_c<2;flip_c++){//flip
             for(int angle=0;angle<4;angle++){//angle
                 for(int y=0;y<8;y++){//縦に一行ごと
@@ -236,7 +241,8 @@ void stone_type::make_bit()
 
 #ifdef _DEBUG
     std::cout<<"bit plain stones"<<std::endl;
-    //for(int x=0;x<39;x++){//マイケルの動き
+    //for(int x=0;x<41;x++){//マイケルの動き
+        if(x==0 || x==41) std::cout<<"無駄な石"<<std::endl;
         for(int y=0;y<8;y++){//縦に一行ごと
             std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[0][0][0][y])<<std::endl;
         }

@@ -36,6 +36,19 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
     //置く
+    //#bit_system
+    for(int i=0;i<8;i++){
+        //upper
+        bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //under
+        bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //left
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //right
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //add stone
+        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+    }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//石がないならどうでもいい
@@ -55,13 +68,25 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-    //std::cout << "is_puttable start" << std::endl;
-    bool is_connection = false;
+    uint64_t collision = 0;
+#ifdef _DEBUG
+    if(is_placed(stone)==true) return false;
+#endif
+    for(int i=0;i<8;i++){
+        collision |= ((bit_plain_field[16+y+i]) & ((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)));
+    }
+    if(collision!=0) return false;
     if(processes.size() == 0)
     {
-        is_connection = true;//始めの石なら繋がりは必要ない
+        return true;//始めの石なら繋がりは必要ない
         //std::cerr << "first stone" << std::endl;
     }
+    for(int i=0;i<8;i++){
+        collision |= bit_sides_field[16+y+i] & (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)stone.get_angle(),i);
+    }
+    if(collision==0) return false;
+    /*
+    //std::cout << "is_puttable start" << std::endl;
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
@@ -90,11 +115,10 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
             if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
         }
     }
-    if(is_placed(stone)==true) is_connection=false;
     //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
     //else std::cerr << "This stone can put here." << std::endl;
-
-    return is_connection;
+    */
+    return true;
 }
 
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
@@ -310,7 +334,7 @@ void field_type::make_bit()
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
-            bit_plain_field[y+2] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
+            bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
         }
     }
     //make bit sides field
