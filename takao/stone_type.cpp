@@ -141,28 +141,28 @@ int stone_type::get_nth()const
 /* from raw_stone */
 void stone_type::_set_random(int const zk)
 {
-    std::cerr << "creating " << zk << std::endl;
     raw_stone_type candidate;
     do {
         for(auto& row : candidate)
             std::fill(row.begin(), row.end(), 0);
 
         std::random_device seed_gen;
-        std::default_random_engine engine(seed_gen());
-        std::uniform_int_distribution<> dist_x(0, STONE_SIZE - 1);
-        std::uniform_int_distribution<> dist_y(0, STONE_SIZE - 1);
-        candidate.at(dist_y(engine)).at(dist_x(engine)) = 1;
+        std::mt19937_64 engine(seed_gen());
+        std::uniform_int_distribution<int> dist_pos(0, STONE_SIZE - 1);
+        int x = dist_pos(engine);
+        int y = dist_pos(engine);
+        candidate.at(y).at(x) = 1;
+        std::cerr << "start x: " << x << ", y: " << y << std::endl;
         for(int count = 1; count < zk; ) {
-            int const x = dist_x(engine);
-            int const y = dist_y(engine);
-            if((0 < y && candidate.at(y-1).at(x) == 1)
-                    /* 上にblock */
-                || (y+1 < STONE_SIZE - 1 && candidate.at(y+1).at(x) == 1)
-                    /* 下にblock */
-                || (0 < x && candidate.at(y).at(x-1) == 1)
-                    /* 左にblock */
-                || (x+1 < STONE_SIZE - 1 && candidate.at(y).at(x+1) == 1))
-                    /* 右にblock */ {
+            x = dist_pos(engine);
+            y = dist_pos(engine);
+            if (!candidate.at(y).at(x) &&
+                ((_is_in_stone(y - 1) && candidate.at(y - 1).at(x)) ||
+                 (_is_in_stone(y + 1) && candidate.at(y + 1).at(x)) ||
+                 (_is_in_stone(x - 1) && candidate.at(y).at(x - 1)) ||
+                 (_is_in_stone(x + 1) && candidate.at(y).at(x + 1)))
+                    ) {
+                std::cerr << "x: " << x << ", y: " << y << std::endl;
                 count++;
                 candidate.at(y).at(x) = 1;
             }
@@ -196,9 +196,14 @@ std::string stone_type::str()
 }
 
 /* returns if (y, x) is in stone (valid range) */
+bool inline stone_type::_is_in_stone(int p)
+{
+    return 0 <= p && p < STONE_SIZE;
+}
+
 bool inline stone_type::_is_in_stone(int y, int x)
 {
-    return 0 <= x && 0 <= y && x < STONE_SIZE && y < STONE_SIZE;
+    return _is_in_stone(x) && _is_in_stone(y);
 }
 
 bool inline stone_type::_is_in_stone(point_type p)

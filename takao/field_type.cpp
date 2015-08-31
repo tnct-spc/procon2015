@@ -267,12 +267,12 @@ void field_type::set_random(int const obstacle, int const col, int const row)
     int insurance = 0;
     std::random_device seed_gen;
     std::default_random_engine engine(seed_gen());
-    std::uniform_int_distribution<> dist_x(0, FIELD_SIZE - row - 1);
-    std::uniform_int_distribution<> dist_y(0, FIELD_SIZE - col - 1);
+    std::uniform_int_distribution<> dist_x(0, col - 1);
+    std::uniform_int_distribution<> dist_y(0, row - 1);
 
     while (count < obstacle) {
-        int const x = dist_x(engine);
-        int const y = dist_y(engine);
+        int x = dist_x(engine);
+        int y = dist_y(engine);
         if(raw_data.at(y).at(x) == 0) {
             raw_data.at(y).at(x) = 1;
             count++;
@@ -295,8 +295,8 @@ int field_type::empty_zk()
 std::string field_type::str()
 {
     std::ostringstream ss;
-    for(row : raw_data) {
-        for(block : row) {
+    for(auto row : raw_data) {
+        for(auto block : row) {
             ss << block;
         }
         ss << "\r\n";

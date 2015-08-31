@@ -45,6 +45,7 @@ private:
     bool _has_hole(raw_stone_type stone);
     void _set_random(int zk);
     void _set_from_raw(raw_stone_type raw);
+    bool inline _is_in_stone(int p);
     bool inline _is_in_stone(int y, int x);
     bool inline _is_in_stone(point_type p);
 };

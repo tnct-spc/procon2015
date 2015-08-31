@@ -16,9 +16,9 @@ int main(int argc, char **argv)
         ("with-answer,w", "答え付きの問題を生成")
         ("ansfile,a", boost::program_options::value<std::string>()->default_value("answer.txt"), "解答ファイル名")
         ("num-of-problem,n", boost::program_options::value<int>()->default_value(1), "問題数")
-        ("cut-row,r", boost::program_options::value<int>()->default_value(-1), "削る横列")
-        ("cut-column,c", boost::program_options::value<int>()->default_value(-1), "削る縦列")
-        ("obstacle,o", boost::program_options::value<int>()->default_value(-1), "障害物");
+        ("row,r", boost::program_options::value<int>(), "横列")
+        ("column,c", boost::program_options::value<int>(), "縦列")
+        ("obstacle,o", boost::program_options::value<int>(), "障害物");
 
 
     boost::program_options::variables_map vm;
@@ -43,19 +43,19 @@ int main(int argc, char **argv)
     int const nop = vm["num-of-problem"].as<int>();
     std::cout << "problems: " << nop << std::endl;
 
-    int const row = vm["cut-row"].as<int>() < 1 ?
-                dist_row(engine) : vm["cut-row"].as<int>();
+    int const row = vm.count("row") ?
+                vm["row"].as<int>() : dist_row(engine);
     std::cout << "row: " << row << std::endl;
 
-    int const column = vm["cut-column"].as<int>() < 1 ?
-                dist_col(engine) : vm["cut-column"].as<int>();
+    int const column = vm.count("column") ?
+                vm["column"].as<int>() : dist_col(engine);
     std::cout << "column: " << column << std::endl;
 
     //ルール上はこうだけどあまりに多いので
     //std::uniform_int_distribution<> dist_obs(0, 1023-row-column);
     std::uniform_int_distribution<> dist_obs(0, std::min(50, row * column));
-    int const obstacle = vm["obstacle"].as<int>() < 1 ?
-                dist_obs(engine) : vm["obstacle"].as<int>();
+    int const obstacle = vm.count("obstacle") ?
+                vm["obstacle"].as<int>() : dist_obs(engine);
     std::cout << "obstacles: " << obstacle << std::endl;
 
     int const create_answer = vm.count("with-answer");
@@ -73,11 +73,14 @@ int main(int argc, char **argv)
             std::cout << "empty blocks: " << minimum_zk << std::endl;
             for(int total_zk = 0; total_zk < minimum_zk; ) {
                 std::uniform_int_distribution<int> dist_zk(1, 16);
-                stone_type stone(dist_zk(engine));
+                int const stone_zk = dist_zk(engine);
+                std::cerr << stone_zk << " zk" << std::endl;
+                stone_type stone(stone_zk);
+                std::cerr << stone.get_area() << " zk comp" << std::endl;
                 total_zk += stone.get_area();
-                std::cerr << "filled " << total_zk << std::endl;
                 stones.push_back(stone);
             }
+            std::cerr << "stone comp" << std::endl;
             problem_type problem(field, stones);
             std::ofstream ofs("quest" + std::to_string(i) + ".txt");
             ofs << problem.str();
