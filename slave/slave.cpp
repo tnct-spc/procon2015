@@ -86,7 +86,7 @@ void Slave::clicked_run_button(){
     }
     //solve
     algo_manager = new algorithm_manager(_problem);
-    //algo_manager->setParent(this);
+    algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
     //connect(algo_manager,&algorithm_manager::finished,[&](){delete algo_manager;std::cout << "manager殺した" << std::endl;});

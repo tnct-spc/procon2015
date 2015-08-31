@@ -16,19 +16,17 @@ algorithm_manager::algorithm_manager(problem_type _problem)
     qRegisterMetaType<std::string>();
     problem = _problem;
     //動かしたいアルゴリズムを配列に入れる
-    algo_vec.push_back(new sticky_algo(problem));
-    algo_vec.push_back(new square(problem));
+    //algo_vec.push_back(new sticky_algo(problem));
+    //algo_vec.push_back(new square(problem));
     algo_vec.push_back(new simple_algorithm(problem));
     for(auto algo : algo_vec){
         //algo->setParent(this);
         connect(algo,&algorithm_type::answer_ready,this,&algorithm_manager::get_answer);
         connect(algo,&algorithm_type::send_text,this,&algorithm_manager::get_text);
-        connect(algo,&algorithm_type::finished,[=](){
+        connect(algo,&algorithm_type::finished,[&](){
             mtx.lock();
             boost::remove_erase(algo_vec,algo);
-            if(algo_vec.size() == 0){
-                emit finished();
-            }
+            delete algo;
             mtx.unlock();
         });
     }
