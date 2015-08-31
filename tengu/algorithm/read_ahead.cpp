@@ -70,11 +70,6 @@ int read_ahead::evaluate(field_type const& field, stone_type stone,int const i, 
 //おける場所の中から評価値の高いものを選んで返す
 void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t const ishi)
 {
-    if(s.rank == 3 || ishi >= problem.stones.size())
-    {
-        sv.push_back(s);
-        return;
-    }
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 2; ++flip)
