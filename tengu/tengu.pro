@@ -17,7 +17,7 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/yrange.cpp \
     algorithm/sticky_algo.cpp \
     algorithm/read_ahead.cpp \
-    algorithm/square.cpp \
+    algorithm/square.cpp
 
 
 HEADERS += tengu.hpp\

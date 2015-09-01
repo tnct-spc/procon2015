@@ -47,19 +47,19 @@ void yrange::run()
     threads.waitForFinished();
 }
 
-void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotate)
+void yrange::one_try(problem_type problem, int y, int x, std::size_t const rotate)
 {
     problem.stones.at(0).rotate(rotate / 2  * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
 
-    if(problem.field.is_puttable(problem.stones.at(0),x,y) == true)
+    if(problem.field.is_puttable(problem.stones.at(0),y,x) == true)
     {
         //1個目
-        problem.field.put_stone(problem.stones.at(0),x,y);
-        problem.stones.erase(problem.stones.begin());
+        problem.field.put_stone(problem.stones.at(0),y,x);
         //２個目以降
-        for(auto& each_stone : problem.stones)
+        for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
         {
+            stone_type& each_stone = problem.stones.at(ishi);
             search_type next = std::move(search(problem.field,each_stone));
             if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
             if(next.flip != each_stone.get_side()) each_stone.flip();
@@ -67,10 +67,9 @@ void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotat
             problem.field.put_stone(each_stone,next.point.y,next.point.x);
         }
         std::string const flip = problem.stones.at(0).get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %2lu %s score = %zu",x,y,rotate / 2,flip.c_str(),problem.field.get_score());
+        qDebug("emit starting by %2d,%2d %2lu %s score = %zu",y,x,rotate / 2,flip.c_str(),problem.field.get_score());
         emit answer_ready(problem.field);
     }
-
 }
 
 //評価関数
