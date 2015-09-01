@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+QT       -= gui \
+         += concurrent
 
 TARGET = tengu
 TEMPLATE = lib
@@ -17,8 +18,6 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/square.cpp \
     algorithm/yrange.cpp \
     algorithm/read_ahead.cpp
-    algorithm/square.cpp
-    algorithm/yrange.cpp
 
 HEADERS += tengu.hpp\
         tengu_global.h \
@@ -28,8 +27,8 @@ HEADERS += tengu.hpp\
     algorithm/square.hpp \
     algorithm/yrange.hpp \
     algorithm/read_ahead.hpp
-    algorithm/square.hpp
-    algorithm/yrange.cpp
+
+LIBS += -lQt5Concurrent
 
 unix {
     target.path = /usr/lib

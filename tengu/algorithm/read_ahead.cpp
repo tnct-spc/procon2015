@@ -1,36 +1,72 @@
 #include "read_ahead.hpp"
-#include <queue>
 #include <algorithm>
 #include <vector>
 #include <boost/format.hpp>
 #include <QFile>
+#include <QVector>
 #include <QIODevice>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentMap>
+#include <QFuture>
 
 read_ahead::read_ahead(problem_type _problem)
 {
     pre_problem = _problem;
+
+    LAH = 800 / pre_problem.stones.size();
+    //print_text((boost::format("LAH = %d")%LAH).str());
+    //qDebug("LAH = %d",LAH);
+    STONE_NUM = problem.stones.size();
 }
 
 read_ahead::~read_ahead()
 {
 }
 
+
+
 void read_ahead::run()
 {
     qDebug("read_ahead start");
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 2; ++flip)
-    {
-        problem = pre_problem;
-        problem.stones.at(0).rotate(rotate * 90);
-        if(flip == 1) problem.stones.at(0).flip();
 
+    QVector<std::tuple<int,int,std::size_t>> data;
+    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
+    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 8; ++rotate)
+    {
+        data.push_back(std::make_tuple(l,m,rotate));
+    }
+    QFuture<void> threads = QtConcurrent::map(
+                data,
+                [this](auto& tup)
+                {
+                    this->one_try(pre_problem,std::get<0>(tup),std::get<1>(tup),std::get<2>(tup));
+
+                });
+    threads.waitForFinished();
+
+    /*
+    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 8; ++rotate)
+    {
+        one_try(pre_problem,l,m,rotate);
+    }
+    */
+}
+
+//
+void read_ahead::one_try(problem_type problem, int x, int y, std::size_t const rotate)
+{
+    problem.stones.at(0).rotate(rotate / 2 * 90);
+    if(rotate %2 == 1) problem.stones.at(0).flip();
+    if(problem.field.is_puttable(problem.stones.front(),y,x) == true) problem.field.put_stone(problem.stones.front(),y,x);
+    {
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
         {
             std::vector<search_type> sv;
+            search_type one;
+            one.field = problem.field;
+            search(sv, one, ishi);
 
-            search_type first;
-            first.field = problem.field;
-            search(sv, first, ishi);
+            //std::cout << "koko" << std::endl;
 
             if(sv.size() == 0) continue;
             std::sort(sv.begin(),sv.end(),[&](search_type const& lhs, search_type const&rhs){return lhs.score > rhs.score;});
@@ -39,9 +75,9 @@ void read_ahead::run()
             problem.field.put_stone(problem.stones.at(ishi), sv.at(0).point.y, sv.at(0).point.x);
             print_text((boost::format("%d th stone puted.")%ishi).str());
         }
-        qDebug("emit starting by %2d,%2d %2d %2d",l,m,rotate,flip);
+        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+        qDebug("emit starting by %2d,%2d %2lu %s",y,x,rotate,flip.c_str());
         emit answer_ready(problem.field);
-        return;
     }
 }
 
@@ -70,14 +106,14 @@ int read_ahead::evaluate(field_type const& field, stone_type stone,int const i, 
 //おける場所の中から評価値の高いものを選んで返す
 void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t const ishi)
 {
+    stone_type stone = pre_problem.stones.at(ishi);
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 4; ++rotate) for(int flip = 0; flip < 2; ++flip)
     {
         //std::cout << "koko1" << std::endl;
-        stone_type stone = problem.stones.at(ishi);
         if(flip == 1) stone.flip();
-        stone.rotate(rotate * 90);
+        stone.rotate(90);
         //std::cout << "koko2" << std::endl;
         if(s.field.is_puttable(stone,i,j) == true)
         {
@@ -86,8 +122,8 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
             //置けたら接してる辺を数えて配列に挿入
             if(s.rank == 1)
             {
-                search_vec.push_back(search_type
-                {
+                search_vec.push_back(
+                                    {
                                          field,
                                          point_type{i,j},
                                          stone.get_angle(),
@@ -98,8 +134,8 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
             }
             else
             {
-                search_vec.push_back(search_type
-                {
+                search_vec.push_back(
+                                       {
                                          field,
                                          s.point,
                                          s.rotate,
@@ -115,10 +151,10 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
     std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
 
     std::size_t i;
-    for(i = 1; i < 10 && i < search_vec.size() && search_vec.at(i).score == search_vec.at(i - 1).score; ++i);
+    for(i = 1; i < stone.get_area() && i < search_vec.size(); ++i);
     if(search_vec.size() > i) search_vec.resize(i);
 
-    if(s.rank == 2 || ishi >= problem.stones.size())
+    if(s.rank == LAH || ishi >= STONE_NUM)
     {
         for(auto& each_ele : search_vec)
         {

@@ -12,8 +12,6 @@ public:
     ~read_ahead();
     void run();
 
-private:
-
     struct search_type
     {
         field_type field;
@@ -24,9 +22,13 @@ private:
         int rank = 1;
     };
 
+private:
+
+    int LAH = 3;
+    std::size_t STONE_NUM;
     problem_type pre_problem;
+    void one_try(problem_type problem, int x, int y, std::size_t const rotate);
     int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
-    //std::queue<read_ahead::search_type> search(std::queue<search_type> queue, field_type& _field, int const ishi);
     void search(std::vector<search_type>& sv, search_type s, std::size_t const ishi);
 };
 
