@@ -32,6 +32,7 @@ yrange::~yrange()
 
 void yrange::run()
 {
+    return;
     qDebug("yrange start");
     QVector<std::tuple<int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
@@ -43,7 +44,7 @@ void yrange::run()
         data,
         [this](auto& tup)
         {
-            one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
+            this->one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
         });
     threads.waitForFinished();
 }
