@@ -14,10 +14,10 @@ read_ahead::read_ahead(problem_type _problem)
     pre_problem = _problem;
 
     //LAH = 1600 / pre_problem.stones.size();
-    LAH = 2;
+    LAH = 5;
     //print_text((boost::format("LAH = %d")%LAH).str());
     qDebug("LAH = %d",LAH);
-    STONE_NUM = problem.stones.size();
+    STONE_NUM = pre_problem.stones.size();
 }
 
 read_ahead::~read_ahead()
@@ -50,7 +50,6 @@ void read_ahead::run()
     {
         one_try(pre_problem,l,m,rotate);
     }
-
 }
 
 //
@@ -79,7 +78,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             if(sv.at(0).flip == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
             problem.stones.at(ishi).rotate(sv.at(0).rotate);
             problem.field.put_stone(problem.stones.at(ishi), sv.at(0).point.y, sv.at(0).point.x);
-            //print_text((boost::format("putted %dth stone")%ishi).str());
+            print_text((boost::format("putted %dth stone")%ishi).str());
         }
 
         std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
@@ -139,11 +138,11 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
         //std::cout << "koko3" << std::endl;
     }
 
-    //std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
+    std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
 
-    //std::size_t i;
-    //for(i = 1; i < stone.get_area() && i < search_vec.size(); ++i);
-    //if(search_vec.size() > i) search_vec.resize(i);
+    std::size_t i;
+    for(i = 1; i < stone.get_area()  / 2 && i < search_vec.size(); ++i);
+    if(search_vec.size() > i) search_vec.resize(i);
 
     if(s.rank >= LAH || ishi >= STONE_NUM)
     {
