@@ -32,6 +32,7 @@ yrange::~yrange()
 void yrange::run()
 {
     qDebug("yrange start");
+/*
     QVector<std::tuple<int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
@@ -45,6 +46,11 @@ void yrange::run()
             this->one_try(pre_problem, std::get<0>(tup), std::get<1>(tup), std::get<2>(tup));
         });
     threads.waitForFinished();
+    */
+    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
+    {
+        one_try(pre_problem, l, m, rotate);
+    }
 }
 
 void yrange::one_try(problem_type problem, int y, int x, std::size_t const rotate)
@@ -52,10 +58,11 @@ void yrange::one_try(problem_type problem, int y, int x, std::size_t const rotat
     problem.stones.at(0).rotate(rotate / 2  * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
 
-    if(problem.field.is_puttable(problem.stones.at(0),y,x) == true)
+    if(problem.field.is_puttable(problem.stones.front(),y,x) == true)
     {
         //1個目
-        problem.field.put_stone(problem.stones.at(0),y,x);
+        problem.field.put_stone(problem.stones.front(),y,x);
+
         //２個目以降
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
         {
@@ -66,8 +73,9 @@ void yrange::one_try(problem_type problem, int y, int x, std::size_t const rotat
             each_stone.rotate(next.rotate);
             problem.field.put_stone(each_stone,next.point.y,next.point.x);
         }
-        std::string const flip = problem.stones.at(0).get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %2lu %s score = %zu",y,x,rotate / 2,flip.c_str(),problem.field.get_score());
+
+        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+        qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
         emit answer_ready(problem.field);
     }
 }

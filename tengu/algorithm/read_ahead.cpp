@@ -63,13 +63,14 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
     {
         //1個目
         problem.field.put_stone(problem.stones.front(),y,x);
+
         //2個目以降
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
         {
             std::vector<search_type> sv;
             search_type one;
             one.field = problem.field;
-            search(sv, one, ishi);
+            search(sv, std::move(one), ishi);
 
             //std::cout << "koko" << std::endl;
 
@@ -78,8 +79,9 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             if(sv.at(0).flip == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
             problem.stones.at(ishi).rotate(sv.at(0).rotate);
             problem.field.put_stone(problem.stones.at(ishi), sv.at(0).point.y, sv.at(0).point.x);
-            print_text((boost::format("putted %dth stone")%ishi).str());
+            //print_text((boost::format("putted %dth stone")%ishi).str());
         }
+
         std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
         qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());
         emit answer_ready(problem.field);
@@ -137,7 +139,7 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
         //std::cout << "koko3" << std::endl;
     }
 
-    std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
+    //std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
 
     //std::size_t i;
     //for(i = 1; i < stone.get_area() && i < search_vec.size(); ++i);
@@ -145,16 +147,12 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
 
     if(s.rank >= LAH || ishi >= STONE_NUM)
     {
-        for(auto& each_ele : search_vec)
-        {
-            sv.push_back(each_ele);
-        }
+        std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(sv));
     }
     else
     {
         for(auto& each_ele : search_vec)
         {
-            std::cout << "ara" << std::endl;
             search(sv, each_ele, ishi+1);
         }
     }
