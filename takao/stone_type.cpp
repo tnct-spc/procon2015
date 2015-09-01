@@ -230,7 +230,7 @@ void stone_type::make_bit()
                 for(int y=0;y<8;y++){//縦に一行ごと
                     bit_plain_stones[x][flip_c][angle][y]=0;
                     for(int bit_c=0;bit_c<8;bit_c++){
-                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << ((63-7-x)-bit_c);
+                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << (((32+16-1)-x+8)-bit_c);
                     }
                 }
                 rotate(90);
