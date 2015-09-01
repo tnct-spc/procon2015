@@ -16,15 +16,16 @@ TEMPLATE = app
 
 LIBS += -lboost_system -lboost_program_options
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    problem_maker.cpp
 
-HEADERS +=
+HEADERS += \
+    problem_maker.hpp
 
 QMAKE_CXXFLAGS += -std=c++14
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../takao/release/ -ltakao
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../takao/debug/ -ltakao
-else:unix: LIBS += -L$$OUT_PWD/../takao/ -ltakao
+LIBS += -L$$OUT_PWD/../takao/ -ltakao
+LIBS += -L$$OUT_PWD/../tengu/ -ltengu
 
 INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao
