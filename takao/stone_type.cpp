@@ -230,7 +230,7 @@ void stone_type::make_bit()
                 for(int y=0;y<8;y++){//縦に一行ごと
                     bit_plain_stones[x][flip_c][angle][y]=0;
                     for(int bit_c=0;bit_c<8;bit_c++){
-                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << ((64-10-x)-bit_c);
+                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << ((63-7-x)-bit_c);
                     }
                 }
                 rotate(90);
@@ -238,13 +238,12 @@ void stone_type::make_bit()
             flip();
         }
     }
-
 #ifdef _DEBUG
     std::cout<<"bit plain stones"<<std::endl;
     //for(int x=0;x<41;x++){//マイケルの動き
-        if(x==0 || x==41) std::cout<<"無駄な石"<<std::endl;
+        if(x==0 || x==40) std::cout<<"無駄な石"<<std::endl;
         for(int y=0;y<8;y++){//縦に一行ごと
-            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[0][0][0][y])<<std::endl;
+            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[x][0][2][y])<<std::endl;
         }
         std::cout<<std::endl;
     //}

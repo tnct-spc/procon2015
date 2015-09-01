@@ -1,4 +1,4 @@
-//#define _DEBUG
+#define _DEBUG
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -49,6 +49,12 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
         //add stone
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
     }
+    for(int i = 0; i < STONE_SIZE; ++i){
+        for(int j = 0; j < STONE_SIZE; ++j){
+            std::cout<<stone.at(i,j);
+        }
+        std::cout<<std::endl;
+    }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//石がないならどうでもいい
@@ -75,6 +81,14 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     for(int i=0;i<8;i++){
         collision |= ((bit_plain_field[16+y+i]) & ((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)));
     }
+    if(y==-6 && x==-7 && stone.get_nth()==1 && stone.get_angle()==180 && (int)stone.get_side()==0){
+        for(int i=0;i<8;i++){
+            std::cout<<static_cast<std::bitset<64>>(bit_plain_field[16+y+i])<<std::endl;
+        }
+        for(int i=0;i<8;i++){
+            std::cout<<static_cast<std::bitset<64>>(((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)))<<std::endl;
+        }
+    }
     if(collision!=0) return false;
     if(processes.size() == 0)
     {
@@ -82,7 +96,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
         //std::cerr << "first stone" << std::endl;
     }
     for(int i=0;i<8;i++){
-        collision |= bit_sides_field[16+y+i] & (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)stone.get_angle(),i);
+        collision |= bit_sides_field[16+y+i] & (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
     }
     if(collision==0) return false;
     /*
