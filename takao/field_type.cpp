@@ -1,6 +1,6 @@
-#define _DEBUG
+#define _DEBUGMODE
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(_DEBUGMODE)
 #include <QDebug>
 #include <iostream>
 #endif
@@ -31,12 +31,17 @@ size_t field_type::get_score()
 }
 
 //石を置く  自身への参照を返す   失敗したら例外を出す
-field_type& field_type::put_stone(stone_type const stone, int y, int x)
+field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
+#ifdef _DEBUGMODE
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
+#endif
     //置く
     //#bit_system
+    for(int i=0;i<64;i++){
+        bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
+    }
     for(int i=0;i<8;i++){
         //upper
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
@@ -48,12 +53,6 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
         //add stone
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-    }
-    for(int i = 0; i < STONE_SIZE; ++i){
-        for(int j = 0; j < STONE_SIZE; ++j){
-            std::cout<<stone.at(i,j);
-        }
-        std::cout<<std::endl;
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -74,67 +73,51 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-    uint64_t collision = 0;
-#ifdef _DEBUG
+#ifdef _DEBUGMODE
     if(is_placed(stone)==true) return false;
 #endif
+    uint64_t collision = 0;
     for(int i=0;i<8;i++){
         collision |= ((bit_plain_field[16+y+i]) & ((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)));
     }
-    if(y==-6 && x==-7 && stone.get_nth()==1 && stone.get_angle()==180 && (int)stone.get_side()==0){
-        for(int i=0;i<8;i++){
-            std::cout<<static_cast<std::bitset<64>>(bit_plain_field[16+y+i])<<std::endl;
-        }
-        for(int i=0;i<8;i++){
-            std::cout<<static_cast<std::bitset<64>>(((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)))<<std::endl;
-        }
-    }
     if(collision!=0) return false;
-    if(processes.size() == 0)
-    {
-        return true;//始めの石なら繋がりは必要ない
-        //std::cerr << "first stone" << std::endl;
-    }
+    if(processes.size() == 0) return true;//始めの石なら繋がりは必要ない
+    //colluision = 0;
     for(int i=0;i<8;i++){
         collision |= bit_sides_field[16+y+i] & (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
     }
     if(collision==0) return false;
-    /*
-    //std::cout << "is_puttable start" << std::endl;
-    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
-    {
-        //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
-        if(stone.at(i,j) == 0)//置かないならどうでも良い
-        {
-            //std::cout <<  "==0" << std::endl;
-            continue;
-        }
-        else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
-        {
-            //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
-            //std::cout << "You tried to put the stone out of range" << std::endl;
-            return false;
-        }
-        else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
-        {
-            //std::cout << "You try to put the stone on another stone." << std::endl;
-            return false;
-        }
-        if(is_connection == true) continue;
-        else if(0 <= j+x && j+x < 32 && 0 <= i+y && i+y < 32)
-        {
-            if(i+y > 0  && raw_data.at(i+y-1).at(j+x) > 0 && raw_data.at(i+y-1).at(j+x) < stone.get_nth()) is_connection = true;
-            if(i+y < 31 && raw_data.at(i+y+1).at(j+x) > 0 && raw_data.at(i+y+1).at(j+x) < stone.get_nth()) is_connection = true;
-            if(j+x > 0  && raw_data.at(i+y).at(j+x-1) > 0 && raw_data.at(i+y).at(j+x-1) < stone.get_nth()) is_connection = true;
-            if(j+x < 31 && raw_data.at(i+y).at(j+x+1) > 0 && raw_data.at(i+y).at(j+x+1) < stone.get_nth()) is_connection = true;
-        }
-    }
-    //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
-    //else std::cerr << "This stone can put here." << std::endl;
-    */
     return true;
 }
 
+field_type& field_type::remove_just_before_stone(stone_type const& stone)
+{
+#ifdef _DEBUGMODE
+    if(stone.get_nth() != processes[processes.size()-1].stone.get_nth()){
+        throw std::runtime_error("The stone isn't just before place in remove_stone!");
+        return *this;
+    }
+    if(is_placed(stone) == false){
+        throw std::runtime_error("The stone isn't placed...in remove_stone");
+        return *this;
+    }
+#endif
+    //remove
+    for(int i=0;i<8;i++){
+        bit_plain_field[16+(processes[processes.size()-1].position.y)+i] = ((bit_plain_field[16+(processes[processes.size()-1].position.y)+i]) & (~((processes[processes.size()-1].stone).get_bit_plain_stones((processes[processes.size()-1].position.x)+7,(int)processes[processes.size()-1].stone.get_side(),(int)((processes[processes.size()-1].stone.get_angle())/90),i))));
+    }
+    for(int i=0;i<64;i++){
+        bit_sides_field[i] = bit_sides_field_just_before[processes.size()-1][i];
+    }
+    for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
+    {
+        if(raw_data.at(i).at(j) == stone.get_nth()) raw_data.at(i).at(j) = 0;
+    }
+    processes.erase(processes.end());
+    return *this;
+}
+
+/*
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
 field_type& field_type::remove_stone(stone_type const& stone)
 {
@@ -207,6 +190,7 @@ bool field_type::is_removable(stone_type const& stone)
      }
      return true;
  }
+ */
 
  //置かれた石の一覧を表す配列を返す
  std::vector<stone_type> field_type::list_of_stones() const
