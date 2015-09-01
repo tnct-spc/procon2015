@@ -14,19 +14,20 @@ DEFINES += TENGU_LIBRARY
 
 SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/poor_algo.cpp \
-    algorithm/sticky_algo.cpp \
-    algorithm/square.cpp \
     algorithm/yrange.cpp \
-    algorithm/read_ahead.cpp
+    algorithm/sticky_algo.cpp \
+    algorithm/read_ahead.cpp \
+    algorithm/square.cpp \
+
 
 HEADERS += tengu.hpp\
         tengu_global.h \
     algorithm/simple_algorithm.hpp \
     algorithm/poor_algo.hpp \
-    algorithm/sticky_algo.hpp \
-    algorithm/square.hpp \
     algorithm/yrange.hpp \
-    algorithm/read_ahead.hpp
+    algorithm/sticky_algo.hpp \
+    algorithm/read_ahead.hpp \
+    algorithm/square.hpp
 
 LIBS += -lQt5Concurrent
 
