@@ -3,7 +3,6 @@
 #include <array>
 #include <functional>
 #include <vector>
-#include <thread>
 #include <QFile>
 #include <QVector>
 #include <QtConcurrent/QtConcurrent>
@@ -68,7 +67,7 @@ void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotat
             problem.field.put_stone(each_stone,next.point.y,next.point.x);
         }
         std::string const flip = problem.stones.at(0).get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %2lu %s",x,y,rotate / 2,flip.c_str());
+        qDebug("emit starting by %2d,%2d %2lu %s score = %d",x,y,rotate / 2,flip.c_str(),problem.field.get_score());
         emit answer_ready(problem.field);
     }
 

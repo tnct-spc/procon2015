@@ -25,8 +25,6 @@ HEADERS += tengu.hpp\
     algorithm/yrange.hpp \
     algorithm/sticky_algo.hpp \
     algorithm/square.hpp
-    algorithm/sticky_algo.hpp
-    algorithm/square.hpp
 
 LIBS += -lQt5Concurrent
 
