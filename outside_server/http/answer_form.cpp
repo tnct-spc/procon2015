@@ -65,6 +65,10 @@ void AnswerForm::ServiceRequestCompleted(QByteArray lowdata){
         if(!FormatCheck(plaintext_answer_data,errormesage)){
             response->write("FormatError<br>\n");
             response->write(errormesage.toUtf8());
+#ifdef _DEBUG
+        }
+        if(0){
+#endif
         }else{
             /*Save answer and Display answer_point*/
 
