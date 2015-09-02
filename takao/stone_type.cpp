@@ -7,6 +7,16 @@
 
 // 石
 
+namespace std
+{
+    ostream& operator << (ostream& os, stone_type::Sides const& sides)
+    {
+        if(sides == stone_type::Sides::Head) os << "Head";
+        else os << "Tail";
+        return os;
+    }
+}
+
 bool operator== (stone_type const& lhs, stone_type const& rhs)
 {
     return lhs.get_raw_data() == rhs.get_raw_data();

@@ -10,16 +10,6 @@
 #include <QFuture>
 #include <QIODevice>
 
-namespace std
-{
-    ostream& operator << (ostream& os, stone_type::Sides const& sides)
-    {
-        if(sides == stone_type::Sides::Head) os << "Head";
-        else os << "Tail";
-        return os;
-    }
-}
-
 yrange::yrange(problem_type _problem)
 {
     pre_problem = _problem;

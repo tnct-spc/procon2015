@@ -1,6 +1,7 @@
 #include "read_ahead.hpp"
 #include <algorithm>
 #include <vector>
+#include <functional>
 #include <boost/format.hpp>
 #include <QFile>
 #include <QVector>
@@ -14,7 +15,7 @@ read_ahead::read_ahead(problem_type _problem)
     pre_problem = _problem;
 
     //LAH = 1600 / pre_problem.stones.size();
-    LAH = 5;
+    LAH = 3;
     //print_text((boost::format("LAH = %d")%LAH).str());
     qDebug("LAH = %d",LAH);
     STONE_NUM = pre_problem.stones.size();
@@ -74,7 +75,17 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             //std::cout << "koko" << std::endl;
 
             if(sv.size() == 0) continue;
-            std::sort(sv.begin(),sv.end(),[&](search_type const& lhs, search_type const&rhs){return lhs.score > rhs.score;});
+            std::sort(sv.begin(),sv.end(),[](const search_type& lhs, const search_type& rhs)
+                {
+                    return lhs.score > rhs.score;
+                });
+            for(auto const& each_ele : sv)
+            {
+                std::string const flip = each_ele.flip == stone_type::Sides::Head ? "Head" : "Tail";
+                std::cout << each_ele.point.y << " " << each_ele.point.x << " " << each_ele.rotate << " " << flip << " "<< each_ele.score << std::endl;
+            }
+            std::cout << std::endl;
+
             if(sv.at(0).flip == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
             problem.stones.at(ishi).rotate(sv.at(0).rotate);
             problem.field.put_stone(problem.stones.at(ishi), sv.at(0).point.y, sv.at(0).point.x);
@@ -88,10 +99,10 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
 }
 
 //評価関数
-int read_ahead::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+double read_ahead::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
 {
     int const n = stone.get_nth();
-    int count = 0;
+    double count = 0;
     for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
         int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
@@ -128,21 +139,40 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
             //置けたら接してる辺を数えて配列に挿入
             if(s.rank == 1)
             {
-                search_vec.push_back({field, point_type{i,j}, stone.get_angle(), stone.get_side(), evaluate(field,stone,i,j), s.rank + 1});
+                search_vec.push_back(search_type{
+                        field,
+                        point_type{i,j},
+                        stone.get_angle(),
+                        stone.get_side(),
+                        evaluate(field,stone,i,j) * 10 / get_island(field.get_raw_data(),point_type{i,j}),
+                        s.rank + 1
+                    });
             }
             else
             {
-                search_vec.push_back({field,s.point, s.rotate, s.flip, s.score + evaluate(field,stone,i,j), s.rank + 1});
+                search_vec.push_back(search_type{
+                        field,s.point,
+                        s.rotate,
+                        s.flip,
+                        s.score + evaluate(field,stone,i,j) * 10 / get_island(field.get_raw_data(),point_type{i,j}),
+                        s.rank + 1
+                   });
             }
         }
         //std::cout << "koko3" << std::endl;
     }
-
-    std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs) {return lhs.score > rhs.score;});
-
+    //std::cout << "koko4" << std::endl;
+    std::sort(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs)
+        {
+            return lhs.score > rhs.score;
+        });
+    //std::cout << "koko5" << std::endl;
+    //std::cout << search_vec.size() << std::endl;
     std::size_t i;
-    for(i = 1; i < stone.get_area()  / 2 && i < search_vec.size(); ++i);
+    for(i = 1; i < search_vec.size() && search_vec.at(i).score == search_vec.at(i-1).score; ++i);
+    //std::cout << "koko7" << std::endl;
     if(search_vec.size() > i) search_vec.resize(i);
+    search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
 
     if(s.rank >= LAH || ishi >= STONE_NUM)
     {
@@ -155,4 +185,37 @@ void read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t
             search(sv, each_ele, ishi+1);
         }
     }
+}
+
+
+double read_ahead::get_island(field_type::raw_field_type field, point_type const& point)
+{
+    int num = -1;
+    int const y_min = (point.y < 1) ? 0 : point.y - 1;
+    int const y_max = (point.y + STONE_SIZE + 1) < FIELD_SIZE ? point.y + STONE_SIZE + 1 : FIELD_SIZE;
+    int const x_min = (point.x < 1) ? 0 : point.x - 1;
+    int const x_max = (point.x + STONE_SIZE + 1) < FIELD_SIZE ? point.x + STONE_SIZE + 1 : FIELD_SIZE;
+
+    std::vector<int> result (32,0);
+    std::function<void(int,int,int)> recurision = [&recurision,&field](int y, int x, int num) -> void
+    {
+        field.at(y).at(x) = num;
+        if(1 < y && field.at(y-1).at(x) == 0) recurision(y-1,x,num);
+        if(y < FIELD_SIZE - 1 && field.at(y+1).at(x) == 0) recurision(y+1,x,num);
+        if(1 < x && field.at(y).at(x-1) == 0) recurision(y,x-1,num);
+        if(x < FIELD_SIZE - 1 && field.at(y).at(x+1) == 0) recurision(y,x+1,num);
+        return;
+    };
+    for(int i = y_min; i < y_max; ++i) for(int j = x_min; j < x_max; ++j)
+    {
+        if(field.at(i).at(j) == 0) recurision(i,j,num--);
+    }
+    for(int i = y_min; i < y_max; ++i) for(int j = x_min; j < x_max; ++j)
+    {
+        if(field.at(i).at(j) < 0)
+        {
+            result.at(field.at(i).at(j) * -1)++;
+        }
+    }
+    return static_cast<double>(std::count_if(result.begin(),result.end(),[&](int hs){return hs != 0;}));
 }
