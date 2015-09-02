@@ -172,8 +172,9 @@ field_type& field_type::remove_just_before_stone(stone_type const& stone)
     }
 #endif
     //remove
+    int processes_at = processes.size()-1;
     for(int i=0;i<8;i++){
-        bit_plain_field[16+(processes[processes.size()-1].position.y)+i] = ((bit_plain_field[16+(processes[processes.size()-1].position.y)+i]) & (~((processes[processes.size()-1].stone).get_bit_plain_stones((processes[processes.size()-1].position.x)+7,(int)processes[processes.size()-1].stone.get_side(),(int)((processes[processes.size()-1].stone.get_angle())/90),i))));
+        bit_plain_field[16+(processes[processes_at].position.y)+i] = ((bit_plain_field[16+(processes[processes_at].position.y)+i]) & (~((processes[processes_at].stone).get_bit_plain_stones((processes[processes_at].position.x)+7,(int)processes[processes_at].stone.get_side(),(int)((processes[processes_at].stone.get_angle())/90),i))));
     }
     for(int i=0;i<64;i++){
         bit_sides_field[i] = bit_sides_field_just_before[processes.size()-1][i];
