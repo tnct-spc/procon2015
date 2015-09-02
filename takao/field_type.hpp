@@ -96,9 +96,9 @@ class field_type
         bool is_placed(stone_type const& stone);
 
         //#BitSystem
-        uint64_t bit_plain_field[64];//普通のフィールド
-        uint64_t bit_sides_field[64];//石の辺のフィールド
-        uint64_t bit_sides_field_just_before[256][64];//just_before石の辺のフィールド
+        uint64_t __attribute__((aligned(32))) bit_plain_field[64];//普通のフィールド
+        uint64_t __attribute__((aligned(32))) bit_sides_field[64];//石の辺のフィールド
+        uint64_t __attribute__((aligned(32))) bit_sides_field_just_before[256][64];//just_before石の辺のフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
         void make_bit();//bitデータの作成
 };

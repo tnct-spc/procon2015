@@ -4,13 +4,12 @@
 #include <QDebug>
 #include <iostream>
 #endif
-
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
 #include "field_type.hpp"
 #include "utils.hpp"
-
+#include <immintrin.h>
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
@@ -85,21 +84,78 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     if(is_placed(stone)==true) return false;
 #endif
     uint64_t collision = 0;
+    uint64_t avx_cllis = 0;
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+    //avx
+    __m256i avx_bit_stone = _mm256_set_epi64x( bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][3],
+                                               bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][2],
+                                               bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][1],
+                                               bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
+
+    __m256i avx_bit_field = _mm256_set_epi64x(bit_plain_field[16+y+3],
+                                              bit_plain_field[16+y+2],
+                                              bit_plain_field[16+y+1],
+                                              bit_plain_field[16+y+0]);
+
+    avx_cllis = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+
+    avx_bit_stone = _mm256_set_epi64x( bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][7],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][6],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][5],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
+
+    avx_bit_field = _mm256_set_epi64x(bit_plain_field[16+y+7],
+                                      bit_plain_field[16+y+6],
+                                      bit_plain_field[16+y+5],
+                                      bit_plain_field[16+y+4]);
+
+    avx_cllis |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+
+    /*
     for(int i=0;i<8;i++){
         //collision |= bit_plain_field[16+y+i] & stone.get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
         collision |= bit_plain_field[16+y+i] & bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
-    if(collision) return false;
+    if((!!avx_cllis) != (!!collision)){
+        std::cout << "おかしい" << std::endl;
+    }
+    */
+    //if(collision) return false;
+    if(avx_cllis) return false;
+
     if(processes.size() == 0) return true;//始めの石なら繋がりは必要ない
+
     //collision = 0;
     //この行まで来るということは必ずcollision=0
+    avx_bit_field = _mm256_set_epi64x(bit_sides_field[16+y+7],
+                                      bit_sides_field[16+y+6],
+                                      bit_sides_field[16+y+5],
+                                      bit_sides_field[16+y+4]);
+
+    avx_cllis = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+
+    avx_bit_stone = _mm256_set_epi64x( bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][3],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][2],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][1],
+                                       bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
+
+    avx_bit_field = _mm256_set_epi64x(bit_sides_field[16+y+3],
+                                      bit_sides_field[16+y+2],
+                                      bit_sides_field[16+y+1],
+                                      bit_sides_field[16+y+0]);
+
+    avx_cllis = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+
+    /*
     for(int i=0;i<8;i++){
         //collision |= bit_sides_field[16+y+i] & stone.get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
         collision |= bit_sides_field[16+y+i] & bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
+
     if(collision==0) return false;
+    */
+    if(avx_cllis==0) return false;
     return true;
 }
 
