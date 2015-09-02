@@ -5,7 +5,6 @@
 #include <vector>
 
 int constexpr STONE_SIZE = 8;
-
 struct corner_type
 {
     int value;
@@ -18,7 +17,8 @@ class stone_type
     public:
         enum struct Sides {Head = 0, Tail = 1};
         typedef std::array<std::array<int,STONE_SIZE>,STONE_SIZE> raw_stone_type;
-
+        //以前はstd::vector<std::vector<std::vector<std::vector<uint64_t>>>>でした;
+        typedef std::array <std::array <std::array <std::array <uint64_t,8>,4>,2>,41> bit_stones_type;
         stone_type() = default;
         ~stone_type() = default;
 
@@ -40,7 +40,7 @@ class stone_type
         int count_n_row(int const n)const;
         int count_n_col(int const n)const;
         uint64_t get_bit_plain_stones(int x, int flip, int rotate, int y) const;
-        std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& get_raw_bit_plain_stones() const;
+        bit_stones_type const& get_raw_bit_plain_stones() const;
 
     private:
         int  nth;
@@ -53,8 +53,7 @@ class stone_type
 
         //#BitSystem
         //石のマスク(int64_t bit_stones[41][2][4][8];)
-        std::vector<std::vector<std::vector<std::vector<uint64_t>>>> bit_plain_stones = std::vector<std::vector<std::vector<std::vector<uint64_t>>>>(41,std::vector<std::vector<std::vector<uint64_t>>>(2,std::vector<std::vector<uint64_t>>(4,std::vector<uint64_t>(8))));
-
+        bit_stones_type bit_plain_stones;
         //bitデータの作成
         void make_bit();
 };

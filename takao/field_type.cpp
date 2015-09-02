@@ -86,7 +86,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
 #endif
     uint64_t collision = 0;
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
-    std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+    stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
     for(int i=0;i<8;i++){
         //collision |= bit_plain_field[16+y+i] & stone.get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
         collision |= bit_plain_field[16+y+i] & bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
