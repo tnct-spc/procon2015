@@ -1,4 +1,4 @@
-#define _DEBUGMODE
+//#define _DEBUGMODE
 
 #if defined(_DEBUG) || defined(_DEBUGMODE)
 #include <QDebug>
@@ -39,20 +39,27 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 #endif
     //置く
     //#bit_system
+    //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+    //std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();
     for(int i=0;i<64;i++){
         bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
     }
     for(int i=0;i<8;i++){
         //upper
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //bit_sides_field[16+y+i+1] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //under
         bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //bit_sides_field[16+y+i-1] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //left
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1-1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //right
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //add stone
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -73,18 +80,24 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
+    //vectorのgetterで値をとるよりvector全体を参照で受け取って[]でアクセスしたほうが1.3倍位早い
 #ifdef _DEBUGMODE
     if(is_placed(stone)==true) return false;
 #endif
     uint64_t collision = 0;
+    //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+    std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();
     for(int i=0;i<8;i++){
-        collision |= ((bit_plain_field[16+y+i]) & ((stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i)));
+        //collision |= bit_plain_field[16+y+i] & stone.get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
+        collision |= bit_plain_field[16+y+i] & bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
-    if(collision!=0) return false;
+    if(collision) return false;
     if(processes.size() == 0) return true;//始めの石なら繋がりは必要ない
-    //colluision = 0;
+    //collision = 0;
+    //この行まで来るということは必ずcollision=0
     for(int i=0;i<8;i++){
-        collision |= bit_sides_field[16+y+i] & (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        //collision |= bit_sides_field[16+y+i] & stone.get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
+        collision |= bit_sides_field[16+y+i] & bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
     if(collision==0) return false;
     return true;

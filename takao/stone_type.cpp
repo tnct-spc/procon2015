@@ -219,7 +219,9 @@ uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) co
     return bit_plain_stones[x+1][flip][rotate][y];
 }
 
-
+std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& stone_type::get_raw_bit_plain_stones() const{
+    return bit_plain_stones;
+}
 //#BitSystem
 //bitデータの作成
 void stone_type::make_bit()
