@@ -39,7 +39,7 @@ class stone_type
         corner_type get_corner();
         int count_n_row(int const n)const;
         int count_n_col(int const n)const;
-        uint64_t get_bit_plain_stones(int x,int flip,int rotate,int y) const;
+        uint64_t get_bit_plain_stones(int x, int flip, int rotate, int y) const;
 
 
     private:

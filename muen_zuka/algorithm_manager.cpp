@@ -17,8 +17,8 @@ algorithm_manager::algorithm_manager(problem_type _problem)
     problem = _problem;
     //動かしたいアルゴリズムを配列に入れる
     algo_vec.push_back(new sticky_algo(problem));
-    algo_vec.push_back(new square(problem));
-    algo_vec.push_back(new simple_algorithm(problem));
+    //algo_vec.push_back(new square(problem));
+   // algo_vec.push_back(new simple_algorithm(problem));
     for(auto algo : algo_vec){
         //algo->setParent(this);
         connect(algo,&algorithm_type::answer_ready,this,&algorithm_manager::get_answer);

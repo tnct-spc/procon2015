@@ -215,7 +215,8 @@ int stone_type::get_side_length()const
 }
 uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
 {
-    return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
+    //return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
+    return bit_plain_stones[x+1][flip][rotate][y];
 }
 
 
