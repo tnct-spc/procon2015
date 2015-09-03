@@ -17,6 +17,6 @@ unix {
     INSTALLS += target
 }
 
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14 -mavx
 
 include(./takao.pri)

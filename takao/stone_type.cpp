@@ -1,3 +1,10 @@
+//#define _DEBUG
+
+#ifdef _DEBUG
+#include <QDebug>
+#include <iostream>
+#endif
+
 #include "stone_type.hpp"
 #include "point_type.hpp"
 #include "utils.hpp"
@@ -30,6 +37,8 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
         raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
         raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
     }
+
+    make_bit();
 }
 
 stone_type::stone_type(int const zk)
@@ -44,9 +53,9 @@ int const & stone_type::at(size_t y,size_t x) const
     return get_raw_data().at(y).at(x);
 }
 
-int & stone_type::at(size_t y,size_t x)
+int stone_type::at(size_t y,size_t x)
 {
-    return const_cast<int &>(at(y, x));
+    return get_raw_data().at(y).at(x);
 }
 
 //石へのアクセサ
@@ -211,44 +220,44 @@ int stone_type::get_side_length()const
     }
     return sum;
 }
-
-void stone_type::_set_random(int const zk)
+uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
 {
-    raw_stone_type candidate;
-    do {
-        for(auto& row : candidate)
-            std::fill(row.begin(), row.end(), 0);
-
-        std::random_device seed_gen;
-        std::mt19937_64 engine(seed_gen());
-        std::uniform_int_distribution<int> dist_pos(0, STONE_SIZE - 1);
-        int x = dist_pos(engine);
-        int y = dist_pos(engine);
-        candidate.at(y).at(x) = 1;
-        for(int count = 1; count < zk; ) {
-            x = dist_pos(engine);
-            y = dist_pos(engine);
-            if (!candidate.at(y).at(x) &&
-                ((_is_in_stone(y - 1) && candidate.at(y - 1).at(x)) ||
-                 (_is_in_stone(y + 1) && candidate.at(y + 1).at(x)) ||
-                 (_is_in_stone(x - 1) && candidate.at(y).at(x - 1)) ||
-                 (_is_in_stone(x + 1) && candidate.at(y).at(x + 1)))
-                    ) {
-                count++;
-                candidate.at(y).at(x) = 1;
-            }
-//            if(insrance++ > FIELD_SIZE * FIELD_SIZE)
-//                break;
-        }
-    } while(_has_hole(candidate));
-    _set_from_raw(candidate);
+    //return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
+    return bit_plain_stones[x+1][flip][rotate][y];
 }
 
-void stone_type::_set_from_raw(raw_stone_type raw)
+const stone_type::bit_stones_type &stone_type::get_raw_bit_plain_stones() const{
+    return bit_plain_stones;
+}
+//#BitSystem
+//bitデータの作成
+void stone_type::make_bit()
 {
-    for(int i = 0; i < 4; i++)
-        raw_data_set.at(i) = _rotate(raw, i * 90);
-    raw_data_set.at(4) = _flip(raw);
+    //make bit stones
+    for(int x=0;x<41;x++){//マイケルの動き
+        for(int flip_c=0;flip_c<2;flip_c++){//flip
+            for(int angle=0;angle<4;angle++){//angle
+                for(int y=0;y<8;y++){//縦に一行ごと
+                    bit_plain_stones[x][flip_c][angle][y]=0;
+                    for(int bit_c=0;bit_c<8;bit_c++){
+                        bit_plain_stones[x][flip_c][angle][y] += (uint64_t)at(y,bit_c) << (((32+16-1)-x+8)-bit_c);
+                    }
+                }
+                rotate(90);
+            }
+            flip();
+        }
+    }
+#ifdef _DEBUG
+    std::cout<<"bit plain stones"<<std::endl;
+    //for(int x=0;x<41;x++){//マイケルの動き
+        if(x==0 || x==40) std::cout<<"無駄な石"<<std::endl;
+        for(int y=0;y<8;y++){//縦に一行ごと
+            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[x][0][2][y])<<std::endl;
+        }
+        std::cout<<std::endl;
+    //}
+#endif
     for(int i = 5; i < 8; i++)
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }

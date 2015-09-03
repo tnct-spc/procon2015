@@ -6,6 +6,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <bitset>
 
 int constexpr FIELD_SIZE = 32;
 
@@ -48,20 +49,24 @@ public:
     int buttom_edge = 0;//下方から数えた障害物しかない行の数
     int left_edge = 0;  //左方から数えた障害物しかない列の数
 
+        field_type(std::string const & raw_field_text, size_t stones);
     //現在の状態における得点を返す
     size_t get_score();
 
     //石を置く  自身への参照を返す   失敗したら例外を出す
-    field_type& put_stone(const stone_type stone, int y, int x);
+        field_type& put_stone(stone_type const& stone, int y, int x);
 
     //指定された場所に指定された石が置けるかどうかを返す
     bool is_puttable(stone_type const& stone, int y, int x);
 
+        field_type& remove_just_before_stone(stone_type const& stone);
+/*
     //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
     field_type& remove_stone(stone_type const& stone);
 
     //指定された石を取り除けるかどうかを返す
     bool is_removable(stone_type const& stone);
+*/
 
     //置かれた石の一覧を表す配列を返す
     std::vector<stone_type> list_of_stones() const;
@@ -97,6 +102,13 @@ private:
 
     //石が置かれているか否かを返す
     bool is_placed(stone_type const& stone);
+
+        //#BitSystem
+        uint64_t __attribute__((aligned(32))) bit_plain_field[64];//普通のフィールド
+        uint64_t __attribute__((aligned(32))) bit_sides_field[64];//石の辺のフィールド
+        uint64_t __attribute__((aligned(32))) bit_sides_field_just_before[256][64];//just_before石の辺のフィールド
+        //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
+        void make_bit();//bitデータの作成
 };
 
 #endif // FIELD_TYPE

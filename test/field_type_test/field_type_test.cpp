@@ -296,11 +296,14 @@ void field_type_test::remove_stone_test_data()
 
 void field_type_test::remove_stone_test()
 {
+    qDebug("remove_stone_test is rejected");
+    /*
     QFETCH(field_type, field);
     QFETCH(stone_type, stone);
     QFETCH(field_type, result);
 
     QCOMPARE(field.remove_stone(stone).get_raw_data(), result.get_raw_data());
+    */
 }
 
 void field_type_test::is_puttable_test_data()
@@ -367,11 +370,14 @@ void field_type_test::is_removable_test_data()
 
 void field_type_test::is_removable_test()
 {
+    qDebug("is_removable_test is rejected");
+    /*
     QFETCH(field_type, field);
     QFETCH(stone_type, stone);
     QFETCH(bool, result);
 
     QCOMPARE(field.is_removable(stone), result);
+    */
 }
 
 void field_type_test::is_placed_test_data()

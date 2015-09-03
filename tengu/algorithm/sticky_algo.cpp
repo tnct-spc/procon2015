@@ -3,6 +3,7 @@
 #include <sstream>
 #include "QDebug"
 #include "QString"
+#include "QElapsedTimer"
 sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),problem(_problem)
 {
     algorithm_name = "sticky";
@@ -43,6 +44,8 @@ void sticky_algo::run(){
         if(best_score >= 0)problem.field.put_stone(best_stone,best_y,best_x);
         return;
     };
+    QElapsedTimer et;
+    et.start();
     int count = problem.stones.size();
     for(auto& _stone : problem.stones){
                 put_a_stone(_stone);
@@ -51,6 +54,7 @@ void sticky_algo::run(){
                 //print_text(oss.str());
                 count --;
     }
-    print_text("そうっすね");
+    int64_t time = et.elapsed();
+    print_text(std::to_string(time));
     emit answer_ready(problem.field);
 }

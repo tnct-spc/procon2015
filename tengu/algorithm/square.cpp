@@ -63,12 +63,15 @@ void square::solve(stone_type stone, int direction)
     min_num=32*32+1;//max+1
     //斜めに置ける場所を探して石を挿入していく
     //side
+    int dy,dx;
     for(int i=0;i<40;i++){
         y=0;
         x=i;
         for(int j=0;j<=i;j++){
-            direction_change(&y,&x,direction);
-            put_stone_side(stone,y-7,x-7);
+            dy=y;
+            dx=x;
+            direction_change(&dy,&dx,direction);
+            put_stone_side(stone,dy-7,dx-7);
             y++;
             x--;
         }
@@ -77,8 +80,10 @@ void square::solve(stone_type stone, int direction)
         y=39-i;
         x=39;
         for(int j=0;j<=i;j++){
-            direction_change(&y,&x,direction);
-            put_stone_side(stone,y-7,x-7);
+            dy=y;
+            dx=x;
+            direction_change(&dy,&dx,direction);
+            put_stone_side(stone,dy-7,dx-7);
             y++;
             x--;
         }
@@ -123,7 +128,7 @@ void square::put_stone_side(stone_type stone,int dy,int dx)
                     max_x.push_back(dx);
                     max_stone.push_back(stone);
                 }
-                problem.field.remove_stone(stone);
+                problem.field.remove_just_before_stone(stone);
                 //if(flip==1 && angle==1) qDebug("1");
             }else{
                 //if(flip==1 && angle==1) qDebug("0");
@@ -179,7 +184,7 @@ void square::put_stone_hole(stone_type stone,int dy,int dx)
         min_x = dx;
         min_stone = stone;
     }
-    problem.field.remove_stone(stone);
+    problem.field.remove_just_before_stone(stone);
 }
 
 

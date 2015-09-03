@@ -48,7 +48,7 @@ std::string net::send(field_type answer, QString playerid){
     QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
-    qDebug(reply->readAll().constData());
+    qDebug() << QString(reply->readAll().constData());
     if(network_error_flag)return std::string("");
     return std::string(reply->readAll().constData());
 }

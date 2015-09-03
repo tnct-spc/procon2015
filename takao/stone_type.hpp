@@ -2,8 +2,8 @@
 #define STONE_TYPE
 #include "point_type.hpp"
 #include <array>
+#include <vector>
 int constexpr STONE_SIZE = 8;
-
 struct corner_type
 {
     int value;
@@ -16,7 +16,9 @@ class stone_type
 public:
     enum struct Sides {Head = 0, Tail = 1};
     typedef std::array<std::array<int,STONE_SIZE>,STONE_SIZE> raw_stone_type;
-
+        //以前はstd::vector<std::vector<std::vector<std::vector<uint64_t>>>>でした;
+        //typedef std::array <std::array <std::array <std::array <uint64_t,8>,4>,2>,41> __attribute__((aligned(32))) bit_stones_type;
+        typedef uint64_t bit_stones_type[41][2][4][8];
     stone_type() = default;
     stone_type(int const zk); // set_random
     ~stone_type() = default;
@@ -25,7 +27,7 @@ public:
 
     friend bool operator== (stone_type const& lhs, stone_type const& rhs);
 
-    int & at(size_t y,size_t x);
+        int & at(size_t y,size_t x);
     int const & at(size_t y,size_t x) const;
     raw_stone_type const & get_raw_data() const;
     stone_type& rotate(int angle);
@@ -41,7 +43,8 @@ public:
     int count_n_row(int const n)const;
     int count_n_col(int const n)const;
     std::string str();
-
+        uint64_t get_bit_plain_stones(int x, int flip, int rotate, int y) const;
+        bit_stones_type const& get_raw_bit_plain_stones() const;
 
 private:
     int  nth;
@@ -57,6 +60,12 @@ private:
     void _set_random(int zk);
     void _set_from_raw(raw_stone_type raw);
     bool inline _is_in_stone(int p);
+
+        //#BitSystem
+        //石のマスク(int64_t bit_stones[41][2][4][8];)
+        bit_stones_type bit_plain_stones;
+        //bitデータの作成
+        void make_bit();
     bool inline _is_in_stone(int y, int x);
     bool inline _is_in_stone(point_type p);
 
