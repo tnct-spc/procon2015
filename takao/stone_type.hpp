@@ -27,7 +27,7 @@ public:
 
     friend bool operator== (stone_type const& lhs, stone_type const& rhs);
 
-        int & at(size_t y,size_t x);
+    int at(size_t y,size_t x);
     int const & at(size_t y,size_t x) const;
     raw_stone_type const & get_raw_data() const;
     stone_type& rotate(int angle);

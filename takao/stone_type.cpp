@@ -261,6 +261,45 @@ void stone_type::make_bit()
     for(int i = 5; i < 8; i++)
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }
+void stone_type::_set_random(int const zk)
+{
+    raw_stone_type candidate;
+    do {
+        for(auto& row : candidate)
+            std::fill(row.begin(), row.end(), 0);
+
+        std::random_device seed_gen;
+        std::mt19937_64 engine(seed_gen());
+        std::uniform_int_distribution<int> dist_pos(0, STONE_SIZE - 1);
+        int x = dist_pos(engine);
+        int y = dist_pos(engine);
+        candidate.at(y).at(x) = 1;
+        for(int count = 1; count < zk; ) {
+            x = dist_pos(engine);
+            y = dist_pos(engine);
+            if (!candidate.at(y).at(x) &&
+                ((_is_in_stone(y - 1) && candidate.at(y - 1).at(x)) ||
+                 (_is_in_stone(y + 1) && candidate.at(y + 1).at(x)) ||
+                 (_is_in_stone(x - 1) && candidate.at(y).at(x - 1)) ||
+                 (_is_in_stone(x + 1) && candidate.at(y).at(x + 1)))
+                    ) {
+                count++;
+                candidate.at(y).at(x) = 1;
+            }
+//            if(insrance++ > FIELD_SIZE * FIELD_SIZE)
+//                break;
+        }
+    } while(_has_hole(candidate));
+    _set_from_raw(candidate);
+}
+void stone_type::_set_from_raw(raw_stone_type raw)
+{
+    for(int i = 0; i < 4; i++)
+        raw_data_set.at(i) = _rotate(raw, i * 90);
+    raw_data_set.at(4) = _flip(raw);
+    for(int i = 5; i < 8; i++)
+        raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
+}
 
 /* no new line at end of output */
 std::string stone_type::str()

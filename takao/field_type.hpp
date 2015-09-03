@@ -49,7 +49,6 @@ public:
     int buttom_edge = 0;//下方から数えた障害物しかない行の数
     int left_edge = 0;  //左方から数えた障害物しかない列の数
 
-        field_type(std::string const & raw_field_text, size_t stones);
     //現在の状態における得点を返す
     size_t get_score();
 
