@@ -145,7 +145,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
                                       bit_sides_field[16+y+1],
                                       bit_sides_field[16+y+0]);
 
-    avx_cllis = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+    avx_cllis |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
 
     /*
     for(int i=0;i<8;i++){
