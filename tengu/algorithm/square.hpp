@@ -9,11 +9,13 @@ class square : public algorithm_type
     Q_OBJECT
 public:
     square(problem_type _problem);
+    square(problem_type _problem, int mode);
     ~square();
     void run();
 
 private:
     problem_type original_problem;
+    int _mode;
 
     void solve(stone_type stone, int direction);
     void put_stone_side(stone_type stone,int dy,int dx);
