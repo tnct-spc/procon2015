@@ -28,7 +28,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
         connect(algo,&algorithm_type::answer_ready,this,&algorithm_manager::get_answer);
         connect(algo,&algorithm_type::send_text,this,&algorithm_manager::get_text);
 
-        connect(algo,&algorithm_type::destroyed,[=](){
+        connect(algo,&algorithm_type::finished,[=](){
             mtx.lock();
             boost::remove_erase(algo_vec,algo);
             if(algo_vec.size() == 0)emit finished();
