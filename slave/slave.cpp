@@ -129,7 +129,7 @@ void Slave::answer_save_to_file(){
     QFile file(filename);
     if(!file.open(QIODevice::WriteOnly))return;
     QTextStream out(&file);
-    out << _answer.get_answer().c_str() << endl;
+    out << _answer.get_answer().c_str();
 }
 void Slave::problem_load_from_file(){
     auto filename = QFileDialog::getOpenFileName(this);
