@@ -75,6 +75,7 @@ void Slave::clicked_run_button(){
     if(!ui->ofline_mode_check_box->isChecked()){
         network = new net(get_geturl(),
                           get_posturl(),
+                          settings->value("PLAYERID").toString(),
                           ui->prob_num_line_edit->text().toInt()
                           );
         auto str = network->get();
@@ -112,7 +113,7 @@ void Slave::answer_send(field_type answer){
     }else{
         net_mtx.lock();
 
-        std::string res = network->send(answer,settings->value("PLAYERID").toString());
+        std::string res = network->send(answer);
         print_text(QString(res.c_str()));
         print_text("回答を送信しました");
         print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));

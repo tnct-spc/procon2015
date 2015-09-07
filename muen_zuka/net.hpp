@@ -21,10 +21,10 @@ public:
     explicit net(QObject *parent = 0);
     net(QUrl server_url); //スタンドアロンで動作する
     net(QUrl server_url,QUrl master_url);
-    net(QUrl server_url, QUrl master_url, int problem_num);
+    net(QUrl server_url, QUrl master_url, QString plyaer_id, int problem_num);
     ~net();
     std::string get();
-    std::string send(field_type answer, QString playerid);
+    std::string send(field_type answer);
     bool is_error();
     int what_error();
 signals:
@@ -38,6 +38,7 @@ private:
     //std::shared_ptr<QNetworkAccessManager> manager;
 
     QUrl _server_url,_master_url;
+    QString _player_id;
     int _problem_num;
     bool network_error_flag =false;
     enum QNetworkReply::NetworkError net_error_num = QNetworkReply::NoError;
