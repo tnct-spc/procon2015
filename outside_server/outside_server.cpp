@@ -304,3 +304,8 @@ void OutsideServer::push_restart()
 {
     game_stage_[0].restart_animation_timer();
 }
+
+void OutsideServer::push_change_color()
+{
+    for(int i=0;i<6;i++) if(game_stage_[i].is_start) game_stage_[i].ChangeColor();
+}

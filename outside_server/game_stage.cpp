@@ -111,6 +111,7 @@ void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString useri
     //解答処理を開始する
     stone_flow_count_=0;
     answer_animation_timer_->start(400);
+    is_start=true;
 }
 
 void GameStage::AnswerAnimation(){
@@ -184,16 +185,73 @@ void GameStage::AnswerAnimation(){
     }
     /*設置*/
     //フィールドに置く
+    QBrush *stoneBrush;
+    if(is_colorfull){
+        stoneBrush = new QBrush(SetColorBrush());
+    }else{
+        stoneBrush = new QBrush(Qt::green);
+    }
     for (int y = 0; y < 8; y++){
         for (int x = 0; x < 8; x++){
             if (stone_state_[stone_flow_count_][y][x]){
-                stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->setBrush(Qt::green);
+                stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->setBrush(*stoneBrush);
                 stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->setPen(QPen(QColor(Qt::white)));
                 stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->setZValue(1);
             }
         }
     }
     stone_flow_count_++;
+}
+
+QBrush GameStage::SetColorBrush()
+{
+    Qt::GlobalColor color_list[8]{
+        Qt::magenta,
+        Qt::blue,
+        Qt::darkGreen,
+        Qt::cyan,
+        Qt::yellow,
+        Qt::red,
+        Qt::lightGray,
+        Qt::black,
+    };
+    bool is_sidecolor[8]={0};
+    QColor color;
+    for (int y = 0; y < 8; y++){
+        for (int x = 0; x < 8; x++){
+            if(stone_state_[stone_flow_count_][y][x]){
+                if ((8 + y+1 + answer_flow_[stone_flow_count_][1])!=40){
+                    color = stage_[8 + y+1 + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->brush().color();
+                    ColorCheck(is_sidecolor, color, color_list);
+                }
+                if ((8 + y-1 + answer_flow_[stone_flow_count_][1])!=7){
+                    color = stage_[8 + y-1 + answer_flow_[stone_flow_count_][1]][8 + x + answer_flow_[stone_flow_count_][0]]->brush().color();
+                    ColorCheck(is_sidecolor, color, color_list);
+                }
+                if ((8 + x+1 + answer_flow_[stone_flow_count_][0])!=40){
+                    color = stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x+1 + answer_flow_[stone_flow_count_][0]]->brush().color();
+                    ColorCheck(is_sidecolor, color, color_list);
+                }
+                if ((8 + x-1 + answer_flow_[stone_flow_count_][0])!=7){
+                    color = stage_[8 + y + answer_flow_[stone_flow_count_][1]][8 + x-1 + answer_flow_[stone_flow_count_][0]]->brush().color();
+                    ColorCheck(is_sidecolor, color, color_list);
+                }
+            }
+        }
+    }
+    for(int i=0;i<8;i++){
+        if(!is_sidecolor[i]){
+            return color_list[i];
+        }
+    }
+    return color_list[0];
+}
+
+void GameStage::ColorCheck(bool *isColor, QColor color, Qt::GlobalColor *colorList)
+{
+    for(int i=0;i<8;i++){
+        if(color==colorList[i]) isColor[i]=true;
+    }
 }
 
 void GameStage::update_ranking_tag(int ranking){
@@ -251,6 +309,20 @@ void GameStage::BackAnswer()
     SetStage();
     SetStone();
     int put_stone_num = stone_flow_count_ - 1;
+    stone_flow_count_ = 0;
+    for(int i=0;i<put_stone_num;i++){
+        AnswerAnimation();
+    }
+}
+
+void GameStage::ChangeColor()
+{
+    if(is_colorfull) is_colorfull=false;
+    else is_colorfull=true;
+
+    SetStage();
+    SetStone();
+    int put_stone_num = stone_flow_count_;
     stone_flow_count_ = 0;
     for(int i=0;i<put_stone_num;i++){
         AnswerAnimation();

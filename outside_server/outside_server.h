@@ -32,6 +32,7 @@ public slots:
     void push_back();
     void push_stop();
     void push_restart();
+    void push_change_color();
     //func
     void ReserveAnswer();
 

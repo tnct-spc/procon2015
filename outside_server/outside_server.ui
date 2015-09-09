@@ -133,6 +133,19 @@
     <string>▶</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="change_color_button">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>330</y>
+     <width>41</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
@@ -265,6 +278,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>change_color_button</sender>
+   <signal>clicked()</signal>
+   <receiver>procon26server</receiver>
+   <slot>push_change_color()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>341</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>loadbutton_clicked()</slot>
@@ -276,5 +305,7 @@
   <slot>push_back()</slot>
   <slot>push_stop()</slot>
   <slot>push_restart()</slot>
+  <slot>slot2()</slot>
+  <slot>push_change_color()</slot>
  </slots>
 </ui>

@@ -28,6 +28,7 @@ public:
     void MakeStageData(int user_number/*,bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/);
     //Start
     void StartAnswer(int answer_flow[256][5],int answer_num,QString userid, int answer_point);
+    bool is_start=false;
     //
     void update_ranking_tag(int ranking);
     //
@@ -36,6 +37,8 @@ public:
     //
     void GoAnswer();
     void BackAnswer();
+    //
+    void ChangeColor();
 
 private: 
     //me
@@ -65,6 +68,10 @@ private:
     //
     void SetStage();
     void SetStone();
+    //
+    QBrush SetColorBrush();
+    void ColorCheck(bool *isColor, QColor color, Qt::GlobalColor *colorList);
+    bool is_colorfull=false;
 
 private slots:
     //Animation Answer
