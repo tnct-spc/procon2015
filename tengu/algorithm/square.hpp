@@ -22,7 +22,7 @@ private:
     void put_stone_hole(stone_type stone,int dy,int dx);
     int count_hole();
     void direction_change(int *dy, int *dx, int direction);
-    bool is_hole(int dy, int dx, int size);
+    int is_depression_or_hole_or_none(int dy, int dx, int size);
     int count_side(stone_type stone);
 
     bool field[34][34];

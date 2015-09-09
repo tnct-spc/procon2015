@@ -205,9 +205,17 @@ int square::count_hole()
         for(int size=0;size<32;size++){//'0'=1*1, 'n'=(n+1)*(n+1)
             for(int y=0;y<32-size;y++){
                 for(int x=0;x<32-size;x++){
-                    if(is_hole(y,x,size)){
+                    switch(is_depression_or_hole_or_none(y,x,size)){
+                    case 1:
                         hole_flag=true;
-                        hole_num += size;
+                        hole_num += size+1;
+                        break;
+                    case 2:
+                        hole_flag=true;
+                        hole_num += size+10;
+                        break;
+                    default:
+                        break;
                     }
                 }
             }
@@ -217,7 +225,7 @@ int square::count_hole()
     return hole_num;
 }
 
-bool square::is_hole(int dy, int dx, int size)
+int square::is_depression_or_hole_or_none(int dy, int dx, int size)
 {
     bool flag;
     int count=0;
@@ -250,12 +258,13 @@ bool square::is_hole(int dy, int dx, int size)
     if(flag){
         count++;
     }
-    if(count<3) return false;
-    //ok
+    if(count<3) return 0;//none
+    //is_hole_or_depression
     for(int y=dy ; y<=dy+size ; y++){
         for(int x=dx ; x<=dx+size ; x++){
             field[y+1][x+1]=true;
         }
     }
-    return true;
+    if(count==4) return 2;//hole
+    return 1;//depression
 }
