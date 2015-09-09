@@ -5,7 +5,7 @@
 
 square::square(problem_type _problem)
 {
-    qDebug("!!!test mode!!!");
+    qDebug("not parallel");
     original_problem = _problem;
     _mode = 0;
 }
@@ -22,15 +22,17 @@ square::~square()
 
 void square::run()
 {
-    qDebug("@square start direction%d",_mode);
-    problem=original_problem;
-    //Make answer
-    for(stone_type stone : problem.stones){
-        solve(stone,_mode);
+    for(_mode=0;_mode<8;_mode++){
+        qDebug("@square start direction%d",_mode);
+        problem=original_problem;
+        //Make answer
+        for(stone_type stone : problem.stones){
+            solve(stone,_mode);
+        }
+        //解答の送信
+        qDebug("@square emit direction%d",_mode);
+        emit answer_ready(problem.field);
     }
-    //解答の送信
-    qDebug("@square emit direction%d",_mode);
-    emit answer_ready(problem.field);
 }
 
 void square::direction_change(int *dy, int *dx, int direction)
