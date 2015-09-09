@@ -28,6 +28,10 @@ public slots:
     void loadbutton_clicked();
     void uisizebutton_clicked();
     void pnspinbutton_changed(QString num);
+    void push_go();
+    void push_back();
+    void push_stop();
+    void push_restart();
     //func
     void ReserveAnswer();
 

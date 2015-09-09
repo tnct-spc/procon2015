@@ -32,6 +32,10 @@ public:
     void update_ranking_tag(int ranking);
     //
     void stop_animation_timer();
+    void restart_animation_timer();
+    //
+    void GoAnswer();
+    void BackAnswer();
 
 private: 
     //me
@@ -58,6 +62,9 @@ private:
     //answer animation
     int stone_flow_count_;//animation count
     QTimer *answer_animation_timer_;
+    //
+    void SetStage();
+    void SetStone();
 
 private slots:
     //Animation Answer

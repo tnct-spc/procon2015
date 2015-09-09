@@ -284,3 +284,23 @@ void OutsideServer::resizeEvent(QResizeEvent *event)
     ui->graphicsView->setMatrix(matrix);
     ui->graphicsView->resize(width()-200 ,height());
 }
+
+void OutsideServer::push_go()
+{
+    game_stage_[0].GoAnswer();
+}
+
+void OutsideServer::push_back()
+{
+    game_stage_[0].BackAnswer();
+}
+
+void OutsideServer::push_stop()
+{
+    game_stage_[0].stop_animation_timer();
+}
+
+void OutsideServer::push_restart()
+{
+    game_stage_[0].restart_animation_timer();
+}

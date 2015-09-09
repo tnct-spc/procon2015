@@ -51,6 +51,17 @@ void GameStage::IntializeStage(QGraphicsScene *field,int base_x,int base_y,int b
 void GameStage::MakeStageData(int user_number/*,bool stage_state[48][48], bool stone_state[256][8][8], int stone_num*/){
     user_number_=user_number;
     //Set stage
+    SetStage();
+    //Set stone
+    SetStone();
+    //Reset tag
+    tag_name_->setPlainText("");
+    tag_point_->setPlainText("");
+    tag_ranking_->setPlainText("");
+}
+
+void GameStage::SetStage()
+{
     for (int y = 0; y < 48; y++){
         for (int x = 0; x < 48; x++){
             stage_state_[y][x]=0;
@@ -70,7 +81,10 @@ void GameStage::MakeStageData(int user_number/*,bool stage_state[48][48], bool s
             }
         }
     }
-    //Set stone
+}
+
+void GameStage::SetStone()
+{
     stone_num_=g_stone_num_;
     for (int n = 0; n < g_stone_num_; n++){
         for (int y = 0; y < 8; y++){
@@ -79,12 +93,7 @@ void GameStage::MakeStageData(int user_number/*,bool stage_state[48][48], bool s
             }
         }
     }
-    //Reset tag
-    tag_name_->setPlainText("");
-    tag_point_->setPlainText("");
-    tag_ranking_->setPlainText("");
 }
-
 
 void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString userid,int answer_point){
     //nametag name
@@ -221,4 +230,29 @@ void GameStage::update_ranking_tag(int ranking){
 
 void GameStage::stop_animation_timer(){
     if(answer_animation_timer_->isActive()) answer_animation_timer_->stop();
+}
+
+void GameStage::restart_animation_timer(){
+    if(!(answer_animation_timer_->isActive())) answer_animation_timer_->start();
+}
+
+void GameStage::GoAnswer()
+{
+    SetStage();
+    SetStone();
+    int put_stone_num = stone_flow_count_ + 1;
+    stone_flow_count_ = 0;
+    for(int i=0;i<put_stone_num;i++){
+        AnswerAnimation();
+    }
+}
+void GameStage::BackAnswer()
+{
+    SetStage();
+    SetStone();
+    int put_stone_num = stone_flow_count_ - 1;
+    stone_flow_count_ = 0;
+    for(int i=0;i<put_stone_num;i++){
+        AnswerAnimation();
+    }
 }
