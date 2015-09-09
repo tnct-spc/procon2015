@@ -45,7 +45,7 @@ std::string problem_type::str()
     std::ostringstream ss;
     ss << field.str() << "\r\n";
     ss << stones.size() << "\r\n";
-    for(int i = 0; i < stones.size(); i++) {
+    for(unsigned int i = 0; i < stones.size(); i++) {
         ss << stones[i].str();
         if(i != stones.size() - 1)
             ss << "\r\n";
