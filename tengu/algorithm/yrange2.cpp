@@ -179,7 +179,7 @@ std::vector<yrange2::search_type> yrange2::search(field_type& _field, stone_type
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-std::vector<yrange2::search_type> yrange2::search2(search_type& s, stone_type stone)
+std::vector<yrange2::search_type> yrange2::search2(search_type& s, stone_type& stone)
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる

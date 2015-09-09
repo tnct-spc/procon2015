@@ -133,7 +133,7 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
             field_type field = _field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
-            search_vec.push_back(search_type{point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j),get_island(field.get_raw_data(),point_type{i,j})});
+            search_vec.push_back({point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j),get_island(field.get_raw_data(),point_type{i,j})});
         }
     }
     if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,0,0};
@@ -179,6 +179,6 @@ int yrange::get_island(field_type::raw_field_type field, point_type const& point
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.7) return true;
+    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
     else return false;
 }
