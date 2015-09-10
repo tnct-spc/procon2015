@@ -86,5 +86,5 @@ void sticky_algo::run(){
     }
     int64_t time = et.elapsed();
     print_text(std::to_string(time));
-    emit answer_ready(pattern.at(0).field);
+    answer_send(pattern.at(0).field);
 }

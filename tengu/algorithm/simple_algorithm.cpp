@@ -42,5 +42,5 @@ void simple_algorithm::run(){
         put_a_stone(_stone);
     }
     //解答の送信
-    emit answer_ready(problem.field);
+    answer_send(problem.field);
 }

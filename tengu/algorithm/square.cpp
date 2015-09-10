@@ -22,7 +22,6 @@ square::~square()
 
 void square::run()
 {
-    for(_mode=0;_mode<8;_mode++){
         qDebug("@square start direction%d",_mode);
         problem=original_problem;
         //Make answer
@@ -31,8 +30,7 @@ void square::run()
         }
         //解答の送信
         qDebug("@square emit direction%d",_mode);
-        emit answer_ready(problem.field);
-    }
+        answer_send(problem.field);
 }
 
 void square::direction_change(int *dy, int *dx, int direction)

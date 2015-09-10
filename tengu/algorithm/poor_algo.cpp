@@ -33,5 +33,5 @@ void poor_algo::run(){
     }
 
     //解答の送信
-    emit answer_ready(problem.field);
+    answer_send(problem.field);
 }

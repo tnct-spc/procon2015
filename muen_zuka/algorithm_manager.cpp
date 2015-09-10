@@ -21,15 +21,14 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(1))algo_vec.push_back(new poor_algo(problem));
     if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem));
     if(enable_algo.at(3)){
-        algo_vec.push_back(new square(problem));
-        //algo_vec.push_back(new square(problem,0));
-        //algo_vec.push_back(new square(problem,1));
-        //algo_vec.push_back(new square(problem,2));
-        //algo_vec.push_back(new square(problem,3));
-        //algo_vec.push_back(new square(problem,4));
-        //algo_vec.push_back(new square(problem,5));
-        //algo_vec.push_back(new square(problem,6));
-        //algo_vec.push_back(new square(problem,7));
+        algo_vec.push_back(new square(problem,0));
+        algo_vec.push_back(new square(problem,1));
+        algo_vec.push_back(new square(problem,2));
+        algo_vec.push_back(new square(problem,3));
+        algo_vec.push_back(new square(problem,4));
+        algo_vec.push_back(new square(problem,5));
+        algo_vec.push_back(new square(problem,6));
+        algo_vec.push_back(new square(problem,7));
     }
     if(enable_algo.at(4))algo_vec.push_back(new yrange(problem));
 

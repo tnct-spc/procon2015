@@ -70,7 +70,7 @@ void yrange::one_try(problem_type problem, int x, int y, std::size_t const rotat
         }
         std::string const flip = problem.stones.at(0).get_side() == stone_type::Sides::Head ? "Head" : "Tail";
         qDebug("emit starting by %2d,%2d %2lu %s",x,y,rotate / 2,flip.c_str());
-        emit answer_ready(problem.field);
+        answer_send(problem.field);
     }
 
 }
