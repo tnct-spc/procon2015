@@ -73,7 +73,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             search(sv, std::move(one), ishi);
 
             if(sv.size() == 0) continue;
-            std::sort(sv.begin(),sv.end(),[&](const search_type& lhs, const search_type& rhs)
+            std::sort(sv.begin(),sv.end(),[](const search_type& lhs, const search_type& rhs)
                 {
                     return lhs.score == rhs.score ? get_island(lhs.field.get_raw_data()) < get_island(rhs.field.get_raw_data()) : lhs.score > rhs.score;
                 });
@@ -162,7 +162,8 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             else
             {
                 search_vec.push_back({
-                        field,s.point,
+                        field,
+                        s.point,
                         s.rotate,
                         s.flip,
                         s.score + evaluate(field,stone,i,j),
