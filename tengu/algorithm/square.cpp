@@ -161,7 +161,10 @@ int square::count_side(stone_type stone)
                 if(field[y+1][x]==true) count++;
                 if(field[y][x-1]==true) count++;
                 if(field[y][x+1]==true) count++;
-                side_num+=count*count;
+                if(count==1) side_num+=1;
+                if(count==2) side_num+=3;
+                if(count==3) side_num+=5;
+                if(count==4) side_num+=16;
             }
         }
     }
