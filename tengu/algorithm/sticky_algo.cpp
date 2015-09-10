@@ -30,7 +30,7 @@ int sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, int 
     return score;
 }
 std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width){
-    std::vector<putted_evalated_field> result_stone;
+    //std::vector<putted_evalated_field> result_stone;
     for(auto _eval_field : pattern){
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle < 4;angle++,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             int score = eval(_eval_field.field,stone,dy,dx);
@@ -70,6 +70,7 @@ std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vec
     if(result_stone.size() == 0){
         return std::move(pattern);
     }
+    result_stone.clear();
     return std::move(return_field_vactor);
 }
 

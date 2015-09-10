@@ -27,6 +27,7 @@ private:
     problem_type problem;
     int eval(field_type &field, const stone_type &stone, int pos_y, int pos_x);
     std::vector<evalated_field> eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width);
+    std::vector<putted_evalated_field> result_stone;
 };
 
 #endif // STICKY_ALGO_HPP

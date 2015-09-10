@@ -18,6 +18,7 @@ class algorithm_type : public QThread
         problem_type problem;
         std::string algorithm_name;
         static std::mutex ans_emit_mtx;
+        static int _best_score;
         void answer_send(field_type ans);
     signals:
         void answer_ready(field_type ans);
