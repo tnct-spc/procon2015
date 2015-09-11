@@ -182,3 +182,25 @@ bool yrange::pass(search_type const& search, stone_type const& stone)
     if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
     else return false;
 }
+
+std::vector<yrange::connect_type> yrange::conect_stone(stone_type& a, stone_type& b)
+{
+    std::vector<connect_type> connectv;
+    field_type _field;
+    _field.put_stone(a,8,8);
+    for(int i = 0; i < 24; ++i) for(int j = 0; j < 24; ++j)
+    {
+        if(_field.is_puttable(b,i,j) == true)
+        {
+            field_type field;
+            field.put_stone(b,i,j);
+            int const score = evaluate(field,b,i,j);
+            if((a.get_side_length() + b.get_side_length()) / 6 < score)
+            {
+                connectv.emplace_back(point_type{i-8,j-8},score,get_island(field.get_raw_data(),point_type{i,j}));
+            }
+        }
+    }
+    std::sort(connectv.begin(),connectv.end(),[](connect_type const& lhs, connect_type const& rhs){return lhs.island < rhs.island;});
+    return std::move(connectv);
+}
