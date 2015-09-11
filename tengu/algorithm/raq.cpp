@@ -25,80 +25,22 @@ void raq::run()
     qDebug("raq start");
 
     //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    std::size_t best_score = FIELD_SIZE * FIELD_SIZE;
-    QVector<std::tuple<problem_type,int,int,std::size_t>> data;
-    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
+    stone_type& stone = pre_problem.stones.at(0);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m)
     {
         for(std::size_t rotate = 0; rotate < 8; ++rotate)
         {
-            data.push_back(std::make_tuple(pre_problem,l,m,rotate));
-        }
-
-        QFuture<void> threads = QtConcurrent::map(
-            data,
-            [this](auto& tup)
+            if(rotate %2 == 0) stone.rotate(90);
+            else stone.flip();
+            if(pre_problem.field.is_puttable(stone,l,m) == true)
             {
-                this->one_try(std::get<0>(tup), std::get<1>(tup), std::get<2>(tup), std::get<3>(tup));
-            });
-        threads.waitForFinished();
-        for(auto& each_data : data)
-        {
-            auto& problem = std::get<0>(each_data);
-            if(problem.field.list_of_stones().size() == 0) continue;
-            std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-            qDebug("find starting by %2d,%2d %2lu %s score = %3zu",
-                   std::get<1>(each_data),std::get<2>(each_data),std::get<3>(each_data) / 2 * 90,flip.c_str(),
-                   problem.field.get_score());
-            if(best_score > problem.field.get_score())
-            {
-                qDebug("emit!");
-                emit answer_ready(problem.field);
-                best_score = problem.field.get_score();
-                print_text((boost::format("score = %d")%problem.field.get_score()).str());
+                field_type field;
+                field.put_stone(stone,l,m);
+                std::vector<raq::search_type> one {{field,0}};
+                steps(one);
             }
         }
-
     }
-    /*
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
-    {
-        one_try(pre_problem, l, m, rotate);
-    }
-    */
 }
 
 void raq::one_step(field_type& _field, int ishi,std::vector<search_type>& sv)
@@ -133,10 +75,10 @@ void raq::one_step(field_type& _field, int ishi,std::vector<search_type>& sv)
     return;
 }
 
-void raq::steps(std::vector<search_type> result)
+void raq::steps(std::vector<raq::search_type> result)
 {
-    QVector<std::tuple<problem_type,std,vector<search_type>>> data;
-    std::vector<search_type> r;
+    QVector<std::tuple<problem_type,std::vector<raq::search_type>>> data;
+    std::vector<raq::search_type> r;
     int ishi = 1;
 
     while(result.size() > 0)
@@ -148,7 +90,7 @@ void raq::steps(std::vector<search_type> result)
 
         QFuture<void> threads = QtConcurrent::map(
             data,
-            [this](auto& tup)
+            [this,&ishi](auto& tup)
             {
                 this->one_step(std::get<0>(tup), ishi, std::get<1>(tup));
             });
@@ -257,7 +199,7 @@ bool raq::pass(search_type const& search, stone_type const& stone)
 
 bool raq::pass(double score, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
+    if((score / static_cast<double>(stone.get_side_length())) < 0.5) return true;
     else return false;
 }
 

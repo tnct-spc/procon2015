@@ -19,16 +19,9 @@ private:
         int score;
     };
 
-    struct rr_type
-    {
-
-    };
-
-    std::vector<rr_type> result;
-
     problem_type pre_problem;
-    void one_step(problem_type& problem, int ishi,std::vector<search_type>& sv);
-    void steps(problem_type problem);
+    void one_step(field_type& _field, int ishi,std::vector<search_type>& sv);
+    void steps(std::vector<raq::search_type> result);
 
 
 
