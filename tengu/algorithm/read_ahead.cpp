@@ -77,6 +77,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                 {
                     return lhs.score == rhs.score ? get_island(lhs.field.get_raw_data()) < get_island(rhs.field.get_raw_data()) : lhs.score > rhs.score;
                 });
+
             /*
             for(auto const& each_ele : sv)
             {
@@ -183,7 +184,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     */
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
-    if(search_vec.size() > 5) search_vec.resize(5);
+    if(search_vec.size() > 3) search_vec.resize(3);
 
     if(s.rank >= LAH || ishi >= STONE_NUM)
     {
@@ -208,7 +209,7 @@ int read_ahead::get_island(field_type::raw_field_type field)
     int const x_min = 0;
     int const x_max = FIELD_SIZE;
 
-    std::vector<int> result (32,0);
+    std::vector<int> result (FIELD_SIZE * FIELD_SIZE,0);
     std::function<void(int,int,int)> recurision = [&recurision,&field](int y, int x, int num) -> void
     {
         field.at(y).at(x) = num;

@@ -23,7 +23,7 @@ yrange2::~yrange2()
 void yrange2::run()
 {
     qDebug("yrange2 start");
-
+/*
     std::size_t best_score = FIELD_SIZE * FIELD_SIZE;
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
@@ -59,12 +59,17 @@ void yrange2::run()
         }
 
     }
-    /*
+    */
+
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        one_try(pre_problem, l, m, rotate);
+        problem_type problem = pre_problem;
+        one_try(problem, l, m, rotate);
+        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+        qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",l,m,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
+        emit answer_ready(problem.field);
     }
-    */
+
 }
 
 void yrange2::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
@@ -92,7 +97,6 @@ void yrange2::one_try(problem_type& problem, int y, int x, std::size_t const rot
                 temp = std::move(search2(next,problem.stones.at(ishi+1)));
                 std::copy(searchv2.begin(),searchv2.end(),std::back_inserter(temp));
             }
-
             for(auto& one : searchv1) one.island = get_island(one.field.get_raw_data());
             std::sort(searchv1.begin(),searchv1.end(),[&](search_type const lhs, search_type const rhs)
             {
@@ -122,11 +126,6 @@ void yrange2::one_try(problem_type& problem, int y, int x, std::size_t const rot
             }
             std::cout << ishi << "th stone putted" << std::endl;
         }
-        /*
-        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
-        emit answer_ready(problem.field);
-        */
     }
 }
 
@@ -217,7 +216,7 @@ int yrange2::get_island(field_type::raw_field_type field)
     int const x_min = 0;
     int const x_max = FIELD_SIZE;
 
-    std::vector<int> result (32,0);
+    std::vector<int> result (FIELD_SIZE * FIELD_SIZE,0);
     std::function<void(int,int,int)> recurision = [&recurision,&field,&y_min,&y_max,&x_min,&x_max](int y, int x, int num) -> void
     {
         field.at(y).at(x) = num;
