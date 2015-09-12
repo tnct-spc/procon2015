@@ -77,6 +77,7 @@ void raq::one_step(field_type& _field, int ishi,std::vector<search_type>& sv)
 
 void raq::steps(std::vector<raq::search_type> result)
 {
+    /*
     QVector<std::tuple<problem_type,std::vector<raq::search_type>>> data;
     std::vector<raq::search_type> r;
     int ishi = 1;
@@ -111,6 +112,7 @@ void raq::steps(std::vector<raq::search_type> result)
 
         ishi++;
     }
+    */
 }
 
 //評価関数
