@@ -6,6 +6,7 @@
 #include <boost/range/algorithm_ext/erase.hpp>
 #include "tengu.hpp"
 #include <iostream>
+#include <limits>
 algorithm_manager::algorithm_manager(QObject *parent) : QObject(parent)
 {
 }
@@ -16,6 +17,8 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     qRegisterMetaType<std::string>();
     problem = _problem;
     enable_algorithm_list = enable_algo;
+    //アルゴリズムの最適解値を初期化
+    algorithm_type::_best_score = std::numeric_limits<int>::max();
     //動かしたいアルゴリズムを配列に入れる
     if(enable_algo.at(0))algo_vec.push_back(new simple_algorithm(problem));
     if(enable_algo.at(1))algo_vec.push_back(new poor_algo(problem));

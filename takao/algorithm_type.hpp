@@ -14,11 +14,13 @@ class algorithm_type : public QThread
         //virtual ~algorithm_type() = 0;
         virtual void run() = 0;
         void print_text(std::string str);
+        //Qtのemitが遅いのでalgorithm自身が送信するかどうか判断するためのClass変数
+        static int _best_score;
     protected:
         problem_type problem;
         std::string algorithm_name;
         static std::mutex ans_emit_mtx;
-        static int _best_score;
+        //static int _best_score;
         void answer_send(field_type ans);
     signals:
         void answer_ready(field_type ans);
