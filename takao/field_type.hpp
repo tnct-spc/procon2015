@@ -88,5 +88,11 @@ private:
     bool is_placed(stone_type const& stone);//石が置かれているか否かを返す
     void make_bit();//bitデータの作成
 };
+inline size_t field_type::empty_zk(){
+    return get_score();
+}
+inline size_t field_type::get_block_num(){
+    return (FIELD_SIZE * FIELD_SIZE) - get_score();
+}
 
 #endif // FIELD_TYPE

@@ -30,14 +30,6 @@ size_t field_type::get_score()
     return sum;
 }
 
-size_t field_type::empty_zk(){
-    return get_score();
-}
-
-size_t field_type::get_block_num(){
-    return (FIELD_SIZE * FIELD_SIZE) - get_score();
-}
-
 //石を置く  自身への参照を返す   失敗したら例外を出す
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
