@@ -242,7 +242,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>RadioButton</string>
+    <string>Rad&amp;ioButton</string>
    </property>
    <attribute name="buttonGroup">
     <string notr="true">buttonGroup_2</string>
@@ -258,7 +258,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>RadioButton</string>
+    <string>Radi&amp;oButton</string>
    </property>
    <attribute name="buttonGroup">
     <string notr="true">buttonGroup_2</string>
@@ -303,7 +303,7 @@
   <widget class="QCheckBox" name="checkBox_0">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>40</x>
      <y>440</y>
      <width>86</width>
      <height>22</height>
@@ -316,7 +316,7 @@
   <widget class="QCheckBox" name="checkBox_1">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>40</x>
      <y>460</y>
      <width>86</width>
      <height>22</height>
@@ -329,7 +329,7 @@
   <widget class="QCheckBox" name="checkBox_2">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>110</x>
      <y>440</y>
      <width>86</width>
      <height>22</height>
@@ -342,7 +342,7 @@
   <widget class="QCheckBox" name="checkBox_3">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>110</x>
      <y>460</y>
      <width>86</width>
      <height>22</height>
@@ -355,7 +355,7 @@
   <widget class="QCheckBox" name="checkBox_4">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>190</x>
      <y>440</y>
      <width>101</width>
      <height>22</height>
@@ -368,14 +368,40 @@
   <widget class="QCheckBox" name="checkBox_5">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>190</x>
      <y>460</y>
      <width>101</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
+    <string>yrange2</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_6">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>440</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
     <string>read_ahead</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_7">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>460</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>raq</string>
    </property>
   </widget>
   <action name="problem_load_action">
@@ -602,7 +628,7 @@
   <slot>ui_button_playerid_pushed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

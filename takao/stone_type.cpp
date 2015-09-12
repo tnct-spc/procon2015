@@ -15,6 +15,16 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+namespace std
+{
+    ostream& operator << (ostream& os, stone_type::Sides const& sides)
+    {
+        if(sides == stone_type::Sides::Head) os << "Head";
+        else os << "Tail";
+        return os;
+    }
+}
+
 
 stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(_nth)
 {

@@ -1,4 +1,4 @@
-#include "yrange.hpp"
+#include "yrange2.hpp"
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -11,20 +11,19 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem)
+yrange2::yrange2(problem_type _problem)
 {
     pre_problem = _problem;
 }
 
-yrange::~yrange()
+yrange2::~yrange2()
 {
 }
 
-void yrange::run()
+void yrange2::run()
 {
-    return;
-    qDebug("yrange start");
-
+    qDebug("yrange2 start");
+/*
     std::size_t best_score = FIELD_SIZE * FIELD_SIZE;
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
@@ -60,15 +59,20 @@ void yrange::run()
         }
 
     }
-    /*
+    */
+
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        one_try(pre_problem, l, m, rotate);
+        problem_type problem = pre_problem;
+        one_try(problem, l, m, rotate);
+        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+        qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",l,m,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
+        emit answer_ready(problem.field);
     }
-    */
+
 }
 
-void yrange::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
+void yrange2::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
 {
     problem.stones.at(0).rotate(rotate / 2  * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
@@ -81,24 +85,52 @@ void yrange::one_try(problem_type& problem, int y, int x, std::size_t const rota
         //２個目以降
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
         {
+            std::vector<search_type> searchv1;
+            std::vector<search_type> searchv2;
             stone_type& each_stone = problem.stones.at(ishi);
-            search_type next = std::move(search(problem.field,each_stone));
-            if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-            if(pass(next,each_stone) == true) continue;
-            if(next.flip != each_stone.get_side()) each_stone.flip();
-            each_stone.rotate(next.rotate);
-            problem.field.put_stone(each_stone,next.point.y,next.point.x);
+            searchv1 = std::move(search(problem.field,each_stone));
+            //std::cout << searchv1.size() << " ";
+            for(auto& next : searchv1)
+            {
+                if(pass(next,each_stone) == true) continue;
+                std::vector<search_type> temp;
+                temp = std::move(search2(next,problem.stones.at(ishi+1)));
+                std::copy(searchv2.begin(),searchv2.end(),std::back_inserter(temp));
+            }
+            for(auto& one : searchv1) one.island = get_island(one.field.get_raw_data());
+            std::sort(searchv1.begin(),searchv1.end(),[&](search_type const lhs, search_type const rhs)
+            {
+                return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+            });
+            if(searchv1.size() > 10) searchv1.resize(10);
+
+            if(searchv2.size() == 0)
+            {
+                for(auto& one : searchv1)
+                {
+                    if(pass(one,problem.stones.at(ishi)) == true) continue;
+                    else
+                    {
+                        problem.field = one.field;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                std::sort(searchv2.begin(),searchv2.end(),[&](search_type const lhs, search_type const rhs)
+                {
+                    return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+                });
+                problem.field = searchv2.at(0).field;
+            }
+            std::cout << ishi << "th stone putted" << std::endl;
         }
-        /*
-        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
-        answer_send(problem.field);
-        */
     }
 }
 
 //評価関数
-int yrange::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+int yrange2::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
 {
     int const n = stone.get_nth();
     int count = 0;
@@ -121,7 +153,7 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-yrange::search_type yrange::search(field_type& _field, stone_type& stone)
+std::vector<yrange2::search_type> yrange2::search(field_type& _field, stone_type& stone)
 {
     std::vector<search_type> search_vec;
     //おける可能性がある場所すべてにおいてみる
@@ -134,27 +166,57 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
             field_type field = _field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
-            search_vec.push_back({point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j),get_island(field.get_raw_data(),point_type{i,j})});
+            search_vec.push_back(search_type{field,point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j),0});
         }
     }
-    if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,0,0};
     std::sort(search_vec.begin(),search_vec.end(),
                 [](const search_type& lhs, const search_type& rhs)
                 {
                     return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
                 });
-    return std::move(search_vec.at(0));
+    return std::move(search_vec);
 }
 
-int yrange::get_island(field_type::raw_field_type field, point_type const& point)
+//おける場所の中から評価値の高いものを選んで返す
+std::vector<yrange2::search_type> yrange2::search2(search_type& s, stone_type& stone)
+{
+    std::vector<search_type> search_vec;
+    //おける可能性がある場所すべてにおいてみる
+    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
+    {
+        if(rotate % 2 == 0) stone.rotate(90);
+        else stone.flip();
+        if(s.field.is_puttable(stone,i,j) == true)
+        {
+            field_type field = s.field;
+            field.put_stone(stone,i,j);
+            //置けたら接してる辺を数えて配列に挿入
+            search_type one = s;
+            one.score += evaluate(field,stone,i,j);
+            one.island = get_island(one.field.get_raw_data());
+            //search_vec.push_back(search_type{s.field,point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j),get_island(field.get_raw_data(),point_type{i,j})});
+            search_vec.push_back(one);
+        }
+    }
+    /*
+    std::sort(search_vec.begin(),search_vec.end(),
+                [](const search_type& lhs, const search_type& rhs)
+                {
+                    return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+                });
+    */
+    return std::move(search_vec);
+}
+
+int yrange2::get_island(field_type::raw_field_type field)
 {
     int num = -1;
-    int const y_min = (point.y < 1) ? 0 : point.y - 1;
-    int const y_max = (point.y + STONE_SIZE + 1) < FIELD_SIZE ? point.y + STONE_SIZE + 1 : FIELD_SIZE;
-    int const x_min = (point.x < 1) ? 0 : point.x - 1;
-    int const x_max = (point.x + STONE_SIZE + 1) < FIELD_SIZE ? point.x + STONE_SIZE + 1 : FIELD_SIZE;
+    int const y_min = 0;
+    int const y_max = FIELD_SIZE;
+    int const x_min = 0;
+    int const x_max = FIELD_SIZE;
 
-    std::vector<int> result (32,0);
+    std::vector<int> result (FIELD_SIZE * FIELD_SIZE,0);
     std::function<void(int,int,int)> recurision = [&recurision,&field,&y_min,&y_max,&x_min,&x_max](int y, int x, int num) -> void
     {
         field.at(y).at(x) = num;
@@ -175,33 +237,12 @@ int yrange::get_island(field_type::raw_field_type field, point_type const& point
             result.at(field.at(i).at(j) * -1)++;
         }
     }
-    return std::count_if(result.begin(),result.end(),[&](int hs){return hs != 0;});
+    //return std::count_if(result.begin(),result.end(),[&](int hs){return hs != 0;});
+    return std::count_if(result.begin(),result.end(),[&](int hs){return 0 < hs && hs < 4;});
 }
 
-bool yrange::pass(search_type const& search, stone_type const& stone)
+bool yrange2::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
+    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.55) return true;
     else return false;
-}
-
-std::vector<yrange::connect_type> yrange::conect_stone(stone_type& a, stone_type& b)
-{
-    std::vector<connect_type> connectv;
-    field_type _field;
-    _field.put_stone(a,8,8);
-    for(int i = 0; i < 24; ++i) for(int j = 0; j < 24; ++j)
-    {
-        if(_field.is_puttable(b,i,j) == true)
-        {
-            field_type field;
-            field.put_stone(b,i,j);
-            int const score = evaluate(field,b,i,j);
-            if((a.get_side_length() + b.get_side_length()) / 6 < score)
-            {
-                connectv.emplace_back(point_type{i-8,j-8},score,get_island(field.get_raw_data(),point_type{i,j}));
-            }
-        }
-    }
-    std::sort(connectv.begin(),connectv.end(),[](connect_type const& lhs, connect_type const& rhs){return lhs.island < rhs.island;});
-    return std::move(connectv);
 }

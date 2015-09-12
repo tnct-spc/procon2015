@@ -348,7 +348,7 @@ std::string field_type::get_answer() const
         prev_nth = current_nth;
         process_count++;
     }
-    for(unsigned int i = prev_nth; i < provided_stones; i++)result.append("\r\n");
+    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
     return result;
 }
 void field_type::set_random(int const obstacle, int const col, int const row)

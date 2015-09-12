@@ -16,7 +16,11 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/poor_algo.cpp \
     algorithm/yrange.cpp \
     algorithm/sticky_algo.cpp \
-    algorithm/square.cpp
+    algorithm/read_ahead.cpp \
+    algorithm/square.cpp \
+    algorithm/yrange2.cpp \
+    algorithm/raq.cpp
+
 
 HEADERS += tengu.hpp\
         tengu_global.h \
@@ -24,9 +28,10 @@ HEADERS += tengu.hpp\
     algorithm/poor_algo.hpp \
     algorithm/yrange.hpp \
     algorithm/sticky_algo.hpp \
-    algorithm/square.hpp
-    algorithm/sticky_algo.hpp
-    algorithm/square.hpp
+    algorithm/read_ahead.hpp \
+    algorithm/square.hpp \
+    algorithm/yrange2.hpp \
+    algorithm/raq.hpp
 
 LIBS += -lQt5Concurrent
 
