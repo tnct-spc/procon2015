@@ -29,6 +29,10 @@ size_t field_type::get_score()
     }
     return sum;
 }
+size_t field_type::empty_zk(){
+    return get_score();
+}
+
 size_t field_type::get_block_num(){
     return (FIELD_SIZE * FIELD_SIZE) - get_score();
 }
@@ -50,19 +54,14 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     for(int i=0;i<8;i++){
         //upper
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-        //bit_sides_field[16+y+i+1] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //under
         bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-        //bit_sides_field[16+y+i-1] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //left
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1-1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //right
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
         //add stone
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
-        //bit_sides_field[16+y+i] |= bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][i];
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -322,12 +321,6 @@ field_type::raw_field_type const & field_type::get_raw_data() const
 {
     return raw_data;
 }
-
-field_type::raw_field_type& field_type::set_raw_data()
-{
-    return raw_data;
-}
-
 void field_type::print_field()
 {
     for(auto const&each_raw : raw_data)
@@ -393,15 +386,6 @@ void field_type::set_random(int const obstacle, int const col, int const row)
                 return;
         }
     }
-}
-
-int field_type::empty_zk()
-{
-    int sum = 0;
-    for(auto const& each_row : raw_data)
-        sum += std::count(each_row.begin(),each_row.end(),0);
-
-    return sum;
 }
 
 /* 1 new line at end of output */
