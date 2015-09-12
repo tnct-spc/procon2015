@@ -16,12 +16,6 @@
 #include <iostream>
 #include <sstream>
 
-// one 石
-bool operator== (stone_type const& lhs, stone_type const& rhs)
-{
-    return lhs.get_raw_data() == rhs.get_raw_data();
-}
-
 stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(_nth)
 {
     auto rows = _split(raw_stone_text, "\r\n");
@@ -46,71 +40,6 @@ stone_type::stone_type(int const zk)
     _set_random(zk);
 }
 
-//生配列へのアクセサ
-//座標を受け取ってそこの値を返す
-int const & stone_type::at(size_t y,size_t x) const
-{
-    return get_raw_data().at(y).at(x);
-}
-
-int stone_type::at(size_t y,size_t x)
-{
-    return get_raw_data().at(y).at(x);
-}
-
-//石へのアクセサ
-//生配列への参照を返す
-stone_type::raw_stone_type const& stone_type::get_raw_data() const
-{
-    return raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90);
-}
-
-//時計回りを正方向として指定された角度だけ回転する
-// 自身への参照を返す
-stone_type& stone_type::rotate(int angle)
-{
-    current_angle = (current_angle + angle) % 360;
-    return *this;
-}
-stone_type& stone_type::set_angle(int angle){
-    current_angle = angle;
-    return *this;
-}
-
-//左右に反転する
-//自身への参照を返す
-stone_type& stone_type::flip()
-{
-    current_side = current_side == Sides::Head ? Sides::Tail : Sides::Head;
-    return *this;
-}
-stone_type& stone_type::set_side(stone_type::Sides side){
-    current_side = side;
-    return *this;
-}
-
-//面積を返す
-size_t stone_type::get_area() const
-{
-    size_t sum = 0;
-    for(auto const& each_raw_data:get_raw_data())
-    {
-        sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
-    }
-    return sum;
-}
-
-//現在の表裏を返す
-stone_type::Sides stone_type::get_side() const
-{
-    return current_side;
-}
-
-//現在の角度を返す
-std::size_t stone_type::get_angle() const
-{
-    return current_angle;
-}
 
 //時計回りを正方向として指定された角度だけ回転する
 stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, int angle)
@@ -180,55 +109,6 @@ corner_type stone_type::get_corner()
     return corner_type{0,point_type{0,0}};
 }
 
-//n列目のブロック数を返す
-int stone_type::count_n_row(int const n)const
-{
-    int const current_data = static_cast<unsigned>(current_side)*4 + current_angle / 90;
-    return std::count(raw_data_set.at(current_data).at(n).begin(),raw_data_set.at(current_data).at(n).end(),1);
-}
-
-//n行目のブロック数を返す
-int stone_type::count_n_col(int const n)const
-{
-    int const current_data = static_cast<unsigned>(current_side)*4 + current_angle / 90;
-    int sum = 0;
-    for(int i = 0;i < STONE_SIZE; ++i) sum += raw_data_set.at(current_data).at(i).at(n);
-    return sum;
-}
-
-
-//左右に反転する
-stone_type::raw_stone_type stone_type::_flip(raw_stone_type stone)
-{
-    for(auto& each_stone:stone)
-        std::reverse(each_stone.begin(),each_stone.end());
-    return stone;
-}
-
-int stone_type::get_nth()const
-{
-    return nth;
-}
-
-int stone_type::get_side_length()const
-{
-    int sum = 0;
-    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
-    {
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))sum++;
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))sum++;
-    }
-    return sum;
-}
-uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
-{
-    //return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
-    return bit_plain_stones[x+1][flip][rotate][y];
-}
-
-const stone_type::bit_stones_type &stone_type::get_raw_bit_plain_stones() const{
-    return bit_plain_stones;
-}
 //#BitSystem
 //bitデータの作成
 void stone_type::make_bit()
@@ -314,21 +194,6 @@ std::string stone_type::str()
     return std::move(ss.str());
 }
 
-/* returns if (y, x) is in stone (valid range) */
-bool inline stone_type::_is_in_stone(int p)
-{
-    return 0 <= p && p < STONE_SIZE;
-}
-
-bool inline stone_type::_is_in_stone(int y, int x)
-{
-    return _is_in_stone(x) && _is_in_stone(y);
-}
-
-bool inline stone_type::_is_in_stone(point_type p)
-{
-    return _is_in_stone(p.y, p.x);
-}
 
 /* returns if stone has any hole */
 bool stone_type::_has_hole(raw_stone_type stone)
