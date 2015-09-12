@@ -14,57 +14,29 @@ sticky_algo::~sticky_algo(){
 
 }
 
-int sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, int pos_x){
-    int score = 0;
+double sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, int pos_x){
+    double score = 0;
     //int neighbors = 0;
     if(!field.is_puttable(stone,pos_y,pos_x))return -1;
-    for(int i = 0; i < 8;i ++)for(int j = 0; j < 8 ; j ++){
-        int neighbors = 0;
-        if(stone.get_raw_data().at(i).at(j) == 1){
-            if(pos_y + i + 1 < 32 && field.get_raw_data().at(pos_y + i + 1).at(pos_x + j))neighbors ++;
-            if(pos_y + i - 1 >= 0 && field.get_raw_data().at(pos_y + i - 1).at(pos_x + j))neighbors ++;
-            if(pos_x + j + 1 < 32 && field.get_raw_data().at(pos_y + i).at(pos_x + j + 1))neighbors ++;
-            if(pos_x + j - 1 >= 0 && field.get_raw_data().at(pos_y + i).at(pos_x + j - 1))neighbors ++;
-        }
-        /*
-        int tmp = 0;
-        switch (neighbors){
-            case 1:
-                tmp = 1;
-                break;
-            case 2:
-                tmp = 3;
-                break;
-            case 3:
-                tmp = 4;
-                break;
-            case 4:
-                tmp = 16;
-                break;
-
-        }
-        */
-        //score += tmp;
-
-        score += neighbors;
-    }
-    //score += neighbors /* neighbors */;
+    field.put_stone(stone,pos_y,pos_x);
+    score = field.evaluate_normalized_complexity();
+    field.remove_just_before_stone(stone);
     return score;
 }
 std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width){
     for(auto _eval_field : pattern){
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle < 4;angle++,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
-            int score = eval(_eval_field.field,stone,dy,dx);
+            double score = eval(_eval_field.field,stone,dy,dx);
             if(score >= 0){
                 if(result_stone.size() < search_width){
-                    result_stone.push_back(putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score + _eval_field.score});
+                    result_stone.push_back(putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score});
                 }else{
-                    auto min_result = std::min_element(result_stone.begin(),result_stone.end(),
+                    auto max_result = std::max_element(result_stone.begin(),result_stone.end(),
                                                                          [](auto const &t1, auto const &t2) {
                                                                                  return t1.score < t2.score;
                     });
-                    if(min_result->score < (score + _eval_field.score)){
-                        *min_result = putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score + _eval_field.score};
+                    if(max_result->score > score){
+                        *max_result = putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score};
                     }
                 }
             }
@@ -97,7 +69,7 @@ void sticky_algo::run(){
     std::vector<evalated_field> pattern;
     pattern.push_back({problem.field,0});
     for(auto& _stone : problem.stones){
-        pattern = eval_pattern(std::move(_stone),std::move(pattern),20);
+        pattern = eval_pattern(std::move(_stone),std::move(pattern),50);
         qDebug() << count--;
     }
     int64_t time = et.elapsed();

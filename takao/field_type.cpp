@@ -1,5 +1,5 @@
 //#define _DEBUGMODE
-#define _DEBUG
+//#define _DEBUG
 #if defined(_DEBUG) || defined(_DEBUGMODE)
 #include <QDebug>
 #include <iostream>
