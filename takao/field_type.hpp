@@ -51,7 +51,7 @@ public:
 
     //現在の状態における得点を返す
     size_t get_score();
-
+    size_t get_block_num();
     //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(stone_type const& stone, int y, int x);
 
@@ -86,7 +86,7 @@ public:
     std::string str();
 
     void print_field();
-    //double evaluate_normalized_complexity();
+    double evaluate_normalized_complexity();
 
 private:
     raw_field_type raw_data;

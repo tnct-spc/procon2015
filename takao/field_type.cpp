@@ -1,4 +1,5 @@
 //#define _DEBUGMODE
+#define _DEBUG
 #if defined(_DEBUG) || defined(_DEBUGMODE)
 #include <QDebug>
 #include <iostream>
@@ -27,6 +28,9 @@ size_t field_type::get_score()
         sum += std::count(row.begin(), row.end(), 0);
     }
     return sum;
+}
+size_t field_type::get_block_num(){
+    return (FIELD_SIZE * FIELD_SIZE) - get_score();
 }
 
 //石を置く  自身への参照を返す   失敗したら例外を出す
@@ -442,4 +446,14 @@ void field_type::make_bit()
         std::cout<<std::endl;
     }
 #endif
+}
+double field_type::evaluate_normalized_complexity(){
+    uint64_t side = 0;
+    for(int i = 1; i < 63; i ++){
+        side += _mm_popcnt_u64((bit_plain_field[i] << 1)^(bit_plain_field[i]));
+        side += _mm_popcnt_u64((bit_plain_field[i] >> 1)^(bit_plain_field[i]));
+        side += _mm_popcnt_u64((bit_plain_field[i+1])^   (bit_plain_field[i]));
+        side += _mm_popcnt_u64((bit_plain_field[i-1])^   (bit_plain_field[i]));
+    }
+    return (double)(side * side) / (double)get_block_num();
 }
