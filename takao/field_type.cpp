@@ -29,6 +29,7 @@ size_t field_type::get_score()
     }
     return sum;
 }
+
 size_t field_type::empty_zk(){
     return get_score();
 }
@@ -45,23 +46,22 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
 #endif
     //置く
-    //#bit_system
-    //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+    //get_bit_plain_stonesはxが+1されているのでbit_plain_stones(ナマの配列そのまま)を使う場合は+1し忘れないこと
     //std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();
     for(int i=0;i<64;i++){
         bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
     }
     for(int i=0;i<8;i++){
         //upper
-        bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
         //under
-        bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
         //left
-        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
         //right
-        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
         //add stone
-        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
     }
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -74,22 +74,22 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
-    //processes.emplace_back(stone, point_type{y, x});
-    processes.push_back({stone,point_type{y,x}});
+    processes.emplace_back(stone, point_type{y, x});
     return *this;
 }
 
 //指定された場所に指定された石が置けるかどうかを返す
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-    //vectorのgetterで値をとるよりvector全体を参照で受け取って[]でアクセスしたほうが1.3倍位早い
 #ifdef _DEBUGMODE
     if(is_placed(stone)==true) return false;
 #endif
     int avx_cllis = 0;
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+    //_mm256_testz_si256  256bitのandで1つでも1があれば1,なければ0
+    //_mm256_loadu_si256  アラインメントが揃っていないデータを読み込む
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
-    //avx
+
     __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
     __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_plain_field[16+y+0]);
 
@@ -99,13 +99,11 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_plain_field[16+y+4]);
 
     avx_cllis |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
-    if(avx_cllis) return false;
 
+    if(avx_cllis) return false;
     if(processes.size() == 0) return true;//始めの石なら繋がりは必要ない
 
-    //collision = 0;
-    //この行まで来るということは必ずcollision=0
-    //上ですでにbit_plain_stonesの[4]~[7]が読んであるので再利用
+    //上ですでにbit_plain_stonesの[4]~[7]は読んであるので再利用
     avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field[16+y+4]);
 
     avx_cllis = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
@@ -243,7 +241,6 @@ bool field_type::is_removable(stone_type const& stone)
      return result;
  }
 
-//コメント書こう
  placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
 {
     auto nth = raw_data.at(y).at(x);
@@ -266,7 +263,6 @@ bool field_type::is_removable(stone_type const& stone)
     return placed_stone_type(*stone, pf, ps);
 }
 
- //コメント書こう
 field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
 {
     provided_stones = stone_nth;
@@ -321,6 +317,7 @@ field_type::raw_field_type const & field_type::get_raw_data() const
 {
     return raw_data;
 }
+
 void field_type::print_field()
 {
     for(auto const&each_raw : raw_data)
@@ -431,7 +428,8 @@ void field_type::make_bit()
     }
 #endif
 }
-double field_type::evaluate_normalized_complexity(){
+double field_type::evaluate_normalized_complexity()
+{
     uint64_t side = 0;
     for(int i = 1; i < 63; i ++){
         side += _mm_popcnt_u64((bit_plain_field[i] << 1)^(bit_plain_field[i]));
@@ -439,5 +437,5 @@ double field_type::evaluate_normalized_complexity(){
         side += _mm_popcnt_u64((bit_plain_field[i+1])^   (bit_plain_field[i]));
         side += _mm_popcnt_u64((bit_plain_field[i-1])^   (bit_plain_field[i]));
     }
-    return (double)(side * side) / (double)get_block_num();
+    return static_cast<double>(side * side) / static_cast<double>(get_block_num());
 }
