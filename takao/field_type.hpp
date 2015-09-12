@@ -86,6 +86,7 @@ public:
     std::string str();
 
     void print_field();
+    //double evaluate_normalized_complexity();
 
 private:
     raw_field_type raw_data;
