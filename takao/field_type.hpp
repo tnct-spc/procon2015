@@ -54,9 +54,14 @@ class field_type
         //石を置く  自身への参照を返す   失敗したら例外を出す
         field_type& put_stone(const stone_type stone, int y, int x);
 
+        //石を置く  自身への参照を返す   失敗したら例外を出す
+        field_type& put_stone_force(const stone_type stone, int y, int x);
+
         //指定された場所に指定された石が置けるかどうかを返す
         bool is_puttable(stone_type const& stone, int y, int x);
 
+        //指定された場所に指定された石が置けるかどうかを返す ルール上の繋がりを考慮しない
+        bool is_puttable_force(stone_type const& stone, int y, int x) const;
 
         //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
         field_type& remove_stone(stone_type const& stone);
@@ -89,7 +94,7 @@ class field_type
         };
 
         //石が置かれているか否かを返す
-        bool is_placed(stone_type const& stone);
+        bool is_placed(stone_type const& stone) const;
 };
 
 #endif // FIELD_TYPE

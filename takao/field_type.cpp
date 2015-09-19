@@ -5,7 +5,7 @@
 #include "field_type.hpp"
 #include "utils.hpp"
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
-bool field_type::is_placed(stone_type const& stone)
+bool field_type::is_placed(stone_type const& stone) const
 {
     return std::find_if(processes.begin(), processes.end(),
                         [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }
@@ -28,6 +28,28 @@ field_type& field_type::put_stone(stone_type const stone, int y, int x)
 {
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
+    //置く
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
+    {
+        if(stone.at(i,j) == 0)//石がないならどうでもいい
+        {
+            continue;
+        }
+        else
+        {
+            raw_data.at(i+y).at(j+x) = stone.get_nth();
+        }
+    }
+    //processes.emplace_back(stone, point_type{y, x});
+    processes.push_back({stone,point_type{y,x}});
+    return *this;
+}
+
+//石を置く  自身への参照を返す   失敗したら例外を出す
+field_type& field_type::put_stone_force(stone_type const stone, int y, int x)
+{
+    //さきに置けるか確かめる
+    if(is_puttable_force(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
     //置く
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
@@ -89,6 +111,37 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
 
     return is_connection;
 }
+
+//指定された場所に指定された石が置けるかどうかを返す ルール上の繋がりを考慮しない
+bool field_type::is_puttable_force(stone_type const& stone, int y, int x) const
+{
+    if(is_placed(stone)==true) return false;
+    //std::cout << "is_puttable start" << std::endl;
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
+    {
+        //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
+        if(stone.at(i,j) == 0)//置かないならどうでも良い
+        {
+            //std::cout <<  "==0" << std::endl;
+            continue;
+        }
+        else if(y+i < 0 || x+j < 0 || y+i > 31 || x+j > 31)//敷地外に石を置こうとした
+        {
+            //std::cout << "x = " << x << " y = " << y << " i = " << i << " j = " << j << std::endl;
+            //std::cout << "You tried to put the stone out of range" << std::endl;
+            return false;
+        }
+        else if(raw_data.at(y+i).at(j+x) != 0)//石または障害物の上へ石を置こうとした
+        {
+            //std::cout << "You try to put the stone on another stone." << std::endl;
+            return false;
+        }
+    }
+    //if(is_connection == false) std::cerr << "This stone cannot put here becase there is not connection." << std::endl;
+    //else std::cerr << "This stone can put here." << std::endl;
+    return true;
+}
+
 
 //指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
 field_type& field_type::remove_stone(stone_type const& stone)
