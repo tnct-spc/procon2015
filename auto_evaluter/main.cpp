@@ -1,10 +1,11 @@
 #include <QCoreApplication>
 #include <algorithm_evaluater.hpp>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     algorithm_evaluater eval;
-    auto q_vec = eval.load_problem_fires();
-    eval.evaluate(q_vec.at(0));
+    QTimer::singleShot(0,&eval,SLOT(run()));
+    return a.exec();
 }

@@ -14,6 +14,7 @@ class problem_maker : public QObject
     Q_OBJECT
 public:
     problem_maker(int argc, char **argv);
+    problem_maker();
 public slots:
     void run();
 private:

@@ -26,28 +26,77 @@ std::vector<problem_type> algorithm_evaluater::load_problem_fires(){
      }
      return problem_vector;
 }
-void algorithm_evaluater::save_answer(field_type answer){
-    QStringList::iterator f_itr;
-    for (f_itr = filelist.begin(); f_itr != filelist.end(); ++f_itr){
-        QFile file(QString().append(*f_itr).append("answer.txt"));
+std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::string problem_name){
+    int rows, cols;
+    int obstacles;
+    int min_zk, max_zk; // per stone
+    std::random_device seed_gen;
+    std::default_random_engine engine(seed_gen());
+
+    std::uniform_int_distribution<int> dist_size(1, FIELD_SIZE);
+    std::uniform_int_distribution<int> dist_obs(0, std::min(50, rows * cols));
+    rows = dist_size(engine);
+    cols = dist_size(engine);
+    obstacles = dist_obs(engine);
+    min_zk = 1;
+    max_zk = 16;
+
+    field_type field;
+    field.set_random(obstacles, cols, rows);
+    std::vector<stone_type> stones;
+    int const minimum_zk = field.empty_zk();
+    std::cout << "empty blocks: " << minimum_zk << std::endl;
+    for(int total_zk = 0; total_zk < minimum_zk; ) {
+        std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
+        int const zk = dist_zk(engine);
+        stone_type stone(zk);
+        total_zk += stone.get_area();
+        stones.push_back(stone);
+    }
+    field.set_provided_stones(stones.size());
+    problem_type problem(field, stones);
+    return std::make_tuple(problem_name,problem);
+}
+
+void algorithm_evaluater::save_answer(std::vector<std::tuple<std::string,field_type>> named_answers){
+    for(auto named_answer : named_answers){
+        QFile file(QString(std::get<0>(named_answer).c_str()).append("ans.txt"));
         if(!file.open(QIODevice::WriteOnly))return;
         QTextStream out(&file);
-        out << answer.get_answer().c_str();
+        out << std::get<1>(named_answer).get_answer().c_str();
     }
     return;
 }
-void algorithm_evaluater::evaluate(problem_type problem){
+std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
+    std::vector<field_type> ans_vector;
     auto algo = new simple_algorithm(problem);
     algo->setParent(this);
     connect(algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
-    connect(algo,&algorithm_type::answer_ready,this,&algorithm_evaluater::get_answer);
+    connect(algo,&algorithm_type::answer_ready,[&](field_type ans){
+        mtx.lock();
+        ans_vector.push_back(ans);
+        mtx.unlock();
+    });
     algo->start();
     eventloop.exec();
+    return ans_vector;
 }
+void algorithm_evaluater::run(){
+    std::vector<std::tuple<std::string,field_type>> named_answers;
+    for(int prob_num = 0; prob_num < loop_num;prob_num++){
+        auto named_problem = make_problem(std::to_string(prob_num));
+        auto answers = evaluate(std::get<1>(named_problem));
+        for(int ans_num = 0; ans_num < answers.size();ans_num++){
+            named_answers.push_back(std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num)));
+        }
+    }
+    save_answer(named_answers);
+    QCoreApplication::exit(0);
+}
+
 void algorithm_evaluater::save_record(){
 
 }
 void algorithm_evaluater::get_answer(field_type ans){
-    save_answer(ans);
 }
