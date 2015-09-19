@@ -24,7 +24,7 @@ yrange::~yrange()
 void yrange::run()
 {
     qDebug("yrange start");
-/*
+    std::size_t best_score = FIELD_SIZE *  FIELD_SIZE;
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m)
@@ -45,21 +45,29 @@ void yrange::run()
         for(auto& each_data : data)
         {
             auto& problem = std::get<0>(each_data);
-            if(problem.field.list_of_stones().size() == 0) continue;
-            answer_send(problem.field);
-            print_text((boost::format("score = %d")%problem.field.get_score()).str());
+            if(problem.field.get_score() < best_score)
+            {
+                answer_send(problem.field);
+                print_text((boost::format("score = %d")%problem.field.get_score()).str());
+                best_score = problem.field.get_score();
+            }
         }
     }
-*/
 
+/*
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
+        problem_type problem = pre_problem;
         //if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
-        one_try(pre_problem, l, m, rotate);
+        one_try(problem, l, m, rotate);
+        answer_send(problem.field);
+        print_text((boost::format("score = %d")%problem.field.get_score()).str());
+
     }
+*/
 }
 
-std::size_t yrange::one_try(problem_type problem, int y, int x, std::size_t const rotate)
+std::size_t yrange::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
 {
     problem.stones.at(0).rotate(rotate / 2  * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
@@ -80,8 +88,6 @@ std::size_t yrange::one_try(problem_type problem, int y, int x, std::size_t cons
         problem.field.put_stone(each_stone,next.point.y,next.point.x);
     }
 
-    answer_send(problem.field);
-    print_text((boost::format("score = %d")%problem.field.get_score()).str());
     std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
     qDebug("emit starting by %2d,%2d %2lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(),problem.field.get_score());
     return problem.field.get_score();
