@@ -10,7 +10,7 @@
 #include <array>
 #include <functional>
 #include <iostream>
-#include <sstream>
+//#include <sstream>
 
 int constexpr STONE_SIZE = 8;
 struct corner_type
