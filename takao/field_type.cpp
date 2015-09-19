@@ -377,17 +377,23 @@ void field_type::set_random(int const obstacle, int const col, int const row)
     }
 }
 
-/* 1 new line at end of output */
+//        sum += std::count(each_row.begin(), each_row.end(),0);
+/* 1 new line at the end of the output */
 std::string field_type::str()
 {
     std::ostringstream ss;
     for(auto row : raw_data) {
         for(auto block : row) {
-            ss << block;
+            ss << (block != 0);
         }
         ss << "\r\n";
     }
     return std::move(ss.str());
+}
+
+void field_type::set_provided_stones(size_t ps)
+{
+    provided_stones = ps;
 }
 //#BitSystem
 //bitデータの作成

@@ -61,10 +61,10 @@ public:
     //field_type& remove_stone(stone_type const& stone);//指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
     //bool is_removable(stone_type const& stone);//指定された石を取り除けるかどうかを返す
     */
-
     //謎
     void set_random(int const obstacle, int const col, int const row);
     std::string str();
+    void set_provided_stones(size_t ps);
     void print_field();
 
 private:
