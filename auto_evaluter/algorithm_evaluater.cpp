@@ -1,7 +1,9 @@
 #include "algorithm_evaluater.hpp"
+#include <tengu.hpp>
 algorithm_evaluater::algorithm_evaluater(QObject *parent) :
     QObject(parent)
 {
+    qRegisterMetaType<field_type>();
 }
 std::vector<problem_type> algorithm_evaluater::load_problem_fires(){
     std::vector<problem_type> problem_vector;
@@ -34,10 +36,18 @@ void algorithm_evaluater::save_answer(field_type answer){
     }
     return;
 }
-field_type algorithm_evaluater::evaluate(problem_type problem){
-    _algorithm = new simple_algorithm(problem);
-    return problem.field;
+void algorithm_evaluater::evaluate(problem_type problem){
+    QEventLoop eventloop;
+    auto algo = new simple_algorithm(problem);
+    algo->setParent(this);
+    connect(algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
+    connect(algo,&algorithm_type::answer_ready,this,&algorithm_evaluater::get_answer);
+    algo->start();
+    eventloop.exec();
 }
 void algorithm_evaluater::save_record(){
 
+}
+void algorithm_evaluater::get_answer(field_type ans){
+    save_answer(ans);
 }

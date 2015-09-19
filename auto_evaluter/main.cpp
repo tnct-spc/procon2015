@@ -3,7 +3,8 @@
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
     algorithm_evaluater eval;
-    eval.load_problem_fires();
-    return 0;
+    auto q_vec = eval.load_problem_fires();
+    eval.evaluate(q_vec.at(0));
 }
