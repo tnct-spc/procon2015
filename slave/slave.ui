@@ -391,19 +391,6 @@
     <string>read_ahead</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_7">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>460</y>
-     <width>101</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>raq</string>
-   </property>
-  </widget>
   <action name="problem_load_action">
    <property name="text">
     <string>問題読み込み</string>

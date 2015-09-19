@@ -33,10 +33,10 @@ size_t field_type::get_score()
 //石を置く  自身への参照を返す   失敗したら例外を出す
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
-#ifdef _DEBUGMODE
+//#ifdef _DEBUGMODE
     //さきに置けるか確かめる
     if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
-#endif
+//#endif
     //置く
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stones(ナマの配列そのまま)を使う場合は+1し忘れないこと
     //std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();

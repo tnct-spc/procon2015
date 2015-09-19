@@ -151,6 +151,17 @@ void stone_type::make_bit()
     for(int i = 5; i < 8; i++)
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }
+
+void stone_type::print_stone()
+{
+    for(auto const& each : raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90))
+    {
+        for(auto const& block : each) std::cout << block << " ";
+        std::cout << std::endl;
+    }
+
+}
+
 void stone_type::_set_random(int const zk)
 {
     raw_stone_type candidate;
