@@ -54,7 +54,8 @@ void yrange::run()
 
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
-        if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
+        //if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
+        one_try(pre_problem, l, m, rotate);
     }
 }
 

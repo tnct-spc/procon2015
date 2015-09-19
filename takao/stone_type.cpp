@@ -43,6 +43,21 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
     }
 
     make_bit();
+
+    //side_length
+    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
+    {
+         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))side_length++;
+         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))side_length++;
+    }
+
+    //area
+    for(auto const& each_raw_data:get_raw_data())
+    {
+        area += std::count(each_raw_data.begin(),each_raw_data.end(),1);
+    }
+
+
 }
 
 stone_type::stone_type(int const zk)

@@ -57,7 +57,9 @@ public:
     void print_stone();
 
 private:
-    int  nth;
+    int nth;
+    std::size_t side_length = 0;
+    std::size_t area;
     std::array<raw_stone_type,STONE_SIZE>  raw_data_set;
     Sides current_side = Sides::Head;
     std::size_t current_angle = 0;
@@ -132,12 +134,7 @@ inline stone_type& stone_type::set_side(stone_type::Sides side){
 //面積を返す
 inline size_t stone_type::get_area() const
 {
-    size_t sum = 0;
-    for(auto const& each_raw_data:get_raw_data())
-    {
-        sum += std::count(each_raw_data.begin(),each_raw_data.end(),1);
-    }
-    return sum;
+    return area;
 }
 
 //現在の表裏を返す
@@ -182,16 +179,11 @@ inline int stone_type::get_nth()const
     return nth;
 }
 
-inline int stone_type::get_side_length()const
+inline int stone_type::get_side_length() const
 {
-    int sum = 0;
-    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
-    {
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))sum++;
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))sum++;
-    }
-    return sum;
+    return side_length;
 }
+
 inline uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
 {
     //return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
