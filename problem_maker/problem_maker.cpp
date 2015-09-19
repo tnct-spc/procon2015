@@ -1,14 +1,9 @@
 #include "problem_maker.hpp"
 #include <boost/program_options.hpp>
-#include <field_type.hpp>
-#include <stone_type.hpp>
-#include <problem_type.hpp>
-#include <array>
+#include <QCoreApplication>
 #include <random>
 #include <iostream>
-#include <fstream>
 #include <limits>
-#include <QCoreApplication>
 
 problem_maker::problem_maker(int argc, char **argv)
 {
@@ -48,7 +43,7 @@ problem_maker::problem_maker(int argc, char **argv)
      std::cout << "problems: " << problems << std::endl;
 
      // set rows
-     if(vm.count("rows")) {
+     if (vm.count("rows")) {
          rows = vm["rows"].as<int>();
      } else {
          std::uniform_int_distribution<int> dist(1, FIELD_SIZE);
@@ -57,8 +52,8 @@ problem_maker::problem_maker(int argc, char **argv)
      std::cout << "rows: " << rows << std::endl;
 
      //set cols
-     if(vm.count("cols")) {
-         cols = vm["col"].as<int>();
+     if (vm.count("cols")) {
+         cols = vm["cols"].as<int>();
      } else {
          std::uniform_int_distribution<int> dist(1, FIELD_SIZE);
          cols = dist(engine);
@@ -66,7 +61,7 @@ problem_maker::problem_maker(int argc, char **argv)
      std::cout << "cols: " << cols << std::endl;
 
      // set obstacles
-     if(vm.count("obstacles")) {
+     if (vm.count("obstacles")) {
          obstacles = vm["obstacles"].as<int>();
      } else {
          // 1023?
@@ -81,41 +76,7 @@ problem_maker::problem_maker(int argc, char **argv)
 
      // set create_answer
      create_answer = vm.count("with-answer");
-}
 
-void problem_maker::run()
-{
-    if(error)
-        QCoreApplication::exit(-1);
-
-    std::random_device seed_gen;
-    std::default_random_engine engine(seed_gen());
-
-    for(int i = 1; i <= problems; ++i) {
-        field_type field;
-        field.set_random(obstacles, cols, rows);
-        std::vector<stone_type> stones;
-        int const minimum_zk = field.empty_zk();
-        std::cout << "empty blocks: " << minimum_zk << std::endl;
-        for(int total_zk = 0; total_zk < minimum_zk; ) {
-            std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
-            int const stone_zk = dist_zk(engine);
-            stone_type stone(stone_zk);
-            total_zk += stone.get_area();
-            stones.push_back(stone);
-        }
-        problem_type problem(field, stones);
-        if(create_answer) {
-            std::cerr << "not implemented yet" << std::endl;
-        } else {
-            std::string const filename = "quest" + std::to_string(i) + ".txt";
-            std::ofstream ofs(filename);
-            if(ofs.fail()) {
-                std::cerr << "failed to open " << filename << std::endl;
-                QCoreApplication::exit(-1);
-            }
-            ofs << problem.str();
-        }
-    }
-    QCoreApplication::exit(0);
+     // set ansfilename
+     ansfilename = vm["ansfile"].as<std::string>();
 }

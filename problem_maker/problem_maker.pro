@@ -17,7 +17,8 @@ TEMPLATE = app
 LIBS += -lboost_system -lboost_program_options
 
 SOURCES += main.cpp \
-    problem_maker.cpp
+    problem_maker.cpp \
+    problem_maker_run.cpp
 
 HEADERS += \
     problem_maker.hpp
@@ -28,4 +29,6 @@ LIBS += -L$$OUT_PWD/../takao/ -ltakao
 LIBS += -L$$OUT_PWD/../tengu/ -ltengu
 
 INCLUDEPATH += $$PWD/../takao
+INCLUDEPATH += $$PWD/../tengu
 DEPENDPATH += $$PWD/../takao
+DEPENDPATH += $$PWD/../tengu

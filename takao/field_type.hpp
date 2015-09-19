@@ -78,8 +78,8 @@ public:
 
     void set_random(int const obstacle, int const col, int const row);
     int empty_zk();
-
     std::string str();
+    void set_provided_stones(size_t ps);
 
     void print_field();
 
