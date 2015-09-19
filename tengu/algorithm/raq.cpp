@@ -43,7 +43,7 @@ void raq::run()
     }
 }
 
-void raq::one_step(field_type& _field, int ishi,std::vector<search_type>& sv)
+void raq::one_step(field_type& _field, std::size_t ishi,std::vector<search_type>& sv)
 {
     if(ishi == pre_problem.stones.size())
     {
@@ -62,7 +62,7 @@ void raq::one_step(field_type& _field, int ishi,std::vector<search_type>& sv)
             field_type field = _field;
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
-            if(pass(evaluate(field,ishi,i,j),stone) == true) continue;
+            if(pass(field, pre_problem.stones,evaluate(field,ishi,i,j),ishi) == true) continue;
             sv.push_back({field,evaluate(field,ishi,i,j)});
         }
     }
@@ -116,11 +116,15 @@ void raq::steps(std::vector<raq::search_type> result)
 }
 
 //評価関数
-int raq::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+int raq::evaluate(field_type& _field, stone_type stone,int const y, int const x)const
 {
+    field_type field = _field;
     int const n = stone.get_nth();
-    int count = 0;
-    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
+    int score = 0; // 接している辺
+    int complexity = field.evaluate_normalized_complexity(); //場の複雑さ
+    field.put_stone(stone,y,x);
+
+    for(int k = (y < 2) ? 0 : y - 1 ;k < y + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (x < 2) ? 0 : x - 1; l < x + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
         int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
         int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
@@ -128,38 +132,16 @@ int raq::evaluate(field_type const& field, stone_type stone,int const i, int con
 
         if(field.get_raw_data().at(k).at(l) == n)
         {
-            count += (kl1 + k1l);
-            if(k == 0 || k == FIELD_SIZE - 1) count++;
-            if(l == 0 || l == FIELD_SIZE - 1) count++;
+            score += (kl1 + k1l);
+            if(k == 0 || k == FIELD_SIZE - 1) score++;
+            if(l == 0 || l == FIELD_SIZE - 1) score++;
         }
-        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
-        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
+        if(field.get_raw_data().at(k).at(l+1) == n) score += kl;
+        if(field.get_raw_data().at(k+1).at(l) == n) score += kl;
     }
-    return count;
+
+    return complexity - score;
 }
-
-//評価関数
-int raq::evaluate(field_type const& field, int const n,int const i, int const j)const
-{
-    int count = 0;
-    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
-    {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
-
-        if(field.get_raw_data().at(k).at(l) == n)
-        {
-            count += (kl1 + k1l);
-            if(k == 0 || k == FIELD_SIZE - 1) count++;
-            if(l == 0 || l == FIELD_SIZE - 1) count++;
-        }
-        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
-        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
-    }
-    return count;
-}
-
 
 int raq::get_island(field_type::raw_field_type field)
 {
@@ -193,15 +175,10 @@ int raq::get_island(field_type::raw_field_type field)
     return std::count_if(result.begin(),result.end(),[&](int hs){return hs != 0;});
 }
 
-bool raq::pass(search_type const& search, stone_type const& stone)
+bool raq::pass(field_type& field, std::vector<stone_type> const& stones,double score, int stone_num)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
-    else return false;
+    int sum = 0;
+    for(std::size_t i = stone_num; i < stones.size(); ++i) sum += stones.at(stone_num).get_area();
+    int remnant = field.get_score() - sum;
+    return (static_cast<double>(score) / static_cast<double>(stones.at(stone_num).get_side_length())) + remnant / FIELD_SIZE * FIELD_SIZE < 0.55;
 }
-
-bool raq::pass(double score, stone_type const& stone)
-{
-    if((score / static_cast<double>(stone.get_side_length())) < 0.5) return true;
-    else return false;
-}
-

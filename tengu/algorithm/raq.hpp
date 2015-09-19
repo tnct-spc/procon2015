@@ -20,17 +20,15 @@ private:
     };
 
     problem_type pre_problem;
-    void one_step(field_type& _field, int ishi,std::vector<search_type>& sv);
+    void one_step(field_type& _field, std::size_t ishi, std::vector<search_type>& sv);
     void steps(std::vector<raq::search_type> result);
 
 
 
-    int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
-    int evaluate(field_type const& field, int const n,int const i, int const j)const;
+    int evaluate(field_type& field, stone_type stone, int const y, int const x)const;
     search_type search(field_type& _field, stone_type& stone);
     int get_island(field_type::raw_field_type field);
-    bool pass(search_type const& search, stone_type const& stone);
-    bool pass(double score, stone_type const& stone);
+    bool pass(field_type& field, std::vector<stone_type> const& stones,double score, int stone_num);
 };
 
 
