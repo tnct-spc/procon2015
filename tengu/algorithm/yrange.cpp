@@ -25,6 +25,7 @@ void yrange::run()
 {
     qDebug("yrange start");
     std::size_t best_score = FIELD_SIZE *  FIELD_SIZE;
+    /*
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m)
@@ -53,18 +54,22 @@ void yrange::run()
             }
         }
     }
+    */
 
-/*
+
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
         problem_type problem = pre_problem;
         //if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
         one_try(problem, l, m, rotate);
-        answer_send(problem.field);
-        print_text((boost::format("score = %d")%problem.field.get_score()).str());
+        if(problem.field.get_score() < best_score)
+        {
+            answer_send(problem.field);
+            print_text((boost::format("score = %d")%problem.field.get_score()).str());
+            best_score = problem.field.get_score();
+        }
 
     }
-*/
 }
 
 std::size_t yrange::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
@@ -83,7 +88,8 @@ std::size_t yrange::one_try(problem_type& problem, int y, int x, std::size_t con
         stone_type& each_stone = problem.stones.at(ishi);
         search_type next = std::move(search(problem.field,each_stone));
         if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-        if(pass(next,each_stone) == true) continue;
+        //if(pass(next,each_stone) == true) continue;
+        if(pass(problem.field,next,ishi)) continue;
         each_stone.set_angle(next.rotate).set_side(next.flip);
         problem.field.put_stone(each_stone,next.point.y,next.point.x);
     }
@@ -136,6 +142,7 @@ yrange::search_type yrange::search(field_type& field, stone_type& stone)
     if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,0};
     return *std::max_element(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
     {
+
         if(lhs.score == rhs.score)
         {
             stone.set_angle(lhs.rotate).set_side(lhs.flip);
@@ -146,6 +153,7 @@ yrange::search_type yrange::search(field_type& field, stone_type& stone)
             field.remove_just_before_stone(stone);
             return lhs_island < rhs_island;
         }
+
         return lhs.score < rhs.score;
     });
 
@@ -159,7 +167,7 @@ int yrange::get_island(field_type::raw_field_type field, point_type const& point
     int const x_min = (point.x < 1) ? 0 : point.x - 1;
     int const x_max = (point.x + STONE_SIZE + 1) < FIELD_SIZE ? point.x + STONE_SIZE + 1 : FIELD_SIZE;
 
-    std::vector<int> result (32,0);
+    std::vector<int> result (FIELD_SIZE * FIELD_SIZE,0);
     std::function<void(int,int,int)> recurision = [&recurision,&field,&y_min,&y_max,&x_min,&x_max](int y, int x, int num) -> void
     {
         field.at(y).at(x) = num;
@@ -185,5 +193,19 @@ int yrange::get_island(field_type::raw_field_type field, point_type const& point
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
-    return (static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5;
+    return (static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.3;
+}
+
+bool yrange::pass(field_type const& field, search_type const& search, int stone_num)
+{
+/*
+    if ((static_cast<double>(search.score) / static_cast<double>(pre_problem.stones.at(stone_num).get_side_length())) > 0.7) return false;
+    int const field_remain = field.get_score();
+    int stone_remain = 0;
+    for(std::size_t i = stone_num; i < pre_problem.stones.size(); ++i) stone_remain += pre_problem.stones.at(i).get_area();
+    //if(stone_remain > field_remain * 2) return (static_cast<double>(search.score) / static_cast<double>(pre_problem.stones.at(stone_num).get_side_length())) < 0.7;
+    if(stone_remain > field_remain) return (static_cast<double>(search.score) / static_cast<double>(pre_problem.stones.at(stone_num).get_side_length())) < 0.6;
+    return false;
+*/
+    return (static_cast<double>(search.score) / static_cast<double>(pre_problem.stones.at(stone_num).get_side_length())) < 0.5;
 }

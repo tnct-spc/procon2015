@@ -44,7 +44,7 @@ public:
 
     ~field_type() = default;
     //アクセッサ
-    size_t get_score();//現在の状態の得点を返す
+    size_t get_score() const;//現在の状態の得点を返す
     size_t empty_zk();//get_score()を同じ.なんのためにあるのかわからない
     size_t get_block_num();//何かが配置されている(空白以外)マスの数を返す
     raw_field_type const& get_raw_data() const;//bit化していない配列のアクセッサ

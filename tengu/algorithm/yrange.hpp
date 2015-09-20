@@ -27,6 +27,7 @@ private:
     search_type search(field_type& _field, stone_type& stone);
     int get_island(field_type::raw_field_type field, point_type const& point);
     bool pass(search_type const& search, stone_type const& stone);
+    bool pass(field_type const& field, search_type const& search, int stone_num);
 };
 
 

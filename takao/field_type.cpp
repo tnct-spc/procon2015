@@ -20,14 +20,14 @@ bool field_type::is_placed(stone_type const& stone)
 }
 
 //現在の状態における得点を返す
-size_t field_type::get_score()
+size_t field_type::get_score() const
 {
-    size_t sum = 0;
-    for (auto const & row : raw_data)
+    uint64_t sum = 0;
+    for(int i = 16; i < 48; i ++)
     {
-        sum += std::count(row.begin(), row.end(), 0);
+        sum += _mm_popcnt_u64(bit_plain_field[i]);
     }
-    return sum;
+    return FIELD_SIZE * FIELD_SIZE * 2 - sum;
 }
 
 //石を置く  自身への参照を返す   失敗したら例外を出す
