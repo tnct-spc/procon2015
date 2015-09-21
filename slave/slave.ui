@@ -303,7 +303,7 @@
   <widget class="QCheckBox" name="checkBox_0">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>440</y>
      <width>86</width>
      <height>22</height>
@@ -316,7 +316,7 @@
   <widget class="QCheckBox" name="checkBox_1">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>460</y>
      <width>86</width>
      <height>22</height>
@@ -329,7 +329,7 @@
   <widget class="QCheckBox" name="checkBox_2">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>80</x>
      <y>440</y>
      <width>86</width>
      <height>22</height>
@@ -342,7 +342,7 @@
   <widget class="QCheckBox" name="checkBox_3">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>80</x>
      <y>460</y>
      <width>86</width>
      <height>22</height>
@@ -355,7 +355,7 @@
   <widget class="QCheckBox" name="checkBox_4">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>440</y>
      <width>101</width>
      <height>22</height>
@@ -368,7 +368,7 @@
   <widget class="QCheckBox" name="checkBox_5">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>160</x>
      <y>460</y>
      <width>101</width>
      <height>22</height>
@@ -381,7 +381,7 @@
   <widget class="QCheckBox" name="checkBox_6">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>240</x>
      <y>440</y>
      <width>101</width>
      <height>22</height>
@@ -394,7 +394,7 @@
   <widget class="QCheckBox" name="checkBox_7">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>240</x>
      <y>460</y>
      <width>101</width>
      <height>22</height>
@@ -402,6 +402,19 @@
    </property>
    <property name="text">
     <string>raq</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_8">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>440</y>
+     <width>81</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange3</string>
    </property>
   </widget>
   <action name="problem_load_action">

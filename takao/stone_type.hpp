@@ -40,6 +40,7 @@ class stone_type
         corner_type get_corner();
         int count_n_row(int const n)const;
         int count_n_col(int const n)const;
+        void print_stone();
 
 
     private:

@@ -19,36 +19,23 @@ private:
         std::size_t rotate;
         stone_type::Sides flip;
         int score;
-        int island;
-    };
-
-    struct connect_type
-    {
-        point_type point;
-        int score;
-        int island;
-
-        connect_type(point_type _point,int _score, int _island)
-        {
-            this -> point = _point;
-            this -> score = _score;
-            this -> island = _island;
-        }
+        std::size_t stone;
     };
 
     problem_type pre_problem;
     void one_try(problem_type& problem, int x, int y, std::size_t const rotate);
-    int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     search_type search(field_type& _field, stone_type& stone);
-    int get_island(field_type::raw_field_type field, point_type const& point);
+    int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search, stone_type const& stone);
-    std::vector<connect_type> conect_stone(stone_type& a, stone_type& b);
-
+    bool pass(double const score, stone_type const& stone, double threshold);
     int nonput_evaluate(field_type const& field, stone_type const& stone, int y, int x) const;
-    search_type ur_search(field_type const& field,stone_type const& stone);
-    search_type ul_search(field_type const& field,stone_type const& stone);
-    search_type dr_search(field_type const& field,stone_type const& stone);
-    search_type dl_search(field_type const& field,stone_type const& stone);
+    int evaluate_reverse(field_type const& field, stone_type stone,int const i, int const j)const;
+    int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
+    void ur_atack(field_type& field,std::vector<stone_type>& stones);
+    void ul_atack(field_type& field, std::vector<stone_type>& stones);
+    void dr_atack(field_type& field,std::vector<stone_type>& stones);
+    void dl_atack(field_type& field,std::vector<stone_type>& stones);
+    void atack(int y, int x, stone_type& stone, std::size_t stone_num, int &count, field_type& field, search_type& best, int wight);
 };
 
 

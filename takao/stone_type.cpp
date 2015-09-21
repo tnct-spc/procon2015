@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <array>
+#include <iostream>
 
 // 石
 
@@ -220,4 +221,13 @@ int stone_type::get_side_length()const
          if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))sum++;
     }
     return sum;
+}
+
+void stone_type::print_stone()
+{
+    for(auto const& each : raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90))
+    {
+        for(auto const& block : each) std::cout << block;
+        std::cout << std::endl;
+    }
 }
