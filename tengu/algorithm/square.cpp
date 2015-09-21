@@ -133,7 +133,7 @@ void square::put_stone_side(stone_type stone,int dy,int dx)
                     max_x.push_back(dx);
                     max_stone.push_back(stone);
                 }
-                problem.field.remove_just_before_stone(stone);
+                problem.field.remove_large_most_number_and_just_before_stone();
                 //if(flip==1 && angle==1) qDebug("1");
             }else{
                 //if(flip==1 && angle==1) qDebug("0");
@@ -192,7 +192,7 @@ void square::put_stone_hole(stone_type stone,int dy,int dx)
         min_x = dx;
         min_stone = stone;
     }
-    problem.field.remove_just_before_stone(stone);
+    problem.field.remove_large_most_number_and_just_before_stone();
 }
 
 

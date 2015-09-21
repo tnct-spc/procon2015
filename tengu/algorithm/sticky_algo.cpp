@@ -20,7 +20,7 @@ double sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, i
     if(!field.is_puttable(stone,pos_y,pos_x))return -1;
     field.put_stone(stone,pos_y,pos_x);
     score = field.evaluate_normalized_complexity();
-    field.remove_just_before_stone(stone);
+    field.remove_large_most_number_and_just_before_stone();
     return score;
 }
 std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width){

@@ -1,5 +1,4 @@
 //#define _DEBUGMODE
-//#define _DEBUG
 #if defined(_DEBUG) || defined(_DEBUGMODE)
 #include <QDebug>
 #include <iostream>
@@ -20,14 +19,14 @@ bool field_type::is_placed(stone_type const& stone)
 }
 
 //現在の状態における得点を返す
-size_t field_type::get_score() const
+size_t field_type::get_score()
 {
-    uint64_t sum = 0;
-    for(int i = 16; i < 48; i ++)
+    size_t sum = 0;
+    for (auto const & row : raw_data)
     {
-        sum += _mm_popcnt_u64(bit_plain_field[i]);
+        sum += std::count(row.begin(), row.end(), 0);
     }
-    return FIELD_SIZE * FIELD_SIZE * 2 - sum;
+    return sum;
 }
 
 //石を置く
@@ -75,7 +74,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
-    processes.emplace_back(stone, point_type{y, x});
+    processes.push_back({stone,point_type{y,x}});
     return *this;
 }
 
@@ -88,8 +87,6 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 #endif
 
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
-    //_mm256_testz_si256  256bitのandで1つでも1があれば1,なければ0
-    //_mm256_loadu_si256  アラインメントが揃っていないデータを読み込む
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
 
     //石が他の石や障害物と重なっているか調べる
@@ -427,6 +424,7 @@ std::vector<stone_type> field_type::list_of_stones() const
     return result;
 }
 
+//コメント書こう
  placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
 {
     auto nth = raw_data.at(y).at(x);
@@ -449,6 +447,7 @@ std::vector<stone_type> field_type::list_of_stones() const
     return placed_stone_type(*stone, pf, ps);
 }
 
+ //コメント書こう
 field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
 {
     provided_stones = stone_nth;
@@ -504,6 +503,11 @@ field_type::raw_field_type const & field_type::get_raw_data() const
     return raw_data;
 }
 
+field_type::raw_field_type& field_type::set_raw_data()
+{
+    return raw_data;
+}
+
 void field_type::print_field()
 {
     for(auto const&each_raw : raw_data)
@@ -544,7 +548,7 @@ std::string field_type::get_answer()
         prev_nth = current_nth;
         process_count++;
     }
-    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    for(unsigned int i = prev_nth; i < provided_stones; i++)result.append("\r\n");
     return result;
 }
 void field_type::set_random(int const obstacle, int const col, int const row)
@@ -573,23 +577,26 @@ void field_type::set_random(int const obstacle, int const col, int const row)
     }
 }
 
-//        sum += std::count(each_row.begin(), each_row.end(),0);
-/* 1 new line at the end of the output */
+int field_type::empty_zk()
+{
+    int sum = 0;
+    for(auto const& each_row : raw_data)
+        sum += std::count(each_row.begin(),each_row.end(),0);
+
+    return sum;
+}
+
+/* 1 new line at end of output */
 std::string field_type::str()
 {
     std::ostringstream ss;
     for(auto row : raw_data) {
         for(auto block : row) {
-            ss << (block != 0);
+            ss << block;
         }
         ss << "\r\n";
     }
     return std::move(ss.str());
-}
-
-void field_type::set_provided_stones(size_t ps)
-{
-    provided_stones = ps;
 }
 //#BitSystem
 //bitデータの作成
@@ -626,15 +633,4 @@ void field_type::make_bit()
         std::cout<<std::endl;
     }
 #endif
-}
-double field_type::evaluate_normalized_complexity()
-{
-    uint64_t side = 0;
-    for(int i = 1; i < 63; i ++){
-        side += _mm_popcnt_u64((bit_plain_field[i] << 1)^(bit_plain_field[i]));
-        side += _mm_popcnt_u64((bit_plain_field[i] >> 1)^(bit_plain_field[i]));
-        side += _mm_popcnt_u64((bit_plain_field[i+1])^   (bit_plain_field[i]));
-        side += _mm_popcnt_u64((bit_plain_field[i-1])^   (bit_plain_field[i]));
-    }
-    return static_cast<double>(side * side) / static_cast<double>(get_block_num());
 }

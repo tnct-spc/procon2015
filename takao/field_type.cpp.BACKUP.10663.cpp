@@ -33,13 +33,37 @@ size_t field_type::get_score() const
 //石を置く
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
+<<<<<<< HEAD
+//#ifdef _DEBUGMODE
+    //さきに置けるか確かめる
+    if(is_puttable(stone,y,x) == false)throw std::runtime_error("The stone cannot put.");
+//#endif
+    //置く
+    //get_bit_plain_stonesはxが+1されているのでbit_plain_stones(ナマの配列そのまま)を使う場合は+1し忘れないこと
+    //std::vector<std::vector<std::vector<std::vector<uint64_t>>>> const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+    for(int i=0;i<64;i++){
+        bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
+    }
+=======
     /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
 
     //フィールドに石を、サイドフィールドに石の辺を置く
+>>>>>>> feature/one_two_three
     for(int i=0;i<8;i++){
         //add stone
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
         //upper
+<<<<<<< HEAD
+        bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
+        //under
+        bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
+        //left
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
+        //right
+        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
+        //add stone
+        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),(stone.get_angle()/90),i);
+=======
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
         //under
         bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
@@ -47,6 +71,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
         //right
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+>>>>>>> feature/one_two_three
     }
 
     //石の番号ごとのサイドフィールドに石の辺を置く
@@ -75,7 +100,11 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone.get_nth();
         }
     }
+<<<<<<< HEAD
     processes.emplace_back(stone, point_type{y, x});
+=======
+    processes.push_back({stone,point_type{y,x}});
+>>>>>>> feature/one_two_three
     return *this;
 }
 
@@ -92,8 +121,11 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
     //_mm256_loadu_si256  アラインメントが揃っていないデータを読み込む
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
 
+<<<<<<< HEAD
+=======
     //石が他の石や障害物と重なっているか調べる
     int avx_collision = 0;
+>>>>>>> feature/one_two_three
     __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
     __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_plain_field[16+y+0]);
     avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
@@ -102,6 +134,15 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
     avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
     if(avx_collision) return false;
 
+<<<<<<< HEAD
+    avx_cllis |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+
+    if(avx_cllis) return false;
+    if(processes.size() == 0) return true;//始めの石なら繋がりは必要ない
+
+    //上ですでにbit_plain_stonesの[4]~[7]は読んであるので再利用
+    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field[16+y+4]);
+=======
     //始めの石なら繋がりは必要ない
     if(processes.size() == 0) return true;
 
@@ -115,6 +156,7 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     //まだ置かれていないか確かめる
     if(is_placed(stone)==true)throw std::runtime_error("The stone has been puted!");
 #endif
+>>>>>>> feature/one_two_three
 
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();

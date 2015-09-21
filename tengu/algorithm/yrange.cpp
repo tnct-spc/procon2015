@@ -136,7 +136,7 @@ yrange::search_type yrange::search(field_type& field, stone_type& stone)
             field.put_stone(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
             search_vec.push_back({point_type{i,j},stone.get_angle(),stone.get_side(),evaluate(field,stone,i,j)});
-            field.remove_just_before_stone(stone);
+            field.remove_large_most_number_and_just_before_stone();
         }
     }
     if(search_vec.size() == 0) return search_type{point_type{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,0};
@@ -147,10 +147,10 @@ yrange::search_type yrange::search(field_type& field, stone_type& stone)
         {
             stone.set_angle(lhs.rotate).set_side(lhs.flip);
             int const lhs_island = get_island(field.put_stone(stone,lhs.point.y,lhs.point.x).get_raw_data(),lhs.point);
-            field.remove_just_before_stone(stone);
+            field.remove_large_most_number_and_just_before_stone();
             stone.set_angle(rhs.rotate).set_side(rhs.flip);
             int const rhs_island = get_island(field.put_stone(stone,rhs.point.y,rhs.point.x).get_raw_data(),rhs.point);
-            field.remove_just_before_stone(stone);
+            field.remove_large_most_number_and_just_before_stone();
             return lhs_island < rhs_island;
         }
 
