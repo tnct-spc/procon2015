@@ -346,12 +346,27 @@ field_type& field_type::remove_stone(stone_type const& stone)
 std::vector<stone_type> field_type::search_not_in_contact_stones()
 {
     std::vector<stone_type> result;
+    int flag;
+    int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
     for(int i=0;i<processes.size();i++){
-        if(min_stone_nth==processes[i].stone.get_nth()) continue;
-        if(is_puttable(processes[i].stone,processes[i].position.y,processes[i].position.x)) continue;
-        //add
-        result.push_back(processes[i].stone);
+        flag=false;
+        stone_nth = processes[i].stone.get_nth();
+        if(min_stone_nth==stone_nth) continue;
+        for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
+        {
+            if(raw_data.at(y).at(x)==stone_nth){
+                if(y!=31) if(raw_data.at(y+1).at(x)<stone_nth) flag = true;
+                if(y!=0) if(raw_data.at(y-1).at(x)==0) flag = true;
+                if(x!=31) if(raw_data.at(y).at(x+1)==0) flag = true;
+                if(x!=0) if(raw_data.at(y).at(x-1)==0) flag = true;
+            }
+        }
+        if(flag==false){
+            //not contact
+            //add
+            result.push_back(processes[i].stone);
+        }
     }
     return result;
 }
@@ -359,12 +374,26 @@ std::vector<stone_type> field_type::search_not_in_contact_stones()
 //すべての石が自分より若い石に接しているか確認する
 bool field_type::is_stones_contact()
 {
+    int flag;
+    int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
     for(int i=0;i<processes.size();i++){
-        if(min_stone_nth==processes[i].stone.get_nth()) continue;
-        if(is_puttable(processes[i].stone,processes[i].position.y,processes[i].position.x)) continue;
-        //not contact
-        return false;
+        flag=false;
+        stone_nth = processes[i].stone.get_nth();
+        if(min_stone_nth==stone_nth) continue;
+        for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
+        {
+            if(raw_data.at(y).at(x)==stone_nth){
+                if(y!=31) if(raw_data.at(y+1).at(x)<stone_nth) flag = true;
+                if(y!=0) if(raw_data.at(y-1).at(x)==0) flag = true;
+                if(x!=31) if(raw_data.at(y).at(x+1)==0) flag = true;
+                if(x!=0) if(raw_data.at(y).at(x-1)==0) flag = true;
+            }
+        }
+        if(flag==false){
+            //not contact
+            return false;
+        }
     }
     return true;
 }
@@ -378,14 +407,13 @@ std::vector<stone_type> field_type::search_cannot_be_in_contact_stones()
     for(int i=0;i<processes.size();i++){
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;
-        if(is_puttable(processes[i].stone,processes[i].position.y,processes[i].position.x)) continue;
         for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
         {
             if(raw_data.at(y).at(x)==stone_nth){
-                if(y!=31) if(raw_data.at(y+1).at(x)==0) continue;
-                if(y!=0) if(raw_data.at(y-1).at(x)==0) continue;
-                if(x!=31) if(raw_data.at(y).at(x+1)==0) continue;
-                if(x!=0) if(raw_data.at(y).at(x-1)==0) continue;
+                if(y!=31) if(raw_data.at(y+1).at(x)==0 || raw_data.at(y+1).at(x)<stone_nth) continue;
+                if(y!=0) if(raw_data.at(y-1).at(x)==0 || raw_data.at(y-1).at(x)<stone_nth) continue;
+                if(x!=31) if(raw_data.at(y).at(x+1)==0 || raw_data.at(y).at(x+1)<stone_nth) continue;
+                if(x!=0) if(raw_data.at(y).at(x-1)==0 || raw_data.at(y).at(x-1)<stone_nth) continue;
             }
         }
         //add
@@ -402,14 +430,13 @@ bool field_type::is_stones_can_contact()
     for(int i=0;i<processes.size();i++){
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;
-        if(is_puttable(processes[i].stone,processes[i].position.y,processes[i].position.x)) continue;
         for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
         {
             if(raw_data.at(y).at(x)==stone_nth){
-                if(y!=31) if(raw_data.at(y+1).at(x)==0) continue;
-                if(y!=0) if(raw_data.at(y-1).at(x)==0) continue;
-                if(x!=31) if(raw_data.at(y).at(x+1)==0) continue;
-                if(x!=0) if(raw_data.at(y).at(x-1)==0) continue;
+                if(y!=31) if(raw_data.at(y+1).at(x)==0 || raw_data.at(y+1).at(x)<stone_nth) continue;
+                if(y!=0) if(raw_data.at(y-1).at(x)==0 || raw_data.at(y-1).at(x)<stone_nth) continue;
+                if(x!=31) if(raw_data.at(y).at(x+1)==0 || raw_data.at(y).at(x+1)<stone_nth) continue;
+                if(x!=0) if(raw_data.at(y).at(x-1)==0 || raw_data.at(y).at(x-1)<stone_nth) continue;
             }
         }
         //not contact
