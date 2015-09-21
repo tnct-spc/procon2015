@@ -30,6 +30,7 @@ public:
         typedef uint64_t bit_stones_type[41][2][4][8];
     stone_type() = default;
     stone_type(int const zk); // set_random
+    stone_type(int const zk,int const nth);
     ~stone_type() = default;
 
     stone_type(std::string const & raw_stone_text, int const _nth);
@@ -51,7 +52,7 @@ public:
     corner_type get_corner();
     int count_n_row(int const n)const;
     int count_n_col(int const n)const;
-    std::string str();
+    std::string str() const;
         uint64_t get_bit_plain_stones(int x, int flip, int rotate, int y) const;
         bit_stones_type const& get_raw_bit_plain_stones() const;
 

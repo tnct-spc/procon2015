@@ -40,6 +40,7 @@ public slots:
 private:
     std::mutex mtx;
     const int loop_num = 100;
+    QCoreApplication* app;
 };
 
 #endif // ALGORITHM_EVALUATER_HPP

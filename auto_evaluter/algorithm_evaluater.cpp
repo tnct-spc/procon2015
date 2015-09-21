@@ -1,5 +1,6 @@
 #include "algorithm_evaluater.hpp"
 #include <tengu.hpp>
+#include <QThread>
 algorithm_evaluater::algorithm_evaluater(QObject *parent) :
     QObject(parent)
 {
@@ -34,22 +35,25 @@ std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::stri
     std::default_random_engine engine(seed_gen());
 
     std::uniform_int_distribution<int> dist_size(1, FIELD_SIZE);
-    std::uniform_int_distribution<int> dist_obs(0, std::min(50, rows * cols));
     rows = dist_size(engine);
     cols = dist_size(engine);
+    std::uniform_int_distribution<int> dist_obs(0, std::min(50, rows * cols));
     obstacles = dist_obs(engine);
     min_zk = 1;
     max_zk = 16;
 
-    field_type field;
-    field.set_random(obstacles, cols, rows);
+    field_type field(obstacles, cols, rows);
+    //field.set_random(obstacles, cols, rows);
     std::vector<stone_type> stones;
+    int stone_num = 1; //初期値は1
     int const minimum_zk = field.empty_zk();
     std::cout << "empty blocks: " << minimum_zk << std::endl;
     for(int total_zk = 0; total_zk < minimum_zk; ) {
         std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
         int const zk = dist_zk(engine);
-        stone_type stone(zk);
+        stone_type stone(zk,stone_num);
+        //qDebug() << stone.str().c_str();
+        stone_num ++;
         total_zk += stone.get_area();
         stones.push_back(stone);
     }
@@ -71,12 +75,18 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
     auto algo = new simple_algorithm(problem);
+    //qDebug() << problem.str().c_str();
     algo->setParent(this);
-    connect(algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
     connect(algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
         ans_vector.push_back(ans);
+        qDebug() << "hello";
         mtx.unlock();
+    });
+    //connect(algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
+    connect(algo,&algorithm_type::finished,[&]{
+        QThread::msleep(50);
+        eventloop.quit();
     });
     algo->start();
     eventloop.exec();
@@ -84,9 +94,14 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
 }
 void algorithm_evaluater::run(){
     std::vector<std::tuple<std::string,field_type>> named_answers;
-    for(int prob_num = 0; prob_num < loop_num;prob_num++){
+    for(int prob_num = 0; prob_num < 10;prob_num++){
+        qDebug() << "a" << prob_num;
         auto named_problem = make_problem(std::to_string(prob_num));
         auto answers = evaluate(std::get<1>(named_problem));
+        if(answers.size() == 0){
+            //answers.at(0);
+            std::get<1>(named_problem).field.print_field();
+        }
         for(int ans_num = 0; ans_num < answers.size();ans_num++){
             named_answers.push_back(std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num)));
         }

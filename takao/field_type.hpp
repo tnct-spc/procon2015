@@ -41,6 +41,7 @@ public:
 
     field_type() = default;
     field_type(std::string const & raw_field_text, size_t stones);
+    field_type(const int obstacles, const int cols, const int rows);
 
     ~field_type() = default;
     //アクセッサ
@@ -87,6 +88,7 @@ private:
 
     bool is_placed(stone_type const& stone);//石が置かれているか否かを返す
     void make_bit();//bitデータの作成
+    void init_edge();
 };
 inline size_t field_type::empty_zk(){
     return get_score();
