@@ -81,8 +81,8 @@ void yrange2::run()
                 break;
             }
         }
-        pre_problem.field.print_field();
-        std::cout << std::endl;
+        //pre_problem.field.print_field();
+        //std::cout << std::endl;
     }
     print_text((boost::format("done score = %d")%pre_problem.field.get_score()).str());
     pre_problem.field.print_field();
@@ -96,9 +96,9 @@ int yrange2::evaluate(field_type const& field, stone_type stone,int const i, int
     int count = 0;
     for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
 
         if(field.get_raw_data().at(k).at(l) == n)
         {
@@ -119,15 +119,15 @@ int yrange2::locale_evaluate(field_type const& field, stone_type stone,int const
     int count = 0;
     for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
 
         if(field.get_raw_data().at(k).at(l) == n)
         {
             count += (kl1 + k1l);
-            if(k == 0 || k == FIELD_SIZE - 1) count += 2;
-            if(l == 0 || l == FIELD_SIZE - 1) count += 2;
+            if(k == 0 || k == FIELD_SIZE - 1) count += 3;
+            if(l == 0 || l == FIELD_SIZE - 1) count += 3;
         }
         if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
         if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
@@ -160,7 +160,7 @@ bool yrange2::search(field_type& _field, stone_type& stone)
             _field.remove_stone(stone);
         }
     }
-    if(best.score < 0 && pass(best,stone) == false) return false;
+    if(best.score < 0 || pass(best,stone) == false) return false;
     _field.put_stone(stone.set_angle(best.angle).set_side(best.side),best.point.y,best.point.x);
     return true;
 }
