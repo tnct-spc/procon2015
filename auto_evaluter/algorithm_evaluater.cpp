@@ -74,34 +74,27 @@ void algorithm_evaluater::save_answer(std::vector<std::tuple<std::string,field_t
 std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
-    auto algo = new simple_algorithm(problem);
-    //qDebug() << problem.str().c_str();
-    algo->setParent(this);
-    connect(algo,&algorithm_type::answer_ready,[&](field_type ans){
+    simple_algorithm algo(problem);
+    algorithm_type::_best_score = std::numeric_limits<int>::max();
+    connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
         ans_vector.push_back(ans);
         qDebug() << "hello";
         mtx.unlock();
-    });
-    //connect(algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
-    connect(algo,&algorithm_type::finished,[&]{
-        QThread::msleep(50);
         eventloop.quit();
     });
-    algo->start();
+    connect(&algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
+    algo.start();
     eventloop.exec();
+    algo.wait();
     return ans_vector;
 }
 void algorithm_evaluater::run(){
     std::vector<std::tuple<std::string,field_type>> named_answers;
-    for(int prob_num = 0; prob_num < 10;prob_num++){
+    for(int prob_num = 0; prob_num < loop_num;prob_num++){
         qDebug() << "a" << prob_num;
         auto named_problem = make_problem(std::to_string(prob_num));
         auto answers = evaluate(std::get<1>(named_problem));
-        if(answers.size() == 0){
-            //answers.at(0);
-            std::get<1>(named_problem).field.print_field();
-        }
         for(int ans_num = 0; ans_num < answers.size();ans_num++){
             named_answers.push_back(std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num)));
         }
