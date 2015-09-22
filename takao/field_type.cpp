@@ -111,10 +111,10 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 //石を置けるか
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-#ifdef _DEBUGMODE
+//#ifdef _DEBUGMODE
     //まだ置かれていないか確かめる
     if(is_placed(stone)==true)throw std::runtime_error("The stone has been puted!");
-#endif
+//#endif
 
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();

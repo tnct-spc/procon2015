@@ -33,6 +33,7 @@ private:
     std::size_t STONE_NUM;
 
     int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
+    int locale_evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     bool search(field_type& _field, stone_type& stone);
     int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search, stone_type const& stone);

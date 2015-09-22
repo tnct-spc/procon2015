@@ -41,8 +41,8 @@ void yrange2::run()
         {
             if(rdx == 31) rdy++;
             else rdx++;
+            stone_list[stone_num-1] = true;
             stone_num++;
-            stone_list[stone_num] = true;
             continue;
         }
 
@@ -55,13 +55,18 @@ void yrange2::run()
         {
             if(dry == 31) drx++;
             else dry++;
+            stone_list[stone_num-1] = true;
             stone_num++;
-            stone_list[stone_num] = true;
             continue;
         }
     }
 
+    for(std::size_t i = 0; i < stone_list.size(); ++i) if(stone_list[i] == true) std::cout << i << std::endl;
+
+    print_text((boost::format("done score = %d")%pre_problem.field.get_score()).str());
     pre_problem.field.print_field();
+    std::cout << std::endl;
+    answer_send(pre_problem.field);
 
     bool next = true;
     while(next == true)
@@ -69,14 +74,15 @@ void yrange2::run()
         for(std::size_t i = 0; i < pre_problem.stones.size(); ++i)
         {
             next = false;
-            if(stone_list[i] == true) continue;
-            if(search(pre_problem.field,pre_problem.stones[i]) == true)
+            if(stone_list[i] == false && search(pre_problem.field,pre_problem.stones[i]) == true)
             {
                 stone_list[i] = true;
                 next = true;
+                break;
             }
-            break;
         }
+        pre_problem.field.print_field();
+        std::cout << std::endl;
     }
     print_text((boost::format("done score = %d")%pre_problem.field.get_score()).str());
     pre_problem.field.print_field();
@@ -106,6 +112,29 @@ int yrange2::evaluate(field_type const& field, stone_type stone,int const i, int
     return count;
 }
 
+//評価関数
+int yrange2::locale_evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+{
+    int const n = stone.get_nth();
+    int count = 0;
+    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
+    {
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
+
+        if(field.get_raw_data().at(k).at(l) == n)
+        {
+            count += (kl1 + k1l);
+            if(k == 0 || k == FIELD_SIZE - 1) count += 2;
+            if(l == 0 || l == FIELD_SIZE - 1) count += 2;
+        }
+        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
+        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
+    }
+    return count;
+}
+
 //おける場所の中から評価値の高いものを選んで返す
 bool yrange2::search(field_type& _field, stone_type& stone)
 {
@@ -127,7 +156,8 @@ bool yrange2::search(field_type& _field, stone_type& stone)
                 get_island(_field.get_raw_data())
             };
             if(one.score > best.score || (one.score == best.score && one.island < best.island)) best = one;
-            _field.remove_large_most_number_and_just_before_stone();//?
+            //_field.remove_large_most_number_and_just_before_stone();//?
+            _field.remove_stone(stone);
         }
     }
     if(best.score < 0 && pass(best,stone) == false) return false;
@@ -188,17 +218,19 @@ bool yrange2::local_put(field_type &field, stone_type &stone, int _y, int _x)
                 field.put_stone(stone,y,x);
                 if(field.get_raw_data().at(_y).at(_x) == stone.get_nth())
                 {
-                    if(best.score < evaluate(field,stone,y,x))
+                    int const score =locale_evaluate(field,stone,y,x);
+                    if(best.score < score)
                     {
                         best = {
                             {y,x},
                             stone.get_angle(),
                             stone.get_side(),
-                            evaluate(field,stone,y,x)
+                            score
                         };
                     }
                 }
-                field.remove_large_most_number_and_just_before_stone();
+                //field.remove_large_most_number_and_just_before_stone();//?
+                field.remove_stone(stone);
             }
         }
     }
