@@ -25,7 +25,7 @@ void yrange::run()
 {
     qDebug("yrange start");
     std::size_t best_score = FIELD_SIZE *  FIELD_SIZE;
-    /*
+/*
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m)
@@ -54,7 +54,7 @@ void yrange::run()
             }
         }
     }
-    */
+*/
 
 
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
@@ -68,8 +68,8 @@ void yrange::run()
             print_text((boost::format("score = %d")%problem.field.get_score()).str());
             best_score = problem.field.get_score();
         }
-
     }
+
 }
 
 std::size_t yrange::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
@@ -151,7 +151,7 @@ yrange::search_type yrange::search(field_type& field, stone_type& stone)
             stone.set_angle(rhs.rotate).set_side(rhs.flip);
             int const rhs_island = get_island(field.put_stone(stone,rhs.point.y,rhs.point.x).get_raw_data(),rhs.point);
             field.remove_large_most_number_and_just_before_stone();
-            return lhs_island < rhs_island;
+            return lhs_island > rhs_island;
         }
 
         return lhs.score < rhs.score;

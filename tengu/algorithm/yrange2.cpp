@@ -13,6 +13,7 @@
 
 yrange2::yrange2(problem_type _problem)
 {
+    algorithm_name = "yrange2";
     pre_problem = _problem;
 }
 
@@ -60,6 +61,42 @@ void yrange2::run()
 
     }
     */
+
+    int rdy = 0, rdx = 0, dry = 0, drx = 0;
+    std::size_t stone_num = 0;
+    while(stone_num < pre_problem.stones.size())
+    {
+        std::cout << stone_num << std::endl;
+        stone_type& stone = pre_problem.stones.at(stone_num++);
+        while(rdx < 32 && rdy < 32 && pre_problem.field.get_raw_data().at(rdy).at(rdx) != 0)
+        {
+            if(rdx == 31) rdy++;
+            else rdx++;
+        }
+        if(rdy < 32 && pre_problem.field.get_raw_data().at(rdy).at(rdx) == 0 && local_put(pre_problem.field,stone,rdy,rdx) == true)
+        {
+            if(rdx == 31) rdy++;
+            else rdx++;
+            stone_num++;
+            continue;
+        }
+
+        while(drx < 32 && dry < 32 && pre_problem.field.get_raw_data().at(dry).at(drx) != 0)
+        {
+            if(dry == 31) drx++;
+            else dry++;
+        }
+        if(drx < 32 && pre_problem.field.get_raw_data().at(dry).at(drx) == 0 && local_put(pre_problem.field,stone,dry,drx) == true)
+        {
+            if(dry == 31) drx++;
+            else dry++;
+            stone_num++;
+            continue;
+        }
+    }
+
+    pre_problem.field.print_field();
+    return;
 
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
@@ -245,4 +282,41 @@ bool yrange2::pass(search_type const& search, stone_type const& stone)
 {
     if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.55) return true;
     else return false;
+}
+
+bool yrange2::local_put(field_type &field, stone_type &stone, int _y, int _x)
+{
+    locale_search_type best = locale_search_type{{0,0},0,stone_type::Sides::Head,-1};
+    for(int y = _y-7; y <= _y; ++y) for(int x = _x-7; x <= _x; ++x)
+    {
+        for(int rotate = 0; rotate < 8; ++rotate)
+        {
+            if(rotate %2 == 0) stone.rotate(90);
+            else stone.flip();
+            if(field.is_puttable(stone,y,x) == true)
+            {
+                field.put_stone(stone,y,x);
+                if(field.get_raw_data().at(_y).at(_x) == stone.get_nth())
+                {
+                    if(best.score < evaluate(field,stone,y,x))
+                    {
+                        std::cout << "haitta" << std::endl;
+                        best = {
+                            {y,x},
+                            stone.get_angle(),
+                            stone.get_side(),
+                            evaluate(field,stone,y,x)
+                        };
+                    }
+                }
+                field.remove_large_most_number_and_just_before_stone();
+            }
+        }
+    }
+    if(best.score > 0)
+    {
+        field.put_stone(stone.set_angle(best.rotate).set_side(best.side),best.point.y,best.point.x);
+        return true;
+    }
+    return false;
 }
