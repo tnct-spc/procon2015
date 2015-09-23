@@ -386,10 +386,10 @@ bool field_type::is_stones_contact()
         for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
         {
             if(raw_data.at(y).at(x)==stone_nth){
-                if(y!=31) if(raw_data.at(y+1).at(x)<stone_nth) is_contact_flag = true;
-                if(y!=0) if(raw_data.at(y-1).at(x)<stone_nth) is_contact_flag = true;
-                if(x!=31) if(raw_data.at(y).at(x+1)<stone_nth) is_contact_flag = true;
-                if(x!=0) if(raw_data.at(y).at(x-1)<stone_nth) is_contact_flag = true;
+                if(y!=31) if(raw_data.at(y+1).at(x)>0 && raw_data.at(y+1).at(x)<stone_nth) is_contact_flag = true;
+                if(y!=0) if(raw_data.at(y-1).at(x)>0 && raw_data.at(y-1).at(x)<stone_nth) is_contact_flag = true;
+                if(x!=31) if(raw_data.at(y).at(x+1)>0 && raw_data.at(y).at(x+1)<stone_nth) is_contact_flag = true;
+                if(x!=0) if(raw_data.at(y).at(x-1)>0 && raw_data.at(y).at(x-1)<stone_nth) is_contact_flag = true;
             }
         }
         if(is_contact_flag==false){
