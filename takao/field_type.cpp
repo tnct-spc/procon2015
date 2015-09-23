@@ -357,9 +357,9 @@ std::vector<stone_type> field_type::search_not_in_contact_stones()
         {
             if(raw_data.at(y).at(x)==stone_nth){
                 if(y!=31) if(raw_data.at(y+1).at(x)<stone_nth) flag = true;
-                if(y!=0) if(raw_data.at(y-1).at(x)==0) flag = true;
-                if(x!=31) if(raw_data.at(y).at(x+1)==0) flag = true;
-                if(x!=0) if(raw_data.at(y).at(x-1)==0) flag = true;
+                if(y!=0) if(raw_data.at(y-1).at(x)<stone_nth) flag = true;
+                if(x!=31) if(raw_data.at(y).at(x+1)<stone_nth) flag = true;
+                if(x!=0) if(raw_data.at(y).at(x-1)<stone_nth) flag = true;
             }
         }
         if(flag==false){
@@ -385,9 +385,9 @@ bool field_type::is_stones_contact()
         {
             if(raw_data.at(y).at(x)==stone_nth){
                 if(y!=31) if(raw_data.at(y+1).at(x)<stone_nth) flag = true;
-                if(y!=0) if(raw_data.at(y-1).at(x)==0) flag = true;
-                if(x!=31) if(raw_data.at(y).at(x+1)==0) flag = true;
-                if(x!=0) if(raw_data.at(y).at(x-1)==0) flag = true;
+                if(y!=0) if(raw_data.at(y-1).at(x)<stone_nth) flag = true;
+                if(x!=31) if(raw_data.at(y).at(x+1)<stone_nth) flag = true;
+                if(x!=0) if(raw_data.at(y).at(x-1)<stone_nth) flag = true;
             }
         }
         if(flag==false){
