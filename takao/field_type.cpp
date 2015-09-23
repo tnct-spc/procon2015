@@ -342,7 +342,6 @@ field_type& field_type::remove_stone(stone_type const& stone)
     return *this;
 }
 
-
 //自分より若い石に接していない石を探してすべて返す
 std::vector<stone_type> field_type::search_not_in_contact_stones()
 {

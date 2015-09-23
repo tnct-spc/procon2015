@@ -80,7 +80,7 @@ public:
 
     //自分より若い石に接していない石を探してすべて返す
     std::vector<stone_type> search_not_in_contact_stones();
-    //自分より若い石に接していないか確認する
+    //すべての石が自分より若い石に接しているか確認する
     bool is_stones_contact();
     //自分より若い石に接することができない(制約違反)石を探してすべて返す
     std::vector<stone_type> search_cannot_be_in_contact_stones();
