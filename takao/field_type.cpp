@@ -53,7 +53,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     }
 
     //石の番号ごとのサイドフィールドに石の辺を置く
-    for(int j=stone_nth-1;j<256;j++){
+    for(int j=stone_nth;j<=256;j++){
         for(int i=0;i<8;i++){
             //upper
             bit_sides_field_at_stone_nth[j][16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
@@ -135,10 +135,10 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x)
     //#avx_collision = 0; (この行まで来るということは必ずavx_collision=0)
     //#上ですでにbit_plain_stonesの[4]~[7]が読んであるので再利用
     //avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
-    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field_at_stone_nth[stone.get_nth()-2][16+y+4]);
+    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field_at_stone_nth[stone.get_nth()-1][16+y+4]);
     avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
     avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
-    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field_at_stone_nth[stone.get_nth()-2][16+y+0]);
+    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field_at_stone_nth[stone.get_nth()-1][16+y+0]);
     avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
     if(avx_collision==0) return false;
 
@@ -226,12 +226,12 @@ field_type& field_type::remove_large_most_number_and_just_before_stone()
     //remove stone from processes
     processes.erase(processes.end());
     //石の番号ごとのサイドフィールドの更新
-    for(int i=most_large_stone_nth-1;i<256;i++){
-        for(int j=0;j<64;j++) bit_sides_field_at_stone_nth[i][j] = bit_sides_field_at_stone_nth[most_large_stone_nth-2][j];
+    for(int i=most_large_stone_nth;i<=256;i++){
+        for(int j=0;j<64;j++) bit_sides_field_at_stone_nth[i][j] = bit_sides_field_at_stone_nth[most_large_stone_nth-1][j];
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
-        bit_sides_field[i] = bit_sides_field_at_stone_nth[255][i];
+        bit_sides_field[i] = bit_sides_field_at_stone_nth[256][i];
     }
     //remove from raw data
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
@@ -267,12 +267,12 @@ field_type& field_type::remove_large_most_number_stone()
     //remove stone from processes
     processes.erase(processes.begin() + large_stone_at);
     //石の番号ごとのサイドフィールドの更新
-    for(int i=most_large_stone_nth-1;i<256;i++){
-        for(int j=0;j<64;j++) bit_sides_field_at_stone_nth[i][j] = bit_sides_field_at_stone_nth[most_large_stone_nth-2][j];
+    for(int i=most_large_stone_nth;i<=256;i++){
+        for(int j=0;j<64;j++) bit_sides_field_at_stone_nth[i][j] = bit_sides_field_at_stone_nth[most_large_stone_nth-1][j];
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
-        bit_sides_field[i] = bit_sides_field_at_stone_nth[255][i];
+        bit_sides_field[i] = bit_sides_field_at_stone_nth[256][i];
     }
     //remove from raw data
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
@@ -313,7 +313,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     //remove stone from processes
     processes.erase(processes.begin() + stone_processes_at);
     //石の番号ごとのサイドフィールドの更新
-    for(int i=0;i<256;i++){
+    for(int i=0;i<=256;i++){
         for(int j=0;j<64;j++){
             bit_sides_field_at_stone_nth[i][j]=0;
         }
@@ -331,7 +331,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
         p_y = processes[i].position.y;
         p_x = processes[i].position.x;
         p_nth = processes[i].stone.get_nth();
-        for(int j=p_nth-1;j<256;j++){
+        for(int j=p_nth;j<=256;j++){
             //put_side_stone
             for(int k=0;k<8;k++){
                 bit_sides_field_at_stone_nth[j][16+p_y+k+1] |= (p_stone).get_bit_plain_stones(p_x+7,(int)p_side,(int)p_angle90,k);
@@ -343,7 +343,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
-        bit_sides_field[i] = bit_sides_field_at_stone_nth[255][i];
+        bit_sides_field[i] = bit_sides_field_at_stone_nth[256][i];
     }
     //remove from raw data
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
@@ -686,7 +686,7 @@ void field_type::make_bit()
     for(int i=0;i<64;i++){
         bit_sides_field[i] = 0;
     }
-    for(int i=0;i<256;i++){
+    for(int i=0;i<=256;i++){
         for(int j=0;j<64;j++){
             bit_sides_field_at_stone_nth[i][j]=0;
         }
