@@ -71,6 +71,8 @@ public:
     field_type& remove_large_most_number_stone();
     //石を取り除けるか
     bool is_removable(stone_type const& stone);
+    //接しているかどうか関係なく、石を取り除けるか
+    bool is_removable_force(stone_type const& stone);
     //石を取り除く
     field_type& remove_stone(stone_type const& stone);
 
@@ -86,6 +88,8 @@ public:
     std::vector<stone_type> search_cannot_be_in_contact_stones();
     //すべての石が自分より若い石に接することができるか確認する
     bool is_stones_can_contact();
+    //障害物にぶつかるか
+    bool is_touch_flame(stone_type const& stone, int y, int x);
 
     /*************/
     /***その他****/
@@ -131,11 +135,13 @@ private:
 
     int processes_min_stone_nth();
 
+    bool is_placed_stone[256];
     //石が置かれているか否かを返す
     bool is_placed(stone_type const& stone);
 
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
+        uint64_t bit_flame_field[64];//障害物のみのフィールド
         uint64_t bit_sides_field[64];//石のサイドフィールド
         uint64_t bit_sides_field_at_stone_nth[256][64];//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下

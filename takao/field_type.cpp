@@ -14,9 +14,7 @@
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
-    return std::find_if(processes.begin(), processes.end(),
-                        [& stone](auto const & process) { return process.stone.get_nth() == stone.get_nth(); }
-           ) != processes.end();
+    return is_placed_stone[stone.get_nth()-1];
 }
 
 //現在の状態における得点を返す
@@ -33,6 +31,11 @@ size_t field_type::get_score() const
 //石を置く
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
+#ifdef _DEBUGMODE
+    if(is_placed(stone) == true)throw std::runtime_error("The stone is placed!");
+#endif
+    int stone_nth = stone.get_nth();
+    is_placed_stone[stone_nth-1]=true;
     /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
 
     //フィールドに石を、サイドフィールドに石の辺を置く
@@ -50,7 +53,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     }
 
     //石の番号ごとのサイドフィールドに石の辺を置く
-    for(int j=stone.get_nth()-1;j<256;j++){
+    for(int j=stone_nth-1;j<256;j++){
         for(int i=0;i<8;i++){
             //upper
             bit_sides_field_at_stone_nth[j][16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
@@ -72,7 +75,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
         }
         else
         {
-            raw_data.at(i+y).at(j+x) = stone.get_nth();
+            raw_data.at(i+y).at(j+x) = stone_nth;
         }
     }
     processes.emplace_back(stone, point_type{y, x});
@@ -82,10 +85,8 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 //接していなくても石を置けるか
 bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 {
-#ifdef _DEBUGMODE
     //まだ置かれていないか確かめる
-    if(is_placed(stone)==true)throw std::runtime_error("The stone has been puted!");
-#endif
+    if(is_placed(stone)==true)return false;
 
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     //_mm256_testz_si256  256bitのandで1つでも1があれば1,なければ0
@@ -111,10 +112,8 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 //石を置けるか
 bool field_type::is_puttable(stone_type const& stone, int y, int x)
 {
-//#ifdef _DEBUGMODE
     //まだ置かれていないか確かめる
-    if(is_placed(stone)==true)throw std::runtime_error("The stone has been puted!");
-//#endif
+    if(is_placed(stone)==true)return false;
 
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
@@ -214,9 +213,12 @@ field_type& field_type::remove_large_most_number_and_just_before_stone()
 #ifdef _DEBUGMODE
     if(processes.size() == 0)throw std::runtime_error("Stone is not even placed one!");
 #endif
-    //remove from bit field
     int processes_end = processes.size()-1;
     int most_large_stone_nth = processes[processes_end].stone.get_nth();
+
+    is_placed_stone[most_large_stone_nth-1]=false;
+
+    //remove from bit field
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
         bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
@@ -246,7 +248,7 @@ field_type& field_type::remove_large_most_number_stone()
     if(processes.size() == 0)throw std::runtime_error("Stone is not even placed one!");
 #endif
     //Search large most number
-    int most_large_stone_nth = 0;
+    int most_large_stone_nth = 1;
     int large_stone_at=0;
     for(int i=0;i<processes.size();i++){
         if(processes[i].stone.get_nth() > most_large_stone_nth){
@@ -254,6 +256,9 @@ field_type& field_type::remove_large_most_number_stone()
             large_stone_at = i;
         }
     }
+
+    is_placed_stone[most_large_stone_nth-1]=false;
+
     //remove from bit field
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
@@ -277,6 +282,11 @@ field_type& field_type::remove_large_most_number_stone()
     return *this;
 }
 
+bool field_type::is_removable_force(const stone_type &stone)
+{
+    return is_placed(stone);
+}
+
 //石を取り除く
 field_type& field_type::remove_stone(stone_type const& stone)
 {
@@ -284,8 +294,10 @@ field_type& field_type::remove_stone(stone_type const& stone)
     if(is_placed(stone) == false)throw std::runtime_error("The stone isn't placed!");
 #endif
 
-    //Search stone
     int stone_nth = stone.get_nth();
+    is_placed_stone[stone_nth-1]=false;
+
+    //Search stone
     int stone_processes_at=0;
     for(int i=0;i<processes.size();i++){
         if(processes[i].stone.get_nth() == stone_nth){
@@ -447,6 +459,29 @@ bool field_type::is_stones_can_contact()
     return true;
 }
 
+bool field_type::is_touch_flame(const stone_type &stone, int y, int x)
+{
+    //#ifdef _DEBUGMODE
+        //まだ置かれていないか確かめる
+        if(is_placed(stone)==true)throw std::runtime_error("The stone has been puted!");
+    //#endif
+
+    //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+    stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+
+    //石が障害物と接しているか調べる
+    int avx_collision = 0;
+    __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
+    __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_flame_field[16+y+4]);
+    avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+    avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
+    avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_flame_field[16+y+0]);
+    avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+    if(avx_collision==0) return false;
+
+    return true;
+}
+
 //置かれた石の一覧を表す配列を返す
 std::vector<stone_type> field_type::list_of_stones() const
 {
@@ -486,6 +521,8 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
+
+    for(int i=0;i<256;i++)is_placed_stone[i]=false;
 
     make_bit();
 
@@ -633,6 +670,18 @@ void field_type::make_bit()
             bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
         }
     }
+    //make bit flame field
+    for(int i=0;i<16;i++){
+        bit_flame_field[i] = 0;
+    }
+    bit_flame_field[16] = 0x0000ffffffff0000;
+    for(int i=17;i<47;i++){
+        bit_flame_field[i] = 0x0000800000010000;
+    }
+    bit_flame_field[47] = 0x0000ffffffff0000;
+    for(int i=48;i<64;i++){
+        bit_flame_field[i] = 0;
+    }
     //make bit sides field
     for(int i=0;i<64;i++){
         bit_sides_field[i] = 0;
@@ -647,6 +696,11 @@ void field_type::make_bit()
     std::cout<<"bit plain field"<<std::endl;
     for(int i=0;i<64;i++){
         std::cout<<static_cast<std::bitset<64>>(bit_plain_field[i]);
+        std::cout<<std::endl;
+    }
+    std::cout<<"bit flame field"<<std::endl;
+    for(int i=0;i<64;i++){
+        std::cout<<static_cast<std::bitset<64>>(bit_flame_field[i]);
         std::cout<<std::endl;
     }
     std::cout<<"bit sides field"<<std::endl;
