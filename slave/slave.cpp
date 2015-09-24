@@ -163,6 +163,19 @@ QString Slave::get_geturl(){
 void Slave::print_algorithm_message(std::string str){
     print_text(QString(str.c_str()));
 }
+void Slave::get_from_official_server(){
+    network = new net(get_geturl(),get_posturl());
+    network->setParent(this);
+    auto str = network->get_from_official_server();
+    qDebug() << str.c_str();
+    _problem = problem_type(str.c_str());
+}
+void Slave::sent_to_official_server(){
+    network = new net(get_geturl(),get_posturl());
+    network->setParent(this);
+    auto str = network->send_to_official_server(_answer);
+    qDebug() << str.c_str();
+}
 
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}
 void Slave::post_button_2_pushed(){settings->setValue("POST_BUTTON",2);}

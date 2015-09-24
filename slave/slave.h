@@ -55,6 +55,8 @@ private slots:
     void get_line_edit_2_changed();
     void get_line_edit_3_changed();
     void ui_button_playerid_pushed();
+    void get_from_official_server();
+    void sent_to_official_server();
 };
 
 #endif // SLAVE_H

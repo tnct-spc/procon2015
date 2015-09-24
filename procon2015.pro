@@ -8,4 +8,5 @@ SUBDIRS += \
     muen_zuka \
     slave \
     master \
-    problem_maker
+    problem_maker \
+    auto_evaluter

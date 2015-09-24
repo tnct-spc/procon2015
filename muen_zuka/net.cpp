@@ -35,6 +35,17 @@ std::string net::get()
     if(network_error_flag)return std::string("");
     return std::string(reply->readAll().constData());
 }
+std::string net::get_from_official_server(){
+    QEventLoop eventloop;
+    connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+    QUrl requrl=_server_url.toString()+"/quest"+QString::number(_problem_num)+".txt?token=0123456789abcdef";
+    //66b77ce56fd29d27
+    QNetworkReply *reply = manager->get(QNetworkRequest(requrl));
+    connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+    if(network_error_flag)return std::string("");
+    return std::string(reply->readAll().constData());
+}
 
 std::string net::send(field_type answer){
     QEventLoop eventloop;
@@ -53,6 +64,30 @@ std::string net::send(field_type answer){
     if(network_error_flag)return std::string("");
     return std::string(reply->readAll().constData());
 }
+std::string net::send_to_official_server(field_type answer){
+    QEventLoop eventloop;
+    QHttpMultiPart multi_part(QHttpMultiPart::FormDataType);
+    QHttpPart token_part;
+    token_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"token\""));
+    token_part.setBody("0123456789abcdef");
+    //66b77ce56fd29d27
+    QHttpPart answer_part;
+    answer_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"answer\"; filename=\"Phantasmagoria_of_Flower_View.txt\""));
+    answer_part.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("text/plain"));
+    answer_part.setBody(answer.get_answer().c_str());
+    multi_part.append(token_part);
+    multi_part.append(answer_part);
+    QUrl req_url = _server_url.toString()+"/answer";
+    QNetworkRequest req(req_url);
+    req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(QString("multipart/form-data; boundary=") + QString(multi_part.boundary())));
+    connect(manager,&QNetworkAccessManager::finished,&eventloop,&QEventLoop::quit);
+    QNetworkReply *reply = manager->post(req,&multi_part);
+    connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+    qDebug() << QString(reply->readAll().constData());
+    if(network_error_flag)return std::string("");
+    return "sent";
+}
 
 //デストラクタ書いてないからメモリリークするよ
 //🍣　ご　め　ん　ね　🍣//
@@ -61,6 +96,13 @@ net::~net()
 {
     delete manager;
 
+}
+void net::replyfinished(QNetworkReply* reply){
+    std::cout << std::string(reply->readAll().constData()) << std::endl;
+    QList<QByteArray> headerList = reply->rawHeaderList();
+    foreach(QByteArray head, headerList) {
+        qDebug() << head << ":" << reply->rawHeader(head);
+    }
 }
 void net::networkerror(QNetworkReply::NetworkError e){
     /*

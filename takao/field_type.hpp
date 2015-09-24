@@ -41,6 +41,7 @@ public:
 
     field_type() = default;
     field_type(std::string const & raw_field_text, size_t stones);
+    field_type(const int obstacles, const int cols, const int rows);
 
     ~field_type() = default;
 
@@ -146,6 +147,7 @@ private:
         uint64_t bit_sides_field_at_stone_nth[257][64];//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
         void make_bit();//bitデータの作成
+    void init_edge();
 };
 inline size_t field_type::empty_zk(){
     return get_score();

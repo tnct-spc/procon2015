@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       -= gui
-
+QT       += network
 TARGET = muen_zuka
 TEMPLATE = lib
 

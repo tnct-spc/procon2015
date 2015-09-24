@@ -11,6 +11,7 @@
 #include "field_type.hpp"
 #include "utils.hpp"
 #include <immintrin.h>
+#include <QDebug>
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
 bool field_type::is_placed(stone_type const& stone)
 {
@@ -513,18 +514,8 @@ std::vector<stone_type> field_type::list_of_stones() const
     return placed_stone_type(*stone, pf, ps);
 }
 
-field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
-{
-    provided_stones = stone_nth;
-    auto rows = _split(raw_field_text, "\r\n");
-    for (std::size_t i = 0; i < raw_data.size(); ++i) {
-        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
-                       [](auto const & c) { return c == '1' ? -1 : 0; });
-    }
-
+void field_type::init_edge(){
     for(int i=0;i<256;i++)is_placed_stone[i]=false;
-
-    make_bit();
 
     //edges
     //upper
@@ -565,6 +556,23 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
     }();
 }
 
+field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
+{
+    provided_stones = stone_nth;
+    auto rows = _split(raw_field_text, "\r\n");
+    for (std::size_t i = 0; i < raw_data.size(); ++i) {
+        std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
+                       [](auto const & c) { return c == '1' ? -1 : 0; });
+    }
+    make_bit();
+    init_edge();
+}
+field_type::field_type(const int obstacles, const int cols, const int rows){
+    set_random(obstacles,cols,rows);
+    make_bit();
+    init_edge();
+}
+
 field_type::raw_field_type const & field_type::get_raw_data() const
 {
     return raw_data;
@@ -574,7 +582,7 @@ void field_type::print_field()
 {
     for(auto const&each_raw : raw_data)
     {
-        for(auto each_block : each_raw)
+        for(auto const each_block : each_raw)
         {
             std::cout << std::setw(3) << each_block;
         }
@@ -610,7 +618,8 @@ std::string field_type::get_answer()
         prev_nth = current_nth;
         process_count++;
     }
-    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    //改行の数が環境依存なので,自分でいじってください.
+    for(std::size_t i = prev_nth;i <= provided_stones; i++)result.append("\r\n");
     return result;
 }
 void field_type::set_random(int const obstacle, int const col, int const row)
@@ -618,7 +627,7 @@ void field_type::set_random(int const obstacle, int const col, int const row)
     // fill outer zone
     for(int i = 0; i < FIELD_SIZE; i++)
         for(int j = 0; j < FIELD_SIZE; j++)
-            raw_data[i][j] = col <= j || row <= i;
+            raw_data[i][j] = -(col <= j || row <= i);
 
     int count = 0;
     int insurance = 0;
@@ -631,7 +640,7 @@ void field_type::set_random(int const obstacle, int const col, int const row)
         int x = dist_x(engine);
         int y = dist_y(engine);
         if(raw_data.at(y).at(x) == 0) {
-            raw_data.at(y).at(x) = 1;
+            raw_data.at(y).at(x) = -1;
             count++;
             if(insurance++ > FIELD_SIZE * FIELD_SIZE)
                 return;
