@@ -62,15 +62,19 @@ std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::stri
     return std::make_tuple(problem_name,problem);
 }
 
-void algorithm_evaluater::save_answer(std::vector<std::tuple<std::string,field_type>> named_answers){
-    for(auto named_answer : named_answers){
-        QFile file(QString(std::get<0>(named_answer).c_str()).append("ans.txt"));
-        if(!file.open(QIODevice::WriteOnly))return;
-        QTextStream out(&file);
-        out << std::get<1>(named_answer).get_answer().c_str();
-    }
-    return;
+void algorithm_evaluater::save_answer(std::tuple<std::string,field_type> named_answer){
+    QFile file(QString(std::get<0>(named_answer).c_str()).append("ans.txt"));
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << std::get<1>(named_answer).get_answer().c_str();
 }
+void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> named_problem){
+    QFile file(QString(std::get<0>(named_problem).c_str()).append("prob.txt"));
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << std::get<1>(named_problem).str().c_str();
+}
+
 std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
@@ -94,12 +98,14 @@ void algorithm_evaluater::run(){
     for(int prob_num = 0; prob_num < loop_num;prob_num++){
         qDebug() << "a" << prob_num;
         auto named_problem = make_problem(std::to_string(prob_num));
+        save_problem(named_problem);
         auto answers = evaluate(std::get<1>(named_problem));
         for(int ans_num = 0; ans_num < answers.size();ans_num++){
-            named_answers.push_back(std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num)));
+            auto named_answer = std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num));
+            named_answers.push_back(named_answer);
+            save_answer(named_answer);
         }
     }
-    save_answer(named_answers);
     QCoreApplication::exit(0);
 }
 
