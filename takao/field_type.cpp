@@ -610,7 +610,8 @@ std::string field_type::get_answer()
         prev_nth = current_nth;
         process_count++;
     }
-    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    //改行の数が環境依存なので,自分でいじってください.
+    for(std::size_t i = prev_nth;i <= provided_stones; i++)result.append("\r\n");
     return result;
 }
 void field_type::set_random(int const obstacle, int const col, int const row)
