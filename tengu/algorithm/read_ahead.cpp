@@ -13,6 +13,7 @@
 read_ahead::read_ahead(problem_type _problem)
 {
     pre_problem = _problem;
+    algorithm_name = "read_ahead";
 
     //LAH = 1600 / pre_problem.stones.size();
     LAH = 3;
@@ -151,10 +152,10 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             field_type& field = s.field;
             field.put_stone(stone,i,j);
             double const score = evaluate(field,stone,i,j);
-            int const island = get_island(field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
-            if(search_vec.size() < 4)
+            if(search_vec.size() < 20) //20個貯まるまでは追加する
             {
+                int const island = get_island(field.get_raw_data());
                 if(s.rank == 1)
                 {
                     search_vec.push_back({
@@ -182,74 +183,83 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             }
             else
             {
-                auto min = std::min_element(search_vec.begin(),search_vec.end(),[](auto const&lhs, auto const& rhs){return lhs.score < rhs.score;});
-                if(s.rank == 1 /*&& min->score <= score*/)
+                //保持している中での最悪手
+                auto min = std::min_element(search_vec.begin(),search_vec.end(),[](auto const&lhs, auto const& rhs)
+                    {
+                        return lhs.score == rhs.score ? lhs.island > rhs.island : lhs.score < rhs.score;
+                    });
+                if(s.rank == 1 && min->score <= score) //1層目　保持している中の最悪手より良い
                 {
-                    /*
-                    *min =
-                        {
-                            field,
-                            point_type{i,j},
-                            stone.get_angle(),
-                            stone.get_side(),
-                            score,
-                            s.rank + 1
-                        };
-                    */
-                    search_vec.push_back({
-                            field,
-                            point_type{i,j},
-                            stone.get_angle(),
-                            stone.get_side(),
-                            score,
-                            s.rank + 1,
-                            island
-                        });
+                    int const island = get_island(field.get_raw_data());
+/*                    if(min->score == score && min->island < island) continue; //スコアが同じで島が多いなら要らない
+                    else if(min->score < score || min->island > island) //スコアが良いか、島が少ないなら置き換える
+                    {
+                        *min =
+                            {
+                                field,
+                                point_type{i,j},
+                                stone.get_angle(),
+                                stone.get_side(),
+                                score,
+                                s.rank + 1,
+                                island
+                            };
+                    }
+                    else //スコアも島も同じなら追加*/
+                    {
+                        search_vec.push_back({
+                                field,
+                                point_type{i,j},
+                                stone.get_angle(),
+                                stone.get_side(),
+                                score,
+                                s.rank + 1,
+                                island
+                            });
+                    }
                 }
-                else if(s.rank > 1 /*&& min->score <= s.score + score*/)
+                else if(s.rank > 1 && min->score <= s.score + score) //2層目以上　保持している中の最悪手より良い
                 {
-                    /*
-                    *min =
-                        {
-                            field,
-                            s.point,
-                            s.rotate,
-                            s.flip,
-                            s.score + score,
-                            s.rank + 1
-                        };
-                   */
-                    search_vec.push_back({
-                            field,
-                            s.point,
-                            s.rotate,
-                            s.flip,
-                            s.score + score,
-                            s.rank + 1,
-                            island
-                       });
+                    int const island = get_island(field.get_raw_data());
+/*                    if(min->score == score && min->island < island) continue; //スコアが同じで島が多いなら要らない
+                    else if(min->score < score || min->island > island) //スコアが良いか、島が少ないなら置き換える
+                    {
+                        *min =
+                            {
+                                field,
+                                s.point,
+                                s.rotate,
+                                s.flip,
+                                s.score + score,
+                                s.rank + 1,
+                                island
+                            };
+                    }
+                    else //スコアも島も同じなら追加*/
+                    {
+                        search_vec.push_back({
+                                field,
+                                s.point,
+                                s.rotate,
+                                s.flip,
+                                s.score + score,
+                                s.rank + 1,
+                                island
+                           });
+                    }
                 }
             }
             field.remove_large_most_number_and_just_before_stone();
         }
     }
+
     std::sort(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
         {
             return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
         });
-    //std::cout << "--------------------------" << std::endl;
-    //for(auto& each : search_vec) std::cout << "score = " << each.score << std::endl;
-
-    /*
-    std::size_t i;
-    for(i = 1; i < search_vec.size() && search_vec.at(i).score == search_vec.at(i-1).score; ++i);
-    if(search_vec.size() > i) search_vec.resize(i);
-    search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
-    */
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     if(search_vec.size() > 3) search_vec.resize(3);
 
-    //for(auto& each : search_vec) if(each.good == false) std::cout << "haitteru" << std::endl;
 
     if(s.rank >= LAH || ishi >= STONE_NUM-1)
     {
