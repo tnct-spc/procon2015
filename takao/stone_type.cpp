@@ -34,7 +34,21 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
         std::transform(rows[i].begin(), rows[i].end(), raw_data_set.at(0)[i].begin(),
                        [](auto const & c) { return c == '1'; });
     }
+    init_stone();
+}
 
+stone_type::stone_type(int const zk)
+{
+    _set_random(zk);
+    init_stone();
+}
+stone_type::stone_type(int const zk, int const nth) : nth(nth)
+{
+    _set_random(zk);
+    init_stone();
+}
+void stone_type::init_stone()
+{
     //rotate用のarrayを準備する
     std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
     for(size_t i = 1; i < 4; ++i)
@@ -58,34 +72,7 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
         area += std::count(each_raw_data.begin(),each_raw_data.end(),1);
     }
 
-
 }
-
-stone_type::stone_type(int const zk)
-{
-    _set_random(zk);
-    std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
-    for(size_t i = 1; i < 4; ++i)
-    {
-        raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
-        raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
-    }
-
-    make_bit();
-}
-stone_type::stone_type(int const zk, int const nth) : nth(nth)
-{
-    _set_random(zk);
-    std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
-    for(size_t i = 1; i < 4; ++i)
-    {
-        raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
-        raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
-    }
-
-    make_bit();
-}
-
 
 //時計回りを正方向として指定された角度だけ回転する
 stone_type::raw_stone_type stone_type::_rotate(raw_stone_type const & raw_data, int angle)

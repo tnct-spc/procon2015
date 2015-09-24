@@ -52,7 +52,7 @@ std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::stri
         std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
         int const zk = dist_zk(engine);
         stone_type stone(zk,stone_num);
-        //qDebug() << stone.str().c_str();
+        qDebug() << stone.str().c_str();
         stone_num ++;
         total_zk += stone.get_area();
         stones.push_back(stone);
@@ -90,6 +90,7 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     connect(&algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
     algo.start();
     eventloop.exec();
+    qDebug() << "ohayo";
     algo.wait();
     return ans_vector;
 }
