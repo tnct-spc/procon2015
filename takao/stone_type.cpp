@@ -3,6 +3,7 @@
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
+#include <bitset>
 #endif
 
 #include "stone_type.hpp"
@@ -63,6 +64,26 @@ stone_type::stone_type(std::string const & raw_stone_text, int const _nth) :nth(
 stone_type::stone_type(int const zk)
 {
     _set_random(zk);
+    std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
+    for(size_t i = 1; i < 4; ++i)
+    {
+        raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
+        raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
+    }
+
+    make_bit();
+}
+stone_type::stone_type(int const zk, int const nth) : nth(nth)
+{
+    _set_random(zk);
+    std::fill_n(std::next(raw_data_set.begin(), 4), 4, _flip(raw_data_set.at(0)));
+    for(size_t i = 1; i < 4; ++i)
+    {
+        raw_data_set.at(i)   = _rotate(raw_data_set.at(0), i*90);
+        raw_data_set.at(4+i) = _rotate(raw_data_set.at(4), i*90);
+    }
+
+    make_bit();
 }
 
 
@@ -155,13 +176,13 @@ void stone_type::make_bit()
     }
 #ifdef _DEBUG
     std::cout<<"bit plain stones"<<std::endl;
-    //for(int x=0;x<41;x++){//マイケルの動き
+    for(int x=0;x<41;x++){//マイケルの動き
         if(x==0 || x==40) std::cout<<"無駄な石"<<std::endl;
         for(int y=0;y<8;y++){//縦に一行ごと
-            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[x][0][2][y])<<std::endl;
+            std::cout<<static_cast<std::bitset<64>>(bit_plain_stones[x][0][0][y])<<std::endl;
         }
         std::cout<<std::endl;
-    //}
+    }
 #endif
     for(int i = 5; i < 8; i++)
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
@@ -218,7 +239,7 @@ void stone_type::_set_from_raw(raw_stone_type raw)
 }
 
 /* no new line at end of output */
-std::string stone_type::str()
+std::string stone_type::str() const
 {
     std::stringstream ss;
     for(auto each_row : get_raw_data()) {
