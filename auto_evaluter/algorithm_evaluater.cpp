@@ -52,7 +52,6 @@ std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::stri
         std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
         int const zk = dist_zk(engine);
         stone_type stone(zk,stone_num);
-        qDebug() << stone.str().c_str();
         stone_num ++;
         total_zk += stone.get_area();
         stones.push_back(stone);
@@ -83,14 +82,12 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
         ans_vector.push_back(ans);
-        qDebug() << "hello";
         mtx.unlock();
         eventloop.quit();
     });
     connect(&algo,&algorithm_type::finished,&eventloop,&QEventLoop::quit);
     algo.start();
     eventloop.exec();
-    qDebug() << "ohayo";
     algo.wait();
     return ans_vector;
 }
@@ -105,13 +102,18 @@ void algorithm_evaluater::run(){
             auto named_answer = std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num));
             named_answers.push_back(named_answer);
             save_answer(named_answer);
+            save_record(named_problem,named_answer);
         }
     }
     QCoreApplication::exit(0);
 }
 
-void algorithm_evaluater::save_record(){
-
+void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer){
+    QFile record_file("recodes.txt");
+    record_file.open(QIODevice::Append);
+    QTextStream out(&record_file);
+    out << "answer :" << std::get<0>(named_answer).c_str()  << " problem :" << std::get<0>(named_problem).c_str() << " score :" << std::get<1>(named_answer).get_score() << endl;
 }
+
 void algorithm_evaluater::get_answer(field_type ans){
 }
