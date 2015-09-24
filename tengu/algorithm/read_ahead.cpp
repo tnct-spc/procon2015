@@ -46,11 +46,15 @@ void read_ahead::run()
                 });
     threads.waitForFinished();
 */
-
+/*
     for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 8; ++rotate)
     {
         one_try(pre_problem,l,m,rotate);
     }
+*/
+    //-4, 4  90 Tail
+    one_try(pre_problem,-4,4,3);
+
 }
 
 //
@@ -96,7 +100,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                     problem.stones.at(ishi).rotate(each_ele.rotate);
                     problem.field.put_stone(problem.stones.at(ishi), each_ele.point.y, each_ele.point.x);
                     print_text((boost::format("putted %dth stone")%ishi).str());
-                    std::cout << ishi << "th stone putted" << std::endl;
+                    //std::cout << ishi << "th stone putted" << std::endl;
                     break;
                 }
             }
@@ -115,9 +119,9 @@ double read_ahead::evaluate(field_type const& field, stone_type stone,int const 
     double count = 0;
     for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) < n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) < n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) < n) ? 1 : 0;
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
         if(field.get_raw_data().at(k).at(l) == n)
         {
             count += (kl1 + k1l);
@@ -139,44 +143,103 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
     {
-        //std::cout << "koko1" << std::endl;
         if(rotate %2 == 0) stone.rotate(90);
         else stone.flip();
-        //std::cout << "koko2" << std::endl;
         if(s.field.is_puttable(stone,i,j) == true)
         {
             count++;
-            field_type field = s.field;
+            field_type& field = s.field;
             field.put_stone(stone,i,j);
+            double const score = evaluate(field,stone,i,j);
+            int const island = get_island(field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
-            if(s.rank == 1)
+            if(search_vec.size() < 4)
             {
-                search_vec.push_back({
-                        field,
-                        point_type{i,j},
-                        stone.get_angle(),
-                        stone.get_side(),
-                        evaluate(field,stone,i,j),
-                        s.rank + 1
-                    });
+                if(s.rank == 1)
+                {
+                    search_vec.push_back({
+                            field,
+                            point_type{i,j},
+                            stone.get_angle(),
+                            stone.get_side(),
+                            score,
+                            s.rank + 1,
+                            island
+                        });
+                }
+                else
+                {
+                    search_vec.push_back({
+                            field,
+                            s.point,
+                            s.rotate,
+                            s.flip,
+                            s.score + score,
+                            s.rank + 1,
+                            island
+                       });
+                }
             }
             else
             {
-                search_vec.push_back({
-                        field,
-                        s.point,
-                        s.rotate,
-                        s.flip,
-                        s.score + evaluate(field,stone,i,j),
-                        s.rank + 1
-                   });
+                auto min = std::min_element(search_vec.begin(),search_vec.end(),[](auto const&lhs, auto const& rhs){return lhs.score < rhs.score;});
+                if(s.rank == 1 /*&& min->score <= score*/)
+                {
+                    /*
+                    *min =
+                        {
+                            field,
+                            point_type{i,j},
+                            stone.get_angle(),
+                            stone.get_side(),
+                            score,
+                            s.rank + 1
+                        };
+                    */
+                    search_vec.push_back({
+                            field,
+                            point_type{i,j},
+                            stone.get_angle(),
+                            stone.get_side(),
+                            score,
+                            s.rank + 1,
+                            island
+                        });
+                }
+                else if(s.rank > 1 /*&& min->score <= s.score + score*/)
+                {
+                    /*
+                    *min =
+                        {
+                            field,
+                            s.point,
+                            s.rotate,
+                            s.flip,
+                            s.score + score,
+                            s.rank + 1
+                        };
+                   */
+                    search_vec.push_back({
+                            field,
+                            s.point,
+                            s.rotate,
+                            s.flip,
+                            s.score + score,
+                            s.rank + 1,
+                            island
+                       });
+                }
             }
+            field.remove_large_most_number_and_just_before_stone();
         }
     }
     std::sort(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
         {
-            return lhs.score == rhs.score ? get_island(lhs.field.get_raw_data()) < get_island(rhs.field.get_raw_data()) : lhs.score > rhs.score;
+            return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
         });
+    //std::cout << "--------------------------" << std::endl;
+    //for(auto& each : search_vec) std::cout << "score = " << each.score << std::endl;
+
     /*
     std::size_t i;
     for(i = 1; i < search_vec.size() && search_vec.at(i).score == search_vec.at(i-1).score; ++i);
@@ -185,6 +248,8 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     */
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     if(search_vec.size() > 3) search_vec.resize(3);
+
+    //for(auto& each : search_vec) if(each.good == false) std::cout << "haitteru" << std::endl;
 
     if(s.rank >= LAH || ishi >= STONE_NUM-1)
     {

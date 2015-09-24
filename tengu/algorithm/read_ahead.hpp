@@ -20,7 +20,8 @@ public:
         stone_type::Sides flip;
         double score = 0;
         int rank = 1;
-        search_type(field_type field,point_type point,std::size_t rotate,stone_type::Sides flip,double score,int rank):field(field),point(point),rotate(rotate),flip(flip),score(score),rank(rank){};
+        int island;
+        search_type(field_type field,point_type point,std::size_t rotate,stone_type::Sides flip,double score,int rank,int island):field(field),point(point),rotate(rotate),flip(flip),score(score),rank(rank),island(island){};
         search_type(){};
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
