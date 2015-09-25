@@ -19,7 +19,7 @@ read_ahead::read_ahead(problem_type _problem)
     LAH = 3;
     //print_text((boost::format("LAH = %d")%LAH).str());
     qDebug("LAH = %lu",LAH);
-    STONE_NUM = pre_problem.stones.size();
+    ALL_STONES_NUM = pre_problem.stones.size();
 }
 
 read_ahead::~read_ahead()
@@ -77,11 +77,12 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             search(sv, std::move(one), problem.field, ishi);
 
             if(sv.size() == 0) continue;
+//*
             std::sort(sv.begin(),sv.end(),[&](const search_type& lhs, const search_type& rhs)
                 {
                     return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
                 });
-
+            for(auto& each_ele : sv) std::cout << "score = " << each_ele.score << " island = " << each_ele.island << std::endl;
 
             for(auto& each_ele : sv)
             {
@@ -92,10 +93,32 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                     problem.stones.at(ishi).rotate(each_ele.iv[0].angle);
                     problem.field.put_stone(problem.stones.at(ishi), each_ele.iv[0].point.y, each_ele.iv[0].point.x);
                     print_text((boost::format("putted %dth stone")%ishi).str());
-                    //std::cout << ishi << "th stone putted" << std::endl;
+                    std::cout << ishi << "th stone putted" << std::endl;
                     break;
                 }
             }
+//*/
+/*
+            for(std::size_t i = 0; i < sv.size(); ++i)
+            {
+                auto max = std::min_element(sv.begin(),sv.end(),[](const search_type& lhs, const search_type& rhs)
+                    {
+                        return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+                    });
+                std::cout << "score = " << max->score << " island = " << max->island << std::endl;
+                if(pass(*max,problem.stones.at(ishi)) == true)
+                {
+                    max->score *= -1;
+                    continue;
+                }
+                if(max->iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
+                problem.stones.at(ishi).rotate(max->iv[0].angle);
+                problem.field.put_stone(problem.stones.at(ishi), max->iv[0].point.y, max->iv[0].point.x);
+                print_text((boost::format("putted %dth stone")%ishi).str());
+                std::cout << ishi << "th stone putted" << std::endl;
+                break;
+            }
+//*/
         }
 
         std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
@@ -202,7 +225,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     if(search_vec.size() > 3) search_vec.resize(3);
 
-    if(s.iv.size()+1 >= LAH || stone_num >= STONE_NUM-1)
+    if(s.iv.size()+1 >= LAH || stone_num >= ALL_STONES_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(sv));
     }

@@ -24,8 +24,8 @@ public:
     struct search_type
     {
         std::vector<stones_info_type> iv;
-        double score = 0;
-        int island;
+        double score = -1;
+        int island = -1;
         search_type(std::vector<stones_info_type> iv,double score,int island):iv(iv),score(score),island(island){};
         search_type(){};
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
@@ -42,7 +42,7 @@ public:
 private:
 
     std::size_t LAH = 3;
-    std::size_t STONE_NUM;
+    std::size_t ALL_STONES_NUM;
     problem_type pre_problem;
     void one_try(problem_type problem, int y, int x, std::size_t const rotate);
     double evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
