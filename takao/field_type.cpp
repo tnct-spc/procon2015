@@ -13,7 +13,7 @@
 #include <immintrin.h>
 #include <QDebug>
 //石が置かれているか否かを返す 置かれているときtrue 置かれていないときfalse
-bool field_type::is_placed(stone_type const& stone)
+bool field_type::is_placed(stone_type const& stone) const
 {
     return is_placed_stone[stone.get_nth()-1];
 }
@@ -111,7 +111,7 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 }
 
 //石を置けるか
-bool field_type::is_puttable(stone_type const& stone, int y, int x)
+bool field_type::is_puttable(stone_type const& stone, int y, int x) const
 {
     //まだ置かれていないか確かめる
     if(is_placed(stone)==true)return false;
@@ -719,7 +719,7 @@ void field_type::make_bit()
     }
 #endif
 }
-double field_type::evaluate_normalized_complexity()
+double field_type::evaluate_normalized_complexity() const
 {
     uint64_t side = 0;
     for(int i = 1; i < 63; i ++){
