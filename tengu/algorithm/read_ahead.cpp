@@ -18,7 +18,7 @@ read_ahead::read_ahead(problem_type _problem)
     //LAH = 1600 / pre_problem.stones.size();
     LAH = 3;
     //print_text((boost::format("LAH = %d")%LAH).str());
-    qDebug("LAH = %d",LAH);
+    qDebug("LAH = %lu",LAH);
     STONE_NUM = pre_problem.stones.size();
 }
 
@@ -74,7 +74,6 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
         {
             std::vector<search_type> sv;
             search_type one;
-            one.field = problem.field;
             search(sv, std::move(one), problem.field, ishi);
 
             if(sv.size() == 0) continue;
@@ -83,14 +82,6 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                     return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
                 });
 
-            /*
-            for(auto const& each_ele : sv)
-            {
-                std::string const flip = each_ele.flip == stone_type::Sides::Head ? "Head" : "Tail";
-                std::cout << each_ele.point.y << " " << each_ele.point.x << " " << each_ele.rotate << " " << flip << " "<< each_ele.score << std::endl;
-            }
-            std::cout << std::endl;
-            */
 
             for(auto& each_ele : sv)
             {
@@ -141,28 +132,25 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
     int count = 0;
     stone_type stone = pre_problem.stones.at(stone_num);
     std::vector<search_type> search_vec;
-    if(_field.get_raw_data() != s.field.get_raw_data()) std::cout << "dame" << std::endl;
 
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
     {
         if(rotate %2 == 0) stone.rotate(90);
         else stone.flip();
-        if(s.field.is_puttable(stone,i,j) == true)
+        if(_field.is_puttable(stone,i,j) == true)
         {
             count++;
-            field_type& field = s.field;
-            field.put_stone(stone,i,j);
-            double const score = evaluate(field,stone,i,j);
-            int const island = get_island(field.get_raw_data());
+            _field.put_stone(stone,i,j);
+            double const score = evaluate(_field,stone,i,j);
+            int const island = get_island(_field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
                 if(s.iv.size() == 0)
                 {
                     search_vec.emplace_back(
-                            field,
-                            std::vector<stones_info_type>{{stone_num,point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
                             island
                         );
@@ -170,12 +158,11 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                 else
                 {
                     search_vec.emplace_back(
-                            field,
                             s.iv,
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(stone_num,point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
             else
@@ -188,8 +175,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                 if(s.iv.size() == 0 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
-                            field,
-                            std::vector<stones_info_type>{{stone_num, point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
                             island
                         );
@@ -197,15 +183,14 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                 else if(s.iv.size() > 0 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
-                            field,
                             s.iv,
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(stone_num,point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
-            field.remove_large_most_number_and_just_before_stone();
+            _field.remove_large_most_number_and_just_before_stone();
         }
     }
 
