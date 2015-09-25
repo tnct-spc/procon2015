@@ -43,6 +43,6 @@ unix {
 }
 
 unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14 -mavx
 INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao

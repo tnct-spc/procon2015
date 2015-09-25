@@ -20,7 +20,7 @@ bool field_type::is_placed(stone_type const& stone)
 }
 
 //現在の状態における得点を返す
-size_t field_type::get_score()
+size_t field_type::get_score() const
 {
     size_t sum = 0;
     for (auto const & row : raw_data)
@@ -71,7 +71,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 }
 
 //指定された場所に指定された石が置けるかどうかを返す
-bool field_type::is_puttable(stone_type const& stone, int y, int x)
+bool field_type::is_puttable(stone_type const& stone, int y, int x) const
 {
 #ifdef _DEBUGMODE
     if(is_placed(stone)==true) return false;
@@ -426,7 +426,7 @@ void field_type::make_bit()
     }
 #endif
 }
-double field_type::evaluate_normalized_complexity()
+double field_type::evaluate_normalized_complexity() const
 {
     uint64_t side = 0;
     for(int i = 1; i < 63; i ++){

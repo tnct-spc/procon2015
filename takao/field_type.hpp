@@ -44,18 +44,18 @@ public:
 
     ~field_type() = default;
     //アクセッサ
-    size_t get_score();//現在の状態の得点を返す
+    size_t get_score() const;//現在の状態の得点を返す
     size_t empty_zk();//get_score()を同じ.なんのためにあるのかわからない
-    size_t get_block_num();//何かが配置されている(空白以外)マスの数を返す
+    size_t get_block_num() const; //何かが配置されている(空白以外)マスの数を返す
     raw_field_type const& get_raw_data() const;//bit化していない配列のアクセッサ
     placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);//引数の座標にある石を返す
     std::string get_answer() const;
     std::vector<stone_type> list_of_stones() const;//置かれた石の一覧を表す配列を返す
-    double evaluate_normalized_complexity();
+    double evaluate_normalized_complexity() const;
 
     //石の操作
     field_type& put_stone(stone_type const& stone, int y, int x);//失敗したら例外を出す
-    bool is_puttable(stone_type const& stone, int y, int x);//指定された場所に指定された石が置けるかどうか
+    bool is_puttable(stone_type const& stone, int y, int x) const;//指定された場所に指定された石が置けるかどうか
     field_type& remove_just_before_stone(stone_type const& stone);//１手前の石を取り除く
     /*bit化で一時的に利用不能
     //field_type& remove_stone(stone_type const& stone);//指定された石を取り除く．その石が置かれていない場合, 取り除いた場合に不整合が生じる場合は例外を出す
@@ -66,6 +66,12 @@ public:
     std::string str();
     void set_provided_stones(size_t ps);
     void print_field();
+
+    // 配列の参照を返すょ
+    uint64_t inline const (&get_bit_plain_field() const)[64]
+    {
+        return bit_plain_field;
+    }
 
 private:
     raw_field_type raw_data;
@@ -91,7 +97,8 @@ private:
 inline size_t field_type::empty_zk(){
     return get_score();
 }
-inline size_t field_type::get_block_num(){
+inline size_t field_type::get_block_num() const
+{
     return (FIELD_SIZE * FIELD_SIZE) - get_score();
 }
 
