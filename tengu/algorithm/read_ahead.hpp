@@ -12,29 +12,29 @@ public:
     ~read_ahead();
     void run();
 
-    struct stone_info_type
+    struct stones_info_type
     {
         point_type point;
         std::size_t angle;
         stone_type::Sides side;
+        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){};
+        stones_info_type(){};
     };
 
     struct search_type
     {
         field_type field;
-        point_type point;
-        std::size_t rotate;
-        stone_type::Sides flip;
+        std::vector<stones_info_type> iv;
         double score = 0;
         int rank = 1;
         int island;
-        search_type(field_type field,point_type point,std::size_t rotate,stone_type::Sides flip,double score,int rank,int island):field(field),point(point),rotate(rotate),flip(flip),score(score),rank(rank),island(island){};
+        search_type(field_type field,std::vector<stones_info_type> iv,double score,int rank,int island):field(field),iv(iv),score(score),rank(rank),island(island){};
         search_type(){};
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
-            return lhs.point == rhs.point &&
-                   lhs.rotate == rhs.rotate &&
-                   lhs.flip == rhs.flip &&
+            return lhs.iv[0].point == rhs.iv[0].point &&
+                   lhs.iv[0].angle == rhs.iv[0].angle &&
+                   lhs.iv[0].side == rhs.iv[0].side &&
                    lhs.rank == rhs.rank &&
                    lhs.score == rhs.score;
         }

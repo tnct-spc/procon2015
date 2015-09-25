@@ -97,9 +97,9 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                 if(pass(each_ele,problem.stones.at(ishi)) == true) continue;
                 else
                 {
-                    if(each_ele.flip == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
-                    problem.stones.at(ishi).rotate(each_ele.rotate);
-                    problem.field.put_stone(problem.stones.at(ishi), each_ele.point.y, each_ele.point.x);
+                    if(each_ele.iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
+                    problem.stones.at(ishi).rotate(each_ele.iv[0].angle);
+                    problem.field.put_stone(problem.stones.at(ishi), each_ele.iv[0].point.y, each_ele.iv[0].point.x);
                     print_text((boost::format("putted %dth stone")%ishi).str());
                     //std::cout << ishi << "th stone putted" << std::endl;
                     break;
@@ -158,27 +158,24 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             {
                 if(s.rank == 1)
                 {
-                    search_vec.push_back({
+                    search_vec.emplace_back(
                             field,
-                            point_type{i,j},
-                            stone.get_angle(),
-                            stone.get_side(),
+                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
                             s.rank + 1,
                             island
-                        });
+                        );
                 }
                 else
                 {
-                    search_vec.push_back({
+                    search_vec.emplace_back(
                             field,
-                            s.point,
-                            s.rotate,
-                            s.flip,
+                            s.iv,
                             s.score + score,
                             s.rank + 1,
                             island
-                       });
+                       );
+                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
             else
@@ -190,27 +187,24 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                     });
                 if(s.rank == 1 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
-                    search_vec.push_back({
-                                             field,
-                                             point_type{i,j},
-                                             stone.get_angle(),
-                                             stone.get_side(),
-                                             score,
-                                             s.rank + 1,
-                                             island
-                                         });
+                    search_vec.emplace_back(
+                            field,
+                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            score,
+                            s.rank + 1,
+                            island
+                        );
                 }
                 else if(s.rank > 1 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
-                    search_vec.push_back({
-                                             field,
-                                             s.point,
-                                             s.rotate,
-                                             s.flip,
-                                             s.score + score,
-                                             s.rank + 1,
-                                             island
-                                         });
+                    search_vec.emplace_back(
+                            field,
+                            s.iv,
+                            s.score + score,
+                            s.rank + 1,
+                            island
+                       );
+                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
             field.remove_large_most_number_and_just_before_stone();
