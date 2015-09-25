@@ -56,7 +56,7 @@ public:
     /**************/
 
     //石を置けるか
-    bool is_puttable(stone_type const& stone, int y, int x);
+    bool is_puttable(stone_type const& stone, int y, int x) const;
     //接していなくても石を置けるか
     bool is_puttable_force(stone_type const& stone, int y, int x);
     //石を置く
@@ -98,8 +98,8 @@ public:
 
     //アクセッサ
     size_t empty_zk();//get_score()を同じ.なんのためにあるのかわからない
-    size_t get_block_num();//何かが配置されている(空白以外)マスの数を返す
-    double evaluate_normalized_complexity();
+    size_t get_block_num() const;//何かが配置されている(空白以外)マスの数を返す
+    double evaluate_normalized_complexity() const;
 
     //現在の状態における得点を返す
     size_t get_score() const;
@@ -107,10 +107,10 @@ public:
     //置かれた石の一覧を表す配列を返す
     std::vector<stone_type> list_of_stones() const;
 
-    //
+    // 引数の座標にある石を返す
     placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
 
-    // accessor for raw_data
+    // bit化していない配列のアクセッサ
     raw_field_type const& get_raw_data() const;
     // don't use this
     raw_field_type& set_raw_data();
@@ -121,6 +121,13 @@ public:
     std::string str();
     void set_provided_stones(size_t ps);
     void print_field();
+
+    // 配列の参照を返すょ
+    uint64_t inline const (&get_bit_plain_field() const)[64]
+    {
+        return bit_plain_field;
+    }
+
 private:
     raw_field_type raw_data;
     std::vector<process_type> processes;
@@ -138,7 +145,7 @@ private:
 
     bool is_placed_stone[256];
     //石が置かれているか否かを返す
-    bool is_placed(stone_type const& stone);
+    bool is_placed(stone_type const& stone) const;
 
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
@@ -152,7 +159,8 @@ private:
 inline size_t field_type::empty_zk(){
     return get_score();
 }
-inline size_t field_type::get_block_num(){
+inline size_t field_type::get_block_num() const
+{
     return (FIELD_SIZE * FIELD_SIZE) - get_score();
 }
 

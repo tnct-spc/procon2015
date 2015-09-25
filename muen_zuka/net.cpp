@@ -77,7 +77,7 @@ std::string net::send_to_official_server(field_type answer){
     answer_part.setBody(answer.get_answer().c_str());
     multi_part.append(token_part);
     multi_part.append(answer_part);
-    QUrl req_url = _server_url.toString()+"/answer";
+    QUrl req_url = _master_url.toString()+"/answer";
     QNetworkRequest req(req_url);
     req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(QString("multipart/form-data; boundary=") + QString(multi_part.boundary())));
     connect(manager,&QNetworkAccessManager::finished,&eventloop,&QEventLoop::quit);

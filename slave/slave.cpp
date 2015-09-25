@@ -78,12 +78,16 @@ void Slave::clicked_run_button(){
                           settings->value("PLAYERID").toString(),
                           ui->prob_num_line_edit->text().toInt()
                           );
-        auto str = network->get();
+        std::string str;
+        if(ui->checkBoxofRaciveOfiicialServer->isChecked()){
+            str = network->get_from_official_server();
+        }else{
+            str = network->get();
+        }
         if(network->is_error()){
             print_text(QString("🍣ネットワークエラーコード ") + QString::number(network->what_error()));
             return;
         }
-        //ui->net_label->setText("ネットは生きてる");
         print_text("問題を受信しました");
         problem_type problem(str);
         _problem = problem;
@@ -113,8 +117,12 @@ void Slave::answer_send(field_type answer){
 
     }else{
         net_mtx.lock();
-
-        std::string res = network->send(answer);
+        std::string res;
+        if(ui->checkBoxofSendOfiicialServer->isChecked()){
+            res = network->send_to_official_server(answer);
+        }else{
+            res = network->send(answer);
+        }
         print_text(QString(res.c_str()));
         print_text("回答を送信しました");
         print_text(QString("動作中アルゴリズム数 ") + QString::number(algo_manager->run_thread_num()));

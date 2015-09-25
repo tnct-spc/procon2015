@@ -18,7 +18,8 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/sticky_algo.cpp \
     algorithm/read_ahead.cpp \
     algorithm/square.cpp \
-    algorithm/yrange2.cpp
+    algorithm/yrange2.cpp \
+    evaluator.cpp
 
 
 HEADERS += tengu.hpp\
@@ -29,7 +30,8 @@ HEADERS += tengu.hpp\
     algorithm/sticky_algo.hpp \
     algorithm/read_ahead.hpp \
     algorithm/square.hpp \
-    algorithm/yrange2.hpp
+    algorithm/yrange2.hpp \
+    evaluator.hpp
 
 LIBS += -lQt5Concurrent
 
@@ -39,6 +41,6 @@ unix {
 }
 
 unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14 -mavx
 INCLUDEPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../takao
