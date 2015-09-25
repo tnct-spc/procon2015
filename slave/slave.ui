@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>497</height>
+    <width>363</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,8 +34,8 @@
   <widget class="QPushButton" name="run_button">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>60</y>
+     <x>10</x>
+     <y>30</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -47,8 +47,8 @@
   <widget class="QLineEdit" name="post_line_edit_1">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>280</y>
+     <x>40</x>
+     <y>290</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -60,8 +60,8 @@
   <widget class="QLineEdit" name="get_line_edit_1">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>340</y>
+     <x>40</x>
+     <y>350</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -73,8 +73,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>340</y>
+     <x>20</x>
+     <y>330</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -86,8 +86,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>280</y>
+     <x>20</x>
+     <y>270</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -99,8 +99,8 @@
   <widget class="QLineEdit" name="prob_num_line_edit">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>410</y>
+     <x>70</x>
+     <y>420</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -112,8 +112,8 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>410</y>
+     <x>10</x>
+     <y>420</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -125,7 +125,7 @@
   <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>100</y>
      <width>341</width>
      <height>171</height>
@@ -135,8 +135,8 @@
   <widget class="QPushButton" name="Clear_button">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>60</y>
+     <x>100</x>
+     <y>30</y>
      <width>85</width>
      <height>31</height>
     </rect>
@@ -148,8 +148,8 @@
   <widget class="QLineEdit" name="post_line_edit_2">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>300</y>
+     <x>40</x>
+     <y>310</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -161,8 +161,8 @@
   <widget class="QRadioButton" name="post_button_1">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>280</y>
+     <x>10</x>
+     <y>290</y>
      <width>21</width>
      <height>22</height>
     </rect>
@@ -177,8 +177,8 @@
   <widget class="QRadioButton" name="post_button_2">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>300</y>
+     <x>10</x>
+     <y>310</y>
      <width>21</width>
      <height>22</height>
     </rect>
@@ -193,8 +193,8 @@
   <widget class="QLineEdit" name="get_line_edit_2">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>360</y>
+     <x>40</x>
+     <y>370</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -206,8 +206,8 @@
   <widget class="QLineEdit" name="get_line_edit_3">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>380</y>
+     <x>40</x>
+     <y>390</y>
      <width>311</width>
      <height>21</height>
     </rect>
@@ -219,8 +219,8 @@
   <widget class="QRadioButton" name="get_button_1">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>340</y>
+     <x>10</x>
+     <y>350</y>
      <width>21</width>
      <height>22</height>
     </rect>
@@ -235,8 +235,8 @@
   <widget class="QRadioButton" name="get_button_2">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>360</y>
+     <x>10</x>
+     <y>370</y>
      <width>21</width>
      <height>22</height>
     </rect>
@@ -251,8 +251,8 @@
   <widget class="QRadioButton" name="get_button_3">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>380</y>
+     <x>10</x>
+     <y>390</y>
      <width>21</width>
      <height>22</height>
     </rect>
@@ -267,7 +267,7 @@
   <widget class="QCheckBox" name="ofline_mode_check_box">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>10</x>
      <y>70</y>
      <width>131</width>
      <height>22</height>
@@ -280,31 +280,31 @@
   <widget class="QLineEdit" name="playerid_lineEdit">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>35</y>
-     <width>201</width>
-     <height>27</height>
+     <x>190</x>
+     <y>420</y>
+     <width>161</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>231</width>
+     <x>170</x>
+     <y>420</y>
+     <width>21</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>プレイヤーID（直接送信時のみ有効)</string>
+    <string>ID</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_0">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>440</y>
+     <x>10</x>
+     <y>450</y>
      <width>86</width>
      <height>22</height>
     </rect>
@@ -316,8 +316,8 @@
   <widget class="QCheckBox" name="checkBox_1">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>460</y>
+     <x>10</x>
+     <y>470</y>
      <width>86</width>
      <height>22</height>
     </rect>
@@ -329,8 +329,8 @@
   <widget class="QCheckBox" name="checkBox_2">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>440</y>
+     <x>80</x>
+     <y>450</y>
      <width>86</width>
      <height>22</height>
     </rect>
@@ -342,8 +342,8 @@
   <widget class="QCheckBox" name="checkBox_3">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>460</y>
+     <x>80</x>
+     <y>470</y>
      <width>86</width>
      <height>22</height>
     </rect>
@@ -355,8 +355,8 @@
   <widget class="QCheckBox" name="checkBox_4">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>440</y>
+     <x>160</x>
+     <y>450</y>
      <width>101</width>
      <height>22</height>
     </rect>
@@ -368,8 +368,8 @@
   <widget class="QCheckBox" name="checkBox_5">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>460</y>
+     <x>160</x>
+     <y>470</y>
      <width>101</width>
      <height>22</height>
     </rect>
@@ -381,14 +381,40 @@
   <widget class="QCheckBox" name="checkBox_6">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>440</y>
+     <x>240</x>
+     <y>450</y>
      <width>101</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
     <string>read_ahead</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxofRaciveOfiicialServer">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>70</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>公式から取得</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxofSendOfiicialServer">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>70</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>公式へ送信</string>
    </property>
   </widget>
   <action name="problem_load_action">
