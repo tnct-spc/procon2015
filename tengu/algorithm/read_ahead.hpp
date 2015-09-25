@@ -12,6 +12,13 @@ public:
     ~read_ahead();
     void run();
 
+    struct stone_info_type
+    {
+        point_type point;
+        std::size_t angle;
+        stone_type::Sides side;
+    };
+
     struct search_type
     {
         field_type field;

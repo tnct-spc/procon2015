@@ -152,10 +152,10 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             field_type& field = s.field;
             field.put_stone(stone,i,j);
             double const score = evaluate(field,stone,i,j);
+            int const island = get_island(field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
-            if(search_vec.size() < 20) //20個貯まるまでは追加する
+            if(search_vec.size() < 14) //20個貯まるまでは追加する
             {
-                int const island = get_island(field.get_raw_data());
                 if(s.rank == 1)
                 {
                     search_vec.push_back({
@@ -188,65 +188,29 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                     {
                         return lhs.score == rhs.score ? lhs.island > rhs.island : lhs.score < rhs.score;
                     });
-                if(s.rank == 1 && min->score <= score) //1層目　保持している中の最悪手より良い
+                if(s.rank == 1 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
-                    int const island = get_island(field.get_raw_data());
-/*                    if(min->score == score && min->island < island) continue; //スコアが同じで島が多いなら要らない
-                    else if(min->score < score || min->island > island) //スコアが良いか、島が少ないなら置き換える
-                    {
-                        *min =
-                            {
-                                field,
-                                point_type{i,j},
-                                stone.get_angle(),
-                                stone.get_side(),
-                                score,
-                                s.rank + 1,
-                                island
-                            };
-                    }
-                    else //スコアも島も同じなら追加*/
-                    {
-                        search_vec.push_back({
-                                field,
-                                point_type{i,j},
-                                stone.get_angle(),
-                                stone.get_side(),
-                                score,
-                                s.rank + 1,
-                                island
-                            });
-                    }
+                    search_vec.push_back({
+                                             field,
+                                             point_type{i,j},
+                                             stone.get_angle(),
+                                             stone.get_side(),
+                                             score,
+                                             s.rank + 1,
+                                             island
+                                         });
                 }
-                else if(s.rank > 1 && min->score <= s.score + score) //2層目以上　保持している中の最悪手より良い
+                else if(s.rank > 1 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
-                    int const island = get_island(field.get_raw_data());
-/*                    if(min->score == score && min->island < island) continue; //スコアが同じで島が多いなら要らない
-                    else if(min->score < score || min->island > island) //スコアが良いか、島が少ないなら置き換える
-                    {
-                        *min =
-                            {
-                                field,
-                                s.point,
-                                s.rotate,
-                                s.flip,
-                                s.score + score,
-                                s.rank + 1,
-                                island
-                            };
-                    }
-                    else //スコアも島も同じなら追加*/
-                    {
-                        search_vec.push_back({
-                                field,
-                                s.point,
-                                s.rotate,
-                                s.flip,
-                                s.score + score,
-                                s.rank + 1,
-                                island
-                           });
-                    }
+                    search_vec.push_back({
+                                             field,
+                                             s.point,
+                                             s.rotate,
+                                             s.flip,
+                                             s.score + score,
+                                             s.rank + 1,
+                                             island
+                                         });
                 }
             }
             field.remove_large_most_number_and_just_before_stone();
