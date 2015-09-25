@@ -154,7 +154,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             double const score = evaluate(field,stone,i,j);
             int const island = get_island(field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
-            if(search_vec.size() < 14) //20個貯まるまでは追加する
+            if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
                 if(s.rank == 1)
                 {
