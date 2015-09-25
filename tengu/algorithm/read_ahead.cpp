@@ -156,13 +156,12 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
-                if(s.rank == 1)
+                if(s.iv.size() == 0)
                 {
                     search_vec.emplace_back(
                             field,
                             std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
-                            s.rank + 1,
                             island
                         );
                 }
@@ -172,7 +171,6 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                             field,
                             s.iv,
                             s.score + score,
-                            s.rank + 1,
                             island
                        );
                     search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
@@ -185,23 +183,21 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                     {
                         return lhs.score == rhs.score ? lhs.island > rhs.island : lhs.score < rhs.score;
                     });
-                if(s.rank == 1 && (min->score <= score)) //1層目　保持している中の最悪手より良い
+                if(s.iv.size() == 0 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
                             field,
                             std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
-                            s.rank + 1,
                             island
                         );
                 }
-                else if(s.rank > 1 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
+                else if(s.iv.size() > 0 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
                             field,
                             s.iv,
                             s.score + score,
-                            s.rank + 1,
                             island
                        );
                     search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
@@ -218,8 +214,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     if(search_vec.size() > 3) search_vec.resize(3);
 
-
-    if(s.rank >= LAH || ishi >= STONE_NUM-1)
+    if(s.iv.size()+1 >= LAH || ishi >= STONE_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(sv));
     }

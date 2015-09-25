@@ -26,16 +26,15 @@ public:
         field_type field;
         std::vector<stones_info_type> iv;
         double score = 0;
-        int rank = 1;
         int island;
-        search_type(field_type field,std::vector<stones_info_type> iv,double score,int rank,int island):field(field),iv(iv),score(score),rank(rank),island(island){};
+        search_type(field_type field,std::vector<stones_info_type> iv,double score,int island):field(field),iv(iv),score(score),island(island){};
         search_type(){};
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
             return lhs.iv[0].point == rhs.iv[0].point &&
                    lhs.iv[0].angle == rhs.iv[0].angle &&
                    lhs.iv[0].side == rhs.iv[0].side &&
-                   lhs.rank == rhs.rank &&
+                   lhs.iv.size() == rhs.iv.size() &&
                    lhs.score == rhs.score;
         }
 
@@ -43,7 +42,7 @@ public:
 
 private:
 
-    int LAH = 3;
+    std::size_t LAH = 3;
     std::size_t STONE_NUM;
     problem_type pre_problem;
     void one_try(problem_type problem, int y, int x, std::size_t const rotate);
