@@ -56,8 +56,8 @@ void yrange::run()
 */
 
 
-    std::array<int,39> start_y{{14,-7,29,13,-1,9,30,19,15,-4,18,17,20,-2,23,10,4,-6,7,-5,31,3,8,21,5,16,-3,0,11,22,24,27,2,26,28,1,12,6,25}};
-    std::array<int,39> start_x{{19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,5,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
+    std::array<int,39> start_y{{24,-7,29,13,-1,9,30,19,15,-4,18,17,20,-2,23,10,4,-6,7,-5,31,3,8,21,5,16,-3,0,11,22,14,27,2,26,28,1,12,6,25}};
+    std::array<int,39> start_x{{5,19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
 
     for(int y : start_y) for(int x : start_x) for(std::size_t rotate = 0; rotate < 8; ++rotate)
     {
@@ -163,6 +163,6 @@ int yrange::get_island(field_type::raw_field_type field)
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.45) return true;
+    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.4) return true;
     else return false;
 }
