@@ -14,10 +14,11 @@ public:
 
     struct stones_info_type
     {
+        std::size_t stone_num;
         point_type point;
         std::size_t angle;
         stone_type::Sides side;
-        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){};
+        stones_info_type(std::size_t stone_num, point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){};
         stones_info_type(){};
     };
 
@@ -47,7 +48,7 @@ private:
     problem_type pre_problem;
     void one_try(problem_type problem, int y, int x, std::size_t const rotate);
     double evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
-    int search(std::vector<search_type>& sv, search_type s, std::size_t const ishi);
+    int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
     int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search,stone_type const& stone);
 };

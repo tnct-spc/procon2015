@@ -75,12 +75,12 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
             std::vector<search_type> sv;
             search_type one;
             one.field = problem.field;
-            search(sv, std::move(one), ishi);
+            search(sv, std::move(one), problem.field, ishi);
 
             if(sv.size() == 0) continue;
             std::sort(sv.begin(),sv.end(),[&](const search_type& lhs, const search_type& rhs)
                 {
-                    return lhs.score == rhs.score ? get_island(lhs.field.get_raw_data()) < get_island(rhs.field.get_raw_data()) : lhs.score > rhs.score;
+                    return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
                 });
 
             /*
@@ -136,11 +136,13 @@ double read_ahead::evaluate(field_type const& field, stone_type stone,int const 
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t const ishi)
+int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& _field, std::size_t const stone_num)
 {
     int count = 0;
-    stone_type stone = pre_problem.stones.at(ishi);
+    stone_type stone = pre_problem.stones.at(stone_num);
     std::vector<search_type> search_vec;
+    if(_field.get_raw_data() != s.field.get_raw_data()) std::cout << "dame" << std::endl;
+
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
     {
@@ -160,7 +162,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                 {
                     search_vec.emplace_back(
                             field,
-                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{stone_num,point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
                             island
                         );
@@ -173,7 +175,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().iv.emplace_back(stone_num,point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
             else
@@ -187,7 +189,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                 {
                     search_vec.emplace_back(
                             field,
-                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{stone_num, point_type{i,j},stone.get_angle(),stone.get_side()}},
                             score,
                             island
                         );
@@ -200,12 +202,13 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().iv.emplace_back(stone_num,point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
             field.remove_large_most_number_and_just_before_stone();
         }
     }
+
 
     std::sort(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
         {
@@ -214,7 +217,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
     if(search_vec.size() > 3) search_vec.resize(3);
 
-    if(s.iv.size()+1 >= LAH || ishi >= STONE_NUM-1)
+    if(s.iv.size()+1 >= LAH || stone_num >= STONE_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(sv));
     }
@@ -222,7 +225,11 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, std::size_t 
     {
         for(auto& each_ele : search_vec)
         {
-            if(search(sv, each_ele, ishi+1) == 0) sv.push_back(each_ele);
+            stone.set_angle(each_ele.iv.back().angle).set_side(each_ele.iv.back().side);
+            _field.put_stone(stone,each_ele.iv.back().point.y,each_ele.iv.back().point.x);
+            if(search(sv, each_ele, _field, stone_num+1) == 0) sv.push_back(each_ele);
+            _field.remove_large_most_number_and_just_before_stone();
+            stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
     }
     return count;
