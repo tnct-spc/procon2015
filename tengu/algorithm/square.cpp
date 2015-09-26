@@ -2,15 +2,18 @@
 #include <QFile>
 #include <QIODevice>
 #include <algorithm>
+#include "QElapsedTimer"
 
 square::square(problem_type _problem)
 {
+    algorithm_name = "square";
     qDebug("not parallel");
     original_problem = _problem;
     _mode = 0;
 }
 square::square(problem_type _problem, int mode)
 {
+    algorithm_name = "square";
     original_problem = _problem;
     _mode = mode;
 }
@@ -22,6 +25,8 @@ square::~square()
 
 void square::run()
 {
+        QElapsedTimer et;
+        et.start();
         qDebug("@square start direction%d",_mode);
         problem=original_problem;
         //Make answer
@@ -30,6 +35,8 @@ void square::run()
         }
         //解答の送信
         qDebug("@square emit direction%d",_mode);
+        int64_t time = et.elapsed();
+        print_text(std::to_string(time));
         answer_send(problem.field);
 }
 
