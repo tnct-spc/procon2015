@@ -53,7 +53,7 @@ public:
     int count_n_row(int const n)const;
     int count_n_col(int const n)const;
     std::string str() const;
-        uint64_t get_bit_plain_stones(int x, int flip, int rotate, int y) const;
+        uint64_t const&get_bit_plain_stones(int x, int flip, int rotate, int y) const;
         bit_stones_type const& get_raw_bit_plain_stones() const;
     void print_stone();
     void init_stone();
@@ -185,7 +185,7 @@ inline int stone_type::get_side_length() const
     return side_length;
 }
 
-inline uint64_t stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
+inline uint64_t const& stone_type::get_bit_plain_stones(int x, int flip, int rotate, int y) const
 {
     //return bit_plain_stones.at(x+1).at(flip).at(rotate).at(y);
     return bit_plain_stones[x+1][flip][rotate][y];

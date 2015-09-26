@@ -54,16 +54,24 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     }
 
     //石の番号ごとのサイドフィールドに石の辺を置く
+    uint64_t bit_side_field_temp[8][3];
+    for(int i = 0; i < 8; ++i)
+    {
+        bit_side_field_temp[i][0] = (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//upper under
+        bit_side_field_temp[i][1] = (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//left
+        bit_side_field_temp[i][2] = (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//right
+    }
+
     for(int j=stone_nth;j<=256;j++){
         for(int i=0;i<8;i++){
             //upper
-            bit_sides_field_at_stone_nth[j][16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+            bit_sides_field_at_stone_nth[j][16+y+i+1] |= bit_side_field_temp[i][0];
             //under
-            bit_sides_field_at_stone_nth[j][16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+            bit_sides_field_at_stone_nth[j][16+y+i-1] |= bit_side_field_temp[i][0];
             //left
-            bit_sides_field_at_stone_nth[j][16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+            bit_sides_field_at_stone_nth[j][16+y+i] |= bit_side_field_temp[i][1];
             //right
-            bit_sides_field_at_stone_nth[j][16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);
+            bit_sides_field_at_stone_nth[j][16+y+i] |= bit_side_field_temp[i][2];
       }
     }
 
