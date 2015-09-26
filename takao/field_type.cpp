@@ -63,6 +63,11 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     }
 
     for(int j=stone_nth;j<=256;j++){
+        for(int i=0;i<64;i++){
+            bit_sides_field_at_stone_nth_just_before[j][i] = bit_sides_field_at_stone_nth[j][i];
+        }
+    }
+    for(int j=stone_nth;j<=256;j++){
         for(int i=0;i<8;i++){
             //upper
             bit_sides_field_at_stone_nth[j][16+y+i+1] |= bit_side_field_temp[i][0];
@@ -246,6 +251,40 @@ field_type& field_type::remove_large_most_number_and_just_before_stone()
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
     {
         if(raw_data.at(i).at(j) == most_large_stone_nth) raw_data.at(i).at(j) = 0;
+    }
+    return *this;
+}
+
+//一番最後に置いたを取り除く
+field_type& field_type::remove_just_before_stone()
+{
+#ifdef _DEBUGMODE
+    if(processes.size() == 0)throw std::runtime_error("Stone is not even placed one!");
+#endif
+    int processes_end = processes.size()-1;
+    int last_stone_nth = processes[processes_end].stone.get_nth();
+
+    is_placed_stone[last_stone_nth-1]=false;
+
+    //remove from bit field
+    //フィールドから石を取り除く
+    for(int i=0;i<8;i++){
+        bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
+    }
+    //remove stone from processes
+    processes.erase(processes.end());
+    //石の番号ごとのサイドフィールドの更新
+    for(int i=0;i<=256;i++){
+        for(int j=0;j<64;j++) bit_sides_field_at_stone_nth[i][j] = bit_sides_field_at_stone_nth_just_before[i][j];
+    }
+    //サイドフィールドを前の状態に復元する
+    for(int i=0;i<64;i++){
+        bit_sides_field[i] = bit_sides_field_at_stone_nth[256][i];
+    }
+    //remove from raw data
+    for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
+    {
+        if(raw_data.at(i).at(j) == last_stone_nth) raw_data.at(i).at(j) = 0;
     }
     return *this;
 }
@@ -627,7 +666,7 @@ std::string field_type::get_answer()
         process_count++;
     }
     //改行の数が環境依存なので,自分でいじってください.
-    for(std::size_t i = prev_nth;i <= provided_stones; i++)result.append("\r\n");
+    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
     return result;
 }
 void field_type::set_random(int const obstacle, int const col, int const row)

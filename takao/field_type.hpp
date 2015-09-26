@@ -68,6 +68,8 @@ public:
 
     //一番番号の大きくて、一番最後に置いたを取り除く
     field_type& remove_large_most_number_and_just_before_stone();
+    //一番最後に置いたを取り除く
+    field_type& remove_just_before_stone();
     //一番番号の大きい石を取り除く
     field_type& remove_large_most_number_stone();
     //石を取り除けるか
@@ -152,6 +154,7 @@ private:
         uint64_t bit_flame_field[64];//障害物のみのフィールド
         uint64_t bit_sides_field[64];//石のサイドフィールド
         uint64_t bit_sides_field_at_stone_nth[257][64];//石の番号ごとのサイドフィールド
+        uint64_t bit_sides_field_at_stone_nth_just_before[257][64];//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
         void make_bit();//bitデータの作成
     void init_edge();
