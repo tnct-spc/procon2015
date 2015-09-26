@@ -114,7 +114,7 @@ void square::solve(stone_type stone, int direction)
 }
 
 
-void square::put_stone_side(stone_type stone,int dy,int dx)
+void square::put_stone_side(stone_type& stone,int dy,int dx)
 {
     int side_num;
     //反転
@@ -124,8 +124,7 @@ void square::put_stone_side(stone_type stone,int dy,int dx)
             //フィールドに置けるかチェック
             if(problem.field.is_puttable(stone,dy,dx)){
                 //qDebug("go at %d:%d:%d:%d",dy,dx,flip,angle);
-                problem.field.put_stone(stone,dy,dx);
-                side_num = count_side(stone);
+                side_num = count_side(stone,dy,dx);
                 //update
                 if(side_num > max_num){
                     max_num = side_num;
@@ -140,7 +139,6 @@ void square::put_stone_side(stone_type stone,int dy,int dx)
                     max_x.push_back(dx);
                     max_stone.push_back(stone);
                 }
-                problem.field.remove_large_most_number_and_just_before_stone();
                 //if(flip==1 && angle==1) qDebug("1");
             }else{
                 //if(flip==1 && angle==1) qDebug("0");
@@ -151,21 +149,21 @@ void square::put_stone_side(stone_type stone,int dy,int dx)
     }
 }
 
-int square::count_side(stone_type stone)
+int square::count_side(stone_type const& stone, int dy,int dx)
 {
     int side_num=0;
     int count;
     //Sideの数を数える
-    field_type::raw_field_type raw_field = problem.field.get_raw_data();
-    int stone_nth = stone.get_nth();
-    for(int y=1;y<33;y++){
-        for(int x=1;x<33;x++){
-            if(raw_field[y-1][x-1]==stone_nth){
+    dy+=1;
+    dx+=1;
+    for(int y=0;y<8;y++){
+        for(int x=0;x<8;x++){
+            if(stone.at(y,x)){
                 count=0;
-                if(field[y-1][x]==true) count++;
-                if(field[y+1][x]==true) count++;
-                if(field[y][x-1]==true) count++;
-                if(field[y][x+1]==true) count++;
+                if(dy+y>=0 && field[dy+y-1][dx+x]==true) count++;
+                if(dy+y<=31 && field[dy+y+1][dx+x]==true) count++;
+                if(dx+x>=0 && field[dy+y][dx+x-1]==true) count++;
+                if(dx+x<=31 && field[dy+y][dx+x+1]==true) count++;
                 if(count==1) side_num+=1;
                 if(count==2) side_num+=3;
                 if(count==3) side_num+=5;
@@ -177,7 +175,7 @@ int square::count_side(stone_type stone)
     return side_num;
 }
 
-void square::put_stone_hole(stone_type stone,int dy,int dx)
+void square::put_stone_hole(stone_type& stone,int dy,int dx)
 {
     int hole_num;
     problem.field.put_stone(stone,dy,dx);
