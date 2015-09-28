@@ -15,6 +15,7 @@
 
 void field_type::cancellation_of_restriction()
 {
+    has_limit = false;
     bit_sides_field_at_stone_nth = new uint64_t*[257];
     for(int i=0;i<257;i++){
         bit_sides_field_at_stone_nth[i] = new uint64_t[64];
@@ -95,21 +96,13 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
 
     /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
 
-    //フィールドに石を、サイドフィールドに石の辺を置く
-    for(int i=0;i<8;i++){
-        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//add stone
-        bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//upper
-        bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//under
-        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//left
-        bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//right
-    }
-
     for(int i=0;i<64;i++){
         bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
     }
-    //石の番号ごとのサイドフィールドに石の辺を置く
-    for(int i = 0; i < 8; ++i)
-    {
+
+    //フィールドに石を、サイドフィールドに石の辺を置く
+    for(int i=0;i<8;i++){
+        bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//add stone
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//upper
         bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//under
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,(int)stone.get_side(),(int)(stone.get_angle()/90),i);//left
@@ -151,7 +144,7 @@ field_type& field_type::remove_stone_basic()
     processes.erase(processes.end());
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
-        bit_sides_field[i] = bit_sides_field_just_before[processes.size()-1][i];
+        bit_sides_field[i] = bit_sides_field_just_before[processes.size()][i];
     }
     //remove from raw data
     for(int i = 0; i < 32; ++i) for(int j = 0; j < 32; ++j)
@@ -692,6 +685,7 @@ void field_type::init_edge(){
 
 field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
 {
+    has_limit = true;
     provided_stones = stone_nth;
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
@@ -702,6 +696,7 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
     init_edge();
 }
 field_type::field_type(const int obstacles, const int cols, const int rows){
+    has_limit = true;
     set_random(obstacles,cols,rows);
     make_bit();
     init_edge();
@@ -842,3 +837,5 @@ double field_type::evaluate_normalized_complexity() const
     }
     return static_cast<double>(side * side) / static_cast<double>(get_block_num());
 }
+
+bool field_type::get_has_limit() const{return has_limit;}
