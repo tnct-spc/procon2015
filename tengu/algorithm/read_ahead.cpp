@@ -64,10 +64,10 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
     problem.stones.at(0).rotate(rotate / 2 * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
 
-    if(problem.field.is_puttable(problem.stones.front(),y,x) == true)
+    if(problem.field.is_puttable_basic(problem.stones.front(),y,x) == true)
     {
         //1個目
-        problem.field.put_stone(problem.stones.front(),y,x);
+        problem.field.put_stone_basic(problem.stones.front(),y,x);
 
         //2個目以降
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
@@ -91,7 +91,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                 {
                     if(each_ele.iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
                     problem.stones.at(ishi).rotate(each_ele.iv[0].angle);
-                    problem.field.put_stone(problem.stones.at(ishi), each_ele.iv[0].point.y, each_ele.iv[0].point.x);
+                    problem.field.put_stone_basic(problem.stones.at(ishi), each_ele.iv[0].point.y, each_ele.iv[0].point.x);
                     print_text((boost::format("putted %dth stone")%ishi).str());
                     std::cout << ishi << "th stone putted" << std::endl;
                     break;
@@ -113,7 +113,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const r
                 }
                 if(max->iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
                 problem.stones.at(ishi).rotate(max->iv[0].angle);
-                problem.field.put_stone(problem.stones.at(ishi), max->iv[0].point.y, max->iv[0].point.x);
+                problem.field.put_stone_basic(problem.stones.at(ishi), max->iv[0].point.y, max->iv[0].point.x);
                 print_text((boost::format("putted %dth stone")%ishi).str());
                 std::cout << ishi << "th stone putted" << std::endl;
                 break;
@@ -161,10 +161,10 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
     {
         if(rotate %2 == 0) stone.rotate(90);
         else stone.flip();
-        if(_field.is_puttable(stone,i,j) == true)
+        if(_field.is_puttable_basic(stone,i,j) == true)
         {
             count++;
-            _field.put_stone(stone,i,j);
+            _field.put_stone_basic(stone,i,j);
             double const score = evaluate(_field,stone,i,j);
             int const island = get_island(_field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
@@ -213,7 +213,7 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                     search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
                 }
             }
-            _field.remove_large_most_number_and_just_before_stone();
+            _field.remove_stone_basic();
         }
     }
 
@@ -234,9 +234,9 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
         for(auto& each_ele : search_vec)
         {
             stone.set_angle(each_ele.iv.back().angle).set_side(each_ele.iv.back().side);
-            _field.put_stone(stone,each_ele.iv.back().point.y,each_ele.iv.back().point.x);
+            _field.put_stone_basic(stone,each_ele.iv.back().point.y,each_ele.iv.back().point.x);
             if(search(sv, each_ele, _field, stone_num+1) == 0) sv.push_back(each_ele);
-            _field.remove_large_most_number_and_just_before_stone();
+            _field.remove_stone_basic();
             stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
     }
