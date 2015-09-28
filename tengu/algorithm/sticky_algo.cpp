@@ -17,10 +17,10 @@ sticky_algo::~sticky_algo(){
 double sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, int pos_x){
     double score = 0;
     //int neighbors = 0;
-    if(!field.is_puttable(stone,pos_y,pos_x))return -1;
-    field.put_stone(stone,pos_y,pos_x);
+    if(!field.is_puttable_basic(stone,pos_y,pos_x))return -1;
+    field.put_stone_basic(stone,pos_y,pos_x);
     score = field.evaluate_normalized_complexity();
-    field.remove_large_most_number_and_just_before_stone();
+    field.remove_stone_basic();
     return score;
 }
 std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width){
@@ -48,7 +48,7 @@ std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vec
     //qDebug() << result_stone.size();
     for(int i = 0; i < search_size; i++){
         //qDebug() << "angle" << result_stone.at(i).angle << "side" << result_stone.at(i).flip << "y" << result_stone.at(i).y << "x" << result_stone.at(i).x;
-        result_stone.at(i).e_field.field.put_stone(
+        result_stone.at(i).e_field.field.put_stone_basic(
               std::move(stone.set_angle(result_stone.at(i).angle).set_side(static_cast<stone_type::Sides>(result_stone.at(i).flip))),
               result_stone.at(i).y,result_stone.at(i).x);
         result_stone.at(i).e_field.score = result_stone.at(i).score;

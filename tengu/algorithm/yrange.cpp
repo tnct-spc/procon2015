@@ -77,10 +77,10 @@ void yrange::one_try(problem_type& problem, int y, int x, std::size_t const rota
     problem.stones.at(0).rotate(rotate / 2  * 90);
     if(rotate %2 == 1) problem.stones.at(0).flip();
 
-    if(problem.field.is_puttable(problem.stones.front(),y,x) == true)
+    if(problem.field.is_puttable_basic(problem.stones.front(),y,x) == true)
     {
         //1個目
-        problem.field.put_stone(problem.stones.front(),y,x);
+        problem.field.put_stone_basic(problem.stones.front(),y,x);
 
         //２個目以降
         for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
@@ -90,7 +90,7 @@ void yrange::one_try(problem_type& problem, int y, int x, std::size_t const rota
             if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
             if(pass(next,each_stone) == true) continue;
             each_stone.set_angle(next.angle).set_side(next.side);
-            problem.field.put_stone(each_stone,next.point.y,next.point.x);
+            problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
         }
     }
 }
@@ -126,9 +126,9 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
         stone.set_angle(angle).set_side(side == 0 ? stone_type::Sides::Head : stone_type::Sides::Tail);
-        if(_field.is_puttable(stone,i,j) == true)
+        if(_field.is_puttable_basic(stone,i,j) == true)
         {
-            _field.put_stone(stone,i,j);
+            _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて配列に挿入
             int const score = evaluate(_field,stone,i,j);
             int const island = get_island(_field.get_raw_data());
@@ -136,7 +136,7 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
             {
                 best = {point_type{i,j}, angle, side == 0 ? stone_type::Sides::Head : stone_type::Sides::Tail, score, island};
             }
-            _field.remove_large_most_number_stone();
+            _field.remove_stone_basic();
         }
     }
     return best;

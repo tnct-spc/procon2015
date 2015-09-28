@@ -24,9 +24,9 @@ void simple_algorithm::run(){
                     //回転
                      for(int angle = 0; angle < 4; angle ++){
                          //フィールドに置けるかチェック
-                         if(problem.field.is_puttable(stone,dy,dx)){
+                         if(problem.field.is_puttable_basic(stone,dy,dx)){
                              //設置
-                             problem.field.put_stone(stone,dy,dx);
+                             problem.field.put_stone_basic(stone,dy,dx);
                              return;
                          }
                          stone.rotate(90);

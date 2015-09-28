@@ -144,9 +144,9 @@ bool yrange2::search(field_type& _field, stone_type& stone)
     {
         if(rotate % 2 == 0) stone.rotate(90);
         else stone.flip();
-        if(_field.is_puttable(stone,i,j) == true)
+        if(_field.is_puttable_basic(stone,i,j) == true)
         {
-            _field.put_stone(stone,i,j);
+            _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
             search_type one = {
                 point_type{i,j},
@@ -156,12 +156,11 @@ bool yrange2::search(field_type& _field, stone_type& stone)
                 get_island(_field.get_raw_data())
             };
             if(one.score > best.score || (one.score == best.score && one.island < best.island)) best = one;
-            //_field.remove_large_most_number_and_just_before_stone();//?
-            _field.remove_stone(stone);
+            _field.remove_stone_basic();
         }
     }
     if(best.score < 0 || pass(best,stone) == false) return false;
-    _field.put_stone(stone.set_angle(best.angle).set_side(best.side),best.point.y,best.point.x);
+    _field.put_stone_basic(stone.set_angle(best.angle).set_side(best.side),best.point.y,best.point.x);
     return true;
 }
 
@@ -213,9 +212,9 @@ bool yrange2::local_put(field_type &field, stone_type &stone, int _y, int _x)
         {
             if(rotate %2 == 0) stone.rotate(90);
             else stone.flip();
-            if(field.is_puttable(stone,y,x) == true)
+            if(field.is_puttable_basic(stone,y,x) == true)
             {
-                field.put_stone(stone,y,x);
+                field.put_stone_basic(stone,y,x);
                 if(field.get_raw_data().at(_y).at(_x) == stone.get_nth())
                 {
                     int const score =locale_evaluate(field,stone,y,x);
@@ -230,13 +229,13 @@ bool yrange2::local_put(field_type &field, stone_type &stone, int _y, int _x)
                     }
                 }
                 //field.remove_large_most_number_and_just_before_stone();//?
-                field.remove_stone(stone);
+                field.remove_stone_basic();
             }
         }
     }
     if(best.score > 0)
     {
-        field.put_stone(stone.set_angle(best.rotate).set_side(best.side),best.point.y,best.point.x);
+        field.put_stone_basic(stone.set_angle(best.rotate).set_side(best.side),best.point.y,best.point.x);
         return true;
     }
     return false;
