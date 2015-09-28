@@ -51,6 +51,22 @@ public:
     int buttom_edge = 0;//下方から数えた障害物しかない行の数
     int left_edge = 0;  //左方から数えた障害物しかない列の数
 
+    /*石の設置・撤去関数*/
+
+    //制限解除(明示的に呼び出してください)
+    void cancellation_of_restriction();
+
+    /*制限解除前に使う関数*/
+
+    //石を置けるか
+    bool is_puttable_basic(stone_type const& stone, int y, int x) const;
+    //石を置く
+    field_type& put_stone_basic(stone_type const& stone, int y, int x);
+    //石を取り除く
+    field_type& remove_stone_basic();
+
+    /*制限解除後に使う関数*/
+
     /**************/
     /***石を置く***/
     /**************/
@@ -89,12 +105,9 @@ public:
     std::vector<stone_type> search_cannot_be_in_contact_stones();
     //すべての石が自分より若い石に接することができるか確認する
     bool is_stones_can_contact();
-    //障害物にぶつかるか
-    bool is_touch_flame(stone_type const& stone, int y, int x);
 
-    /*************/
-    /***その他****/
-    /*************/
+
+    /*その他*/
 
     //アクセッサ
     size_t empty_zk();//get_score()を同じ.なんのためにあるのかわからない
@@ -149,9 +162,9 @@ private:
 
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
-        uint64_t bit_flame_field[64];//障害物のみのフィールド
         uint64_t bit_sides_field[64];//石のサイドフィールド
-        uint64_t bit_sides_field_at_stone_nth[257][64];//石の番号ごとのサイドフィールド
+        uint64_t bit_sides_field_just_before[256][64];
+        uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
         void make_bit();//bitデータの作成
     void init_edge();
