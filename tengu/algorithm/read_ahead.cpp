@@ -89,9 +89,9 @@ int read_ahead::evaluate(field_type const& field, stone_type stone,int const x, 
     int count = 0;
     for(int k = (x < 2) ? 0 : x - 1 ;k < x + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (y < 2) ? 0 : y - 1; l < y + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
+        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;    //at(k).at(l)
+        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;//at(k).at(l+1)
+        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;//at(k+1).at(l)
         if(field.get_raw_data().at(k).at(l) == n)
         {
             count += (kl1 + k1l);
@@ -109,10 +109,10 @@ int read_ahead::evaluate(field_type const& field, stone_type stone,int const x, 
     for(k = k < 0 ? 0 : k; k < (i + STONE_SIZE) && (k + 1 < FIELD_SIZE); ++k) for(l = l < 0 ? 0 : l ; (l < j + STONE_SIZE) && (l + 1 < FIELD_SIZE); ++l)
     {
         int const n = stone.get_nth();
-        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k).at(l+1) < n) count++;
-        if(field.get_raw_data().at(k).at(l+1) == n && field.get_raw_data().at(k).at(l) < n) count++;
-        if(field.get_raw_data().at(k+1).at(l) == n && field.get_raw_data().at(k).at(l) < n) count++;
-        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k+1).at(l) < n) count++;
+        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k).at(l+1) != n) count++;
+        if(field.get_raw_data().at(k).at(l+1) == n && field.get_raw_data().at(k).at(l) != n) count++;
+        if(field.get_raw_data().at(k+1).at(l) == n && field.get_raw_data().at(k).at(l) != n) count++;
+        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k+1).at(l) != n) count++;
         if(k == 0 || k == FIELD_SIZE-1) count++;
         if(l == 0 || l == FIELD_SIZE-1) count++;
     }
