@@ -30,6 +30,7 @@ void square::run()
         qDebug("@square start direction%d",_mode);
         problem=original_problem;
         //Make answer
+        //problem.field.cancellation_of_restriction();
         for(stone_type stone : problem.stones){
             solve(stone,_mode);
         }
@@ -109,7 +110,7 @@ void square::solve(stone_type stone, int direction)
     }
     //設置
     //qDebug("put stone at %d:%d %d:%d",min_y,min_x,min_stone.get_side(), min_stone.get_angle());
-    if(min_num!=32*32+1) problem.field.put_stone(min_stone,min_y,min_x);
+    if(min_num!=32*32+1) problem.field.put_stone_basic(min_stone,min_y,min_x);
     //qDebug("put ok");
 }
 
@@ -122,7 +123,7 @@ void square::put_stone_side(stone_type& stone,int dy,int dx)
         //回転
         for(int angle = 0; angle < 4; angle ++){
             //フィールドに置けるかチェック
-            if(problem.field.is_puttable(stone,dy,dx)){
+            if(problem.field.is_puttable_basic(stone,dy,dx)){
                 //qDebug("go at %d:%d:%d:%d",dy,dx,flip,angle);
                 side_num = count_side(stone,dy,dx);
                 //update
@@ -178,7 +179,7 @@ int square::count_side(stone_type const& stone, int dy,int dx)
 void square::put_stone_hole(stone_type& stone,int dy,int dx)
 {
     int hole_num;
-    problem.field.put_stone(stone,dy,dx);
+    problem.field.put_stone_basic(stone,dy,dx);
     field_type::raw_field_type raw_field = problem.field.get_raw_data();
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
@@ -197,7 +198,7 @@ void square::put_stone_hole(stone_type& stone,int dy,int dx)
         min_x = dx;
         min_stone = stone;
     }
-    problem.field.remove_large_most_number_and_just_before_stone();
+    problem.field.remove_stone_basic();
 }
 
 
