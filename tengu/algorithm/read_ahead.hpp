@@ -23,17 +23,17 @@ public:
 
     struct search_type
     {
-        std::vector<stones_info_type> iv;
-        double score = -1;
+        std::vector<stones_info_type> stones_info_vec;
+        int score = -1;
         int island = -1;
-        search_type(std::vector<stones_info_type> iv,double score,int island):iv(iv),score(score),island(island){};
+        search_type(std::vector<stones_info_type> stones_info_vec,double score,int island):stones_info_vec(stones_info_vec),score(score),island(island){};
         search_type(){};
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
-            return lhs.iv[0].point == rhs.iv[0].point &&
-                   lhs.iv[0].angle == rhs.iv[0].angle &&
-                   lhs.iv[0].side == rhs.iv[0].side &&
-                   lhs.iv.size() == rhs.iv.size() &&
+            return lhs.stones_info_vec[0].point == rhs.stones_info_vec[0].point &&
+                   lhs.stones_info_vec[0].angle == rhs.stones_info_vec[0].angle &&
+                   lhs.stones_info_vec[0].side == rhs.stones_info_vec[0].side &&
+                   lhs.stones_info_vec.size() == rhs.stones_info_vec.size() &&
                    lhs.score == rhs.score;
         }
 
@@ -41,11 +41,11 @@ public:
 
 private:
 
-    std::size_t LAH = 3;
+    std::size_t search_depth = 3;
     std::size_t ALL_STONES_NUM;
     problem_type pre_problem;
-    void one_try(problem_type problem, int y, int x, std::size_t const rotate);
-    double evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
+    void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
+    int evaluate(field_type const& field, stone_type stone,int const y, int const x)const;
     int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
     int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search,stone_type const& stone);

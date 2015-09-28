@@ -15,10 +15,7 @@ read_ahead::read_ahead(problem_type _problem)
     pre_problem = _problem;
     algorithm_name = "read_ahead";
 
-    //LAH = 1600 / pre_problem.stones.size();
-    LAH = 3;
-    //print_text((boost::format("LAH = %d")%LAH).str());
-    qDebug("LAH = %lu",LAH);
+    search_depth = 3;
     ALL_STONES_NUM = pre_problem.stones.size();
 }
 
@@ -31,108 +28,66 @@ read_ahead::~read_ahead()
 void read_ahead::run()
 {
     qDebug("read_ahead start");
-/*
-    QVector<std::tuple<int,int,std::size_t>> data;
-    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 8; ++rotate)
-    {
-        data.push_back(std::make_tuple(l,m,rotate));
-    }
-    QFuture<void> threads = QtConcurrent::map(
-                data,
-                [this](auto& tup)
-                {
-                    this->one_try(pre_problem,std::get<0>(tup),std::get<1>(tup),std::get<2>(tup));
 
-                });
-    threads.waitForFinished();
-*/
-/*
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m) for(int rotate = 0; rotate < 8; ++rotate)
+    //はじめに置く石の場所、角度、反転分のループ
+    for(int y = 1-STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1-STONE_SIZE; x  < FIELD_SIZE; ++x) for(int angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
-        one_try(pre_problem,l,m,rotate);
+        pre_problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        //置ければ始める
+        if(pre_problem.field.is_puttable(pre_problem.stones.front(),y,x) == true)
+        {
+            one_try(pre_problem,y,x,angle,side);
+        }
     }
-*/
-    //-4, 4  90 Tail
-    one_try(pre_problem,-4,4,3);
-
 }
 
-//
-void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const rotate)
+//はじめに置く場所、角度、反転を固定しての試行1回
+void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const angle, int const side)
 {
-    problem.stones.at(0).rotate(rotate / 2 * 90);
-    if(rotate %2 == 1) problem.stones.at(0).flip();
+    problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+    //1個目
+    problem.field.put_stone(problem.stones.front(),y,x);
 
-    if(problem.field.is_puttable(problem.stones.front(),y,x) == true)
+    //2個目以降
+    for(std::size_t stone_num = 1; stone_num < problem.stones.size(); ++stone_num)
     {
-        //1個目
-        problem.field.put_stone(problem.stones.front(),y,x);
+        std::vector<search_type> search_vec;
+        search_type one;//1層目用　空のまま渡す
+        search(search_vec, std::move(one), problem.field, stone_num);
 
-        //2個目以降
-        for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
+        if(search_vec .size() == 0) continue;
+
+        for(std::size_t i = 0; i < search_vec .size(); ++i)
         {
-            std::vector<search_type> sv;
-            search_type one;
-            search(sv, std::move(one), problem.field, ishi);
-
-            if(sv.size() == 0) continue;
-//*
-            std::sort(sv.begin(),sv.end(),[&](const search_type& lhs, const search_type& rhs)
-                {
-                    return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
-                });
-            for(auto& each_ele : sv) std::cout << "score = " << each_ele.score << " island = " << each_ele.island << std::endl;
-
-            for(auto& each_ele : sv)
+            auto max = std::min_element(search_vec .begin(),search_vec .end(),[](const search_type& lhs, const search_type& rhs)
             {
-                if(pass(each_ele,problem.stones.at(ishi)) == true) continue;
-                else
-                {
-                    if(each_ele.iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
-                    problem.stones.at(ishi).rotate(each_ele.iv[0].angle);
-                    problem.field.put_stone(problem.stones.at(ishi), each_ele.iv[0].point.y, each_ele.iv[0].point.x);
-                    print_text((boost::format("putted %dth stone")%ishi).str());
-                    std::cout << ishi << "th stone putted" << std::endl;
-                    break;
-                }
-            }
-//*/
-/*
-            for(std::size_t i = 0; i < sv.size(); ++i)
+                return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+            });
+            if(pass(*max,problem.stones.at(stone_num)) == true)
             {
-                auto max = std::min_element(sv.begin(),sv.end(),[](const search_type& lhs, const search_type& rhs)
-                    {
-                        return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
-                    });
-                std::cout << "score = " << max->score << " island = " << max->island << std::endl;
-                if(pass(*max,problem.stones.at(ishi)) == true)
-                {
-                    max->score *= -1;
-                    continue;
-                }
-                if(max->iv[0].side == stone_type::Sides::Tail) problem.stones.at(ishi).flip();
-                problem.stones.at(ishi).rotate(max->iv[0].angle);
-                problem.field.put_stone(problem.stones.at(ishi), max->iv[0].point.y, max->iv[0].point.x);
-                print_text((boost::format("putted %dth stone")%ishi).str());
-                std::cout << ishi << "th stone putted" << std::endl;
-                break;
+                max->score *= -1;
+                continue;
             }
-//*/
+            if(max->stones_info_vec[0].side == stone_type::Sides::Tail) problem.stones.at(stone_num).flip();
+            problem.stones.at(stone_num).rotate(max->stones_info_vec[0].angle);
+            problem.field.put_stone(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
+            //print_text((boost::format("putted %dth stone")%stone_num).str());
+            std::cout << stone_num << "th stone putted" << std::endl;
+            break;
         }
-
-        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());
-        emit answer_ready(problem.field);
     }
+
+    std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+    qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,angle,flip.c_str(), problem.field.get_score());
+    emit answer_ready(problem.field);
 }
 
 //評価関数
-double read_ahead::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+int read_ahead::evaluate(field_type const& field, stone_type stone,int const x, int const y)const
 {
     int const n = stone.get_nth();
-    double count = 0;
-    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
+    int count = 0;
+    for(int k = (x < 2) ? 0 : x - 1 ;k < x + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (y < 2) ? 0 : y - 1; l < y + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
     {
         int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
         int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
@@ -147,33 +102,48 @@ double read_ahead::evaluate(field_type const& field, stone_type stone,int const 
         if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
     }
     return count;
+
+/*    上記わかりにくい。下記と同じことをやっています
+    int count = 0;
+    int k = i > 1 - STONE_SIZE ? i - 1 : i, l = j > 1 - STONE_SIZE ? j - 1 : j;
+    for(k = k < 0 ? 0 : k; k < (i + STONE_SIZE) && (k + 1 < FIELD_SIZE); ++k) for(l = l < 0 ? 0 : l ; (l < j + STONE_SIZE) && (l + 1 < FIELD_SIZE); ++l)
+    {
+        int const n = stone.get_nth();
+        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k).at(l+1) < n) count++;
+        if(field.get_raw_data().at(k).at(l+1) == n && field.get_raw_data().at(k).at(l) < n) count++;
+        if(field.get_raw_data().at(k+1).at(l) == n && field.get_raw_data().at(k).at(l) < n) count++;
+        if(field.get_raw_data().at(k).at(l) == n && field.get_raw_data().at(k+1).at(l) < n) count++;
+        if(k == 0 || k == FIELD_SIZE-1) count++;
+        if(l == 0 || l == FIELD_SIZE-1) count++;
+    }
+*/
 }
 
-//おける場所の中から評価値の高いものを選んで返す
-int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& _field, std::size_t const stone_num)
+//おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
+int read_ahead::search(std::vector<search_type>& parental_search_vec, search_type s, field_type& _field, std::size_t const stone_num)
 {
     int count = 0;
     stone_type stone = pre_problem.stones.at(stone_num);
     std::vector<search_type> search_vec;
 
     //おける可能性がある場所すべてにおいてみる
-    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(int rotate = 0; rotate < 8; ++rotate)
+    for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
-        if(rotate %2 == 0) stone.rotate(90);
-        else stone.flip();
-        if(_field.is_puttable(stone,i,j) == true)
+        stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+
+        if(_field.is_puttable(stone,y,x) == true)
         {
             count++;
-            _field.put_stone(stone,i,j);
-            double const score = evaluate(_field,stone,i,j);
+            _field.put_stone(stone,y,x);
+            double const score = evaluate(_field,stone,y,x);
             int const island = get_island(_field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
-                if(s.iv.size() == 0)
+                if(s.stones_info_vec.size() == 0)
                 {
                     search_vec.emplace_back(
-                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
                             score,
                             island
                         );
@@ -181,11 +151,11 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                 else
                 {
                     search_vec.emplace_back(
-                            s.iv,
+                            s.stones_info_vec,
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
             }
             else
@@ -195,47 +165,50 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
                     {
                         return lhs.score == rhs.score ? lhs.island > rhs.island : lhs.score < rhs.score;
                     });
-                if(s.iv.size() == 0 && (min->score <= score)) //1層目　保持している中の最悪手より良い
+                if(s.stones_info_vec.size() == 0 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
-                            std::vector<stones_info_type>{{point_type{i,j},stone.get_angle(),stone.get_side()}},
+                            std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
                             score,
                             island
                         );
                 }
-                else if(s.iv.size() > 0 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
+                else if(s.stones_info_vec.size() > 0 && (min->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
-                            s.iv,
+                            s.stones_info_vec,
                             s.score + score,
                             island
                        );
-                    search_vec.back().iv.emplace_back(point_type{i,j},stone.get_angle(),stone.get_side());
+                    search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
             }
             _field.remove_large_most_number_and_just_before_stone();
         }
     }
 
-
+    //uniqueのためにsortが必要
     std::sort(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
         {
             return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
         });
     search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
+    //上位3つだけ残す
     if(search_vec.size() > 3) search_vec.resize(3);
 
-    if(s.iv.size()+1 >= LAH || stone_num >= ALL_STONES_NUM-1)
+    //最下層だったら結果を親ベクトルに入れる
+    if(s.stones_info_vec.size()+1 >= search_depth || stone_num >= ALL_STONES_NUM-1)
     {
-        std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(sv));
+        std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(parental_search_vec));
     }
+    //そうでなければ石を置いて潜る、帰ってきたら石を取り除く
     else
     {
         for(auto& each_ele : search_vec)
         {
-            stone.set_angle(each_ele.iv.back().angle).set_side(each_ele.iv.back().side);
-            _field.put_stone(stone,each_ele.iv.back().point.y,each_ele.iv.back().point.x);
-            if(search(sv, each_ele, _field, stone_num+1) == 0) sv.push_back(each_ele);
+            stone.set_angle(each_ele.stones_info_vec.back().angle).set_side(each_ele.stones_info_vec.back().side);
+            _field.put_stone(stone,each_ele.stones_info_vec.back().point.y,each_ele.stones_info_vec.back().point.x);
+            if(search(parental_search_vec, each_ele, _field, stone_num+1) == 0) parental_search_vec.push_back(each_ele);
             _field.remove_large_most_number_and_just_before_stone();
             stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
@@ -246,34 +219,68 @@ int read_ahead::search(std::vector<search_type>& sv, search_type s, field_type& 
 
 int read_ahead::get_island(field_type::raw_field_type field)
 {
-    int num = -1;
-    int const y_min = 0;
-    int const y_max = FIELD_SIZE;
-    int const x_min = 0;
-    int const x_max = FIELD_SIZE;
+    int label = -2;
+    int count1, count2,count3 = 0;
 
-    std::vector<int> result (FIELD_SIZE * FIELD_SIZE,0);
-    std::function<void(int,int,int)> recurision = [&recurision,&field](int y, int x, int num) -> void
+    //次の空白を見つけ、そこを--labelにして帰る
+    auto next_find = [&label, &field]()
     {
-        field.at(y).at(x) = num;
-        if(1 < y && field.at(y-1).at(x) == 0) recurision(y-1,x,num);
-        if(y < FIELD_SIZE - 1 && field.at(y+1).at(x) == 0) recurision(y+1,x,num);
-        if(1 < x && field.at(y).at(x-1) == 0) recurision(y,x-1,num);
-        if(x < FIELD_SIZE - 1 && field.at(y).at(x+1) == 0) recurision(y,x+1,num);
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(field[i][j] == 0)
+            {
+                field[i][j] = --label;
+                return;
+            }
+        }
         return;
     };
-    for(int i = y_min; i < y_max; ++i) for(int j = x_min; j < x_max; ++j)
+
+    //ただのラベリング　再帰だと遅いらし
+    while(label < count3)
     {
-        if(field.at(i).at(j) == 0) recurision(i,j,num--);
-    }
-    for(int i = y_min; i < y_max; ++i) for(int j = x_min; j < x_max; ++j)
-    {
-        if(field.at(i).at(j) < 0)
+        count3 = label;
+        next_find();
+        count1 = 0;
+        count2 = -1;
+        while(count1 > count2)
         {
-            result.at(field.at(i).at(j) * -1)++;
+            count2 = count1;
+            for(int i = 0; i < FIELD_SIZE - 1; ++i) for(int j = 0; j < FIELD_SIZE - 1; ++j)
+            {
+                if(field[i][j] == label)
+                {
+                    if(field[i][j+1] == 0)
+                    {
+                        field[i][j+1] = field[i][j];
+                        count1++;
+                    }
+                    if(field[i+1][j] == 0)
+                    {
+                        field[i+1][j] = field[i][j];
+                        count1++;
+                    }
+                }
+            }
+            for(int i = FIELD_SIZE - 1; i > 0; --i) for(int j = FIELD_SIZE - 1; j > 0; --j)
+            {
+                if(field[i][j] == label)
+                {
+                    if(field[i][j-1] == 0)
+                    {
+                        field[i][j-1] = field[i][j];
+                        count1++;
+                    }
+                    if(field[i-1][j] == 0)
+                    {
+                        field[i-1][j] = field[i][j];
+                        count1++;
+                    }
+                }
+            }
         }
-    }
-    return std::count_if(result.begin(),result.end(),[&](int hs){return 0 < hs && hs < 5;});
+     }
+     return -1 * label -2;
 }
 
 bool read_ahead::pass(search_type const& search, stone_type const& stone)
