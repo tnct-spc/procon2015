@@ -29,6 +29,7 @@ void read_ahead::run()
 {
     qDebug("read_ahead start");
 
+    //TODO:はじめに置く石も探索するように変える
     //はじめに置く石の場所、角度、反転分のループ
     for(int y = 1-STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1-STONE_SIZE; x  < FIELD_SIZE; ++x) for(int angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -45,11 +46,7 @@ void read_ahead::run()
 void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const angle, int const side)
 {
     problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-    if(problem.field.is_puttable_basic(problem.stones.front(),y,x) == false)
-    {
-        std::cout << "okenai" << std::endl;
-        return;
-    }
+
     //1個目
     problem.field.put_stone_basic(problem.stones.front(),y,x);
 
@@ -75,25 +72,15 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const a
                 continue;
             }
             problem.stones.at(stone_num).set_side(max->stones_info_vec[0].side).set_angle(max->stones_info_vec[0].angle);
-            if(problem.field.is_puttable_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x) == false)
-            {
-                std::cout << "dame" << std::endl;
-            }
             problem.field.put_stone_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
-            //print_text((boost::format("putted %dth stone")%stone_num).str());
             std::cout << stone_num << "th stone putted" << std::endl;
-/*
-            next = std::move(*max);
-            std::cout << "vec size = " << next.stones_info_vec.size() << std::endl;
-            next.stones_info_vec.erase(next.stones_info_vec.begin(),next.stones_info_vec.begin()+1);
-            std::cout << "vec size = " << next.stones_info_vec.size() << std::endl << "----------------------" << std::endl;*/
             break;
         }
     }
 
     std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
     qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,angle,flip.c_str(), problem.field.get_score());
-    emit answer_ready(problem.field);
+    answer_send(problem.field);
 }
 
 //評価関数
