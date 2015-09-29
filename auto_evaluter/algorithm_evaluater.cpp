@@ -1,6 +1,7 @@
 #include "algorithm_evaluater.hpp"
 #include <tengu.hpp>
 #include <QThread>
+#define LOAD_TO_FILE
 algorithm_evaluater::algorithm_evaluater(QObject *parent) :
     QObject(parent)
 {
@@ -77,7 +78,8 @@ void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> nam
 std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
-    simple_algorithm algo(problem);
+    //simple_algorithm algo(problem);
+    sticky_algo algo(problem);
     algorithm_type::_best_score = std::numeric_limits<int>::max();
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
@@ -93,9 +95,23 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
 }
 void algorithm_evaluater::run(){
     std::vector<std::tuple<std::string,field_type>> named_answers;
+#ifdef LOAD_TO_FILE
+    std::vector<std::tuple<std::string,problem_type>> named_problems;
+    auto prob_vec = load_problem_fires();
+    int i = 0;
+    for(auto prob : prob_vec){
+        named_problems.push_back(make_tuple(std::string("q") += std::to_string(i),prob));
+        i++;
+    }
+    loop_num = i;
+#endif
     for(int prob_num = 0; prob_num < loop_num;prob_num++){
         qDebug() << "a" << prob_num;
+#ifdef LOAD_TO_FILE
+        auto named_problem = named_problems.at(prob_num);
+#else
         auto named_problem = make_problem(std::to_string(prob_num));
+#endif
         save_problem(named_problem);
         auto answers = evaluate(std::get<1>(named_problem));
         for(int ans_num = 0; ans_num < answers.size();ans_num++){

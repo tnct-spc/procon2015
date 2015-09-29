@@ -40,7 +40,7 @@ public slots:
     void run();
 private:
     std::mutex mtx;
-    const int loop_num = 100;
+    int loop_num = 100;
     QCoreApplication* app;
 };
 
