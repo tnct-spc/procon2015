@@ -13,6 +13,7 @@ class evaluator : public QObject
 {
     Q_OBJECT
 public:
+    evaluator(evaluator const&);
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
         w_contact_move(w_contact_move_),
