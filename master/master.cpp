@@ -1,3 +1,4 @@
+#include "boost/algorithm/string.hpp"
 #include "master.h"
 #include "ui_master.h"
 
@@ -91,6 +92,9 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     QString post_problem_number=url_query.queryItemValue("quest_number");
     QString post_raw_answer_data=url_query.queryItemValue("answer");
 
+    //encode
+    std::string post_answer_data_encoded = boost::algorithm::replace_all_copy(post_raw_answer_data.toStdString(),"%0D%0A","\r\n");
+
     //response head
     response->setHeader("Content-Type", "text/html; charset=UTF-8");
     response->writeHead(200);
@@ -110,28 +114,31 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
             break;
         }
     }
-
     //Send
     if(upload_flag){
-        QEventLoop eventloop;
-        QUrlQuery postData;
-        postData.addQueryItem("id",token_name_);
-        postData.addQueryItem("quest_number",post_problem_number);
-        postData.addQueryItem("answer",post_raw_answer_data);
-        QNetworkRequest req(get_sendurl());
-        req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-        connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-        QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
-        //connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
-        eventloop.exec();
-        //if(network_error_flag)return std::string("");
+        if(ui->checkBox_sendOfficialServer->isChecked()){
+            net network(QString(""),get_sendurl());
+            network.send_to_official_server(post_answer_data_encoded);
+        }else{
+            QEventLoop eventloop;
+            QUrlQuery postData;
+            postData.addQueryItem("id",token_name_);
+            postData.addQueryItem("quest_number",post_problem_number);
+            postData.addQueryItem("answer",post_raw_answer_data);
+            QNetworkRequest req(get_sendurl());
+            req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+            connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
+            QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
+            //connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+            eventloop.exec();
+            //if(network_error_flag)return std::string("");
 
-        //Response
-        response->write("response:");
-        response->write(reply->readAll());
-        response->write("\n");
+            //Response
+            response->write(reply->readAll());
+        }
+        response->write("Master : send ok.\n");
     }else{
-        response->write("no send\n");
+        response->write("Master : no send.\n");
     }
     response->end();
 }

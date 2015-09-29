@@ -65,10 +65,10 @@ void square::solve(stone_type stone, int direction)
     field_type::raw_field_type raw_field = problem.field.get_raw_data();
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
-            if(raw_field[y][x]>=1 || raw_field[y][x]==-1){
-                field[y+1][x+1]=true;
-            }else{
+            if(raw_field[y][x]==0){
                 field[y+1][x+1]=false;
+            }else{
+                field[y+1][x+1]=true;
             }
         }
     }
@@ -76,29 +76,9 @@ void square::solve(stone_type stone, int direction)
     min_num=32*32+1;//max+1
     //斜めに置ける場所を探して石を挿入していく
     //side
-    int dy,dx;
-    for(int i=0;i<40;i++){
-        y=0;
-        x=i;
-        for(int j=0;j<=i;j++){
-            dy=y;
-            dx=x;
-            direction_change(&dy,&dx,direction);
-            put_stone_side(stone,dy-7,dx-7);
-            y++;
-            x--;
-        }
-    }
-    for(int i=38;i>=0;i--){
-        y=39-i;
-        x=39;
-        for(int j=0;j<=i;j++){
-            dy=y;
-            dx=x;
-            direction_change(&dy,&dx,direction);
-            put_stone_side(stone,dy-7,dx-7);
-            y++;
-            x--;
+    for(int dy=-7;dy<32;dy++){
+        for(int dx=-7;dx<32;dx++){
+            put_stone_side(stone,dy,dx);
         }
     }
     //hole
@@ -155,16 +135,14 @@ int square::count_side(stone_type const& stone, int dy,int dx)
     int side_num=0;
     int count;
     //Sideの数を数える
-    dy+=1;
-    dx+=1;
     for(int y=0;y<8;y++){
         for(int x=0;x<8;x++){
             if(stone.at(y,x)){
                 count=0;
-                if(dy+y>=0 && field[dy+y-1][dx+x]==true) count++;
-                if(dy+y<=31 && field[dy+y+1][dx+x]==true) count++;
-                if(dx+x>=0 && field[dy+y][dx+x-1]==true) count++;
-                if(dx+x<=31 && field[dy+y][dx+x+1]==true) count++;
+                if(dy+y>=0 && field[dy+1+y-1][dx+1+x]==true) count++;
+                if(dy+y<=31 && field[dy+1+y+1][dx+1+x]==true) count++;
+                if(dx+x>=0 && field[dy+1+y][dx+1+x-1]==true) count++;
+                if(dx+x<=31 && field[dy+1+y][dx+1+x+1]==true) count++;
                 if(count==1) side_num+=1;
                 if(count==2) side_num+=3;
                 if(count==3) side_num+=5;

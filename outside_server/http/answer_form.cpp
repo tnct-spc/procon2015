@@ -126,7 +126,7 @@ bool AnswerForm::FormatCheck(QString plain_data, QString &errormesage){
     if(list.size()==1 && list[0]==""){
         answer_num=0;
     }else{
-        answer_num=list.size();
+        answer_num=list.size() - 1;
     }
     if(answer_num != g_stone_num_){
         errormesage = QString("***format error*** 解答の石数と問題の石数が異なる");

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>455</width>
-    <height>143</height>
+    <width>620</width>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,7 +68,7 @@
   <widget class="QPushButton" name="resetbutton">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>350</x>
      <y>10</y>
      <width>51</width>
      <height>27</height>
@@ -147,6 +147,27 @@
    </property>
    <property name="text">
     <string>RadioButton</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_sendOfficialServer">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>50</y>
+     <width>201</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>15</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Send official server</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

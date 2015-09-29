@@ -28,6 +28,7 @@ public:
     std::string get_from_official_server();
     std::string send(field_type answer);
     std::string send_to_official_server(field_type answer);
+    std::string send_to_official_server(std::string answer_text);
     bool is_error();
     int what_error();
 signals:

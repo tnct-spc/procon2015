@@ -135,6 +135,8 @@ public:
     void set_provided_stones(size_t ps);
     void print_field();
 
+    bool get_has_limit() const;
+
     // 配列の参照を返すょ
     uint64_t inline const (&get_bit_plain_field() const)[64]
     {
@@ -142,6 +144,8 @@ public:
     }
 
 private:
+    bool has_limit;
+
     raw_field_type raw_data;
     std::vector<process_type> processes;
     //渡された石の総数.get_answerで必要

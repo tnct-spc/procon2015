@@ -18,9 +18,9 @@ void poor_algo::run(){
         for(int dy=-7;dy<=32;dy++){
             for(int dx=-7;dx<=32;dx++){
                 //フィールドに置けるかチェック
-                if(problem.field.is_puttable(stone,dy,dx)){
+                if(problem.field.is_puttable_basic(stone,dy,dx)){
                     //設置
-                    problem.field.put_stone(stone,dy,dx);
+                    problem.field.put_stone_basic(stone,dy,dx);
                     return;
                 }
             }

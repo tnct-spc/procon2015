@@ -1,6 +1,7 @@
 #ifndef TAKAO_HPP
 #define TAKAO_HPP
 
+
 #include "utils.hpp"
 
 #include "point_type.hpp"

@@ -12,7 +12,7 @@ void algorithm_type::print_text(std::string str){
     emit send_text("<" + algorithm_name + ">" + str);
 }
 void algorithm_type::answer_send(field_type ans){
-    if(problem.field.is_stones_contact()==false){
+    if(problem.field.get_has_limit()==false && problem.field.is_stones_contact()==false){
         print_text("***error!*** Format TIGAU!");
         return;
     }
