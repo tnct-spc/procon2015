@@ -747,7 +747,7 @@ std::string field_type::get_answer()
         prev_nth = current_nth;
         process_count++;
     }
-    for(std::size_t i = prev_nth;i < provided_stones; i++)result.append("\r\n");
+    for(std::size_t i = prev_nth;i <= provided_stones; i++)result.append("\r\n");
     //正しく動かない環境でのみADDITION_NEW_LINEを環境変数に書いてください.
     if(std::getenv("ADDITION_NEW_LINE") != nullptr)result.append("\r\n");
     return result;
