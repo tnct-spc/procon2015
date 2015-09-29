@@ -16,9 +16,12 @@
 #include <QEventLoop>
 #include <QUrlQuery>
 #include <QSharedPointer>
-#include <src/qhttpserver.h>
-#include <src/qhttprequest.h>
-#include <src/qhttpresponse.h>
+#include "net.hpp"
+#include "takao.hpp"
+#include "muen_zuka.hpp"
+#include "src/qhttpserver.h"
+#include "src/qhttprequest.h"
+#include "src/qhttpresponse.h"
 #include <QSettings>
 
 namespace Ui {

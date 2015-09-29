@@ -88,6 +88,30 @@ std::string net::send_to_official_server(field_type answer){
     if(network_error_flag)return std::string("");
     return "sent";
 }
+std::string net::send_to_official_server(std::string answer_text){
+    QEventLoop eventloop;
+    QHttpMultiPart multi_part(QHttpMultiPart::FormDataType);
+    QHttpPart token_part;
+    token_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"token\""));
+    token_part.setBody("0123456789abcdef");
+    //66b77ce56fd29d27
+    QHttpPart answer_part;
+    answer_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"answer\"; filename=\"Phantasmagoria_of_Flower_View.txt\""));
+    answer_part.setHeader(QNetworkRequest::ContentTypeHeader,QVariant("text/plain"));
+    answer_part.setBody(answer_text.c_str());
+    multi_part.append(token_part);
+    multi_part.append(answer_part);
+    QUrl req_url = _master_url.toString()+"/answer";
+    QNetworkRequest req(req_url);
+    req.setHeader(QNetworkRequest::ContentTypeHeader, QVariant(QString("multipart/form-data; boundary=") + QString(multi_part.boundary())));
+    connect(manager,&QNetworkAccessManager::finished,&eventloop,&QEventLoop::quit);
+    QNetworkReply *reply = manager->post(req,&multi_part);
+    connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
+    eventloop.exec();
+    qDebug() << QString(reply->readAll().constData());
+    if(network_error_flag)return std::string("");
+    return "sent";
+}
 
 //デストラクタ書いてないからメモリリークするよ
 //🍣　ご　め　ん　ね　🍣//
