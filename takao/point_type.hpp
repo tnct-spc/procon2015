@@ -7,6 +7,9 @@ class point_type
     public:
         point_type() = default;
         ~point_type() = default;
+        point_type(int y_, int x_) : y(y_), x(x_)
+        {
+        }
 
         int y;
         int x;
