@@ -45,15 +45,21 @@ void read_ahead::run()
 void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const angle, int const side)
 {
     problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+    if(problem.field.is_puttable_basic(problem.stones.front(),y,x) == false)
+    {
+        std::cout << "okenai" << std::endl;
+        return;
+    }
     //1個目
-    problem.field.put_stone(problem.stones.front(),y,x);
+    problem.field.put_stone_basic(problem.stones.front(),y,x);
 
+    //search_type next;//1層目用　空のまま渡す
     //2個目以降
     for(std::size_t stone_num = 1; stone_num < problem.stones.size(); ++stone_num)
     {
+        search_type next;//1層目用　空のまま渡す
         std::vector<search_type> search_vec;
-        search_type one;//1層目用　空のまま渡す
-        search(search_vec, std::move(one), problem.field, stone_num);
+        search(search_vec, std::move(next), problem.field, stone_num);
 
         if(search_vec .size() == 0) continue;
 
@@ -68,11 +74,19 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const a
                 max->score *= -1;
                 continue;
             }
-            if(max->stones_info_vec[0].side == stone_type::Sides::Tail) problem.stones.at(stone_num).flip();
-            problem.stones.at(stone_num).rotate(max->stones_info_vec[0].angle);
-            problem.field.put_stone(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
+            problem.stones.at(stone_num).set_side(max->stones_info_vec[0].side).set_angle(max->stones_info_vec[0].angle);
+            if(problem.field.is_puttable_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x) == false)
+            {
+                std::cout << "dame" << std::endl;
+            }
+            problem.field.put_stone_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
             //print_text((boost::format("putted %dth stone")%stone_num).str());
             std::cout << stone_num << "th stone putted" << std::endl;
+/*
+            next = std::move(*max);
+            std::cout << "vec size = " << next.stones_info_vec.size() << std::endl;
+            next.stones_info_vec.erase(next.stones_info_vec.begin(),next.stones_info_vec.begin()+1);
+            std::cout << "vec size = " << next.stones_info_vec.size() << std::endl << "----------------------" << std::endl;*/
             break;
         }
     }
@@ -131,11 +145,11 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
     {
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
 
-        if(_field.is_puttable(stone,y,x) == true)
+        if(_field.is_puttable_basic(stone,y,x) == true)
         {
             count++;
-            _field.put_stone(stone,y,x);
-            double const score = evaluate(_field,stone,y,x);
+            _field.put_stone_basic(stone,y,x);
+            int const score = evaluate(_field,stone,y,x);
             int const island = get_island(_field.get_raw_data());
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
@@ -183,7 +197,7 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
             }
-            _field.remove_large_most_number_and_just_before_stone();
+            _field.remove_stone_basic();
         }
     }
 
@@ -207,9 +221,9 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
         for(auto& each_ele : search_vec)
         {
             stone.set_angle(each_ele.stones_info_vec.back().angle).set_side(each_ele.stones_info_vec.back().side);
-            _field.put_stone(stone,each_ele.stones_info_vec.back().point.y,each_ele.stones_info_vec.back().point.x);
+            _field.put_stone_basic(stone,each_ele.stones_info_vec.back().point.y,each_ele.stones_info_vec.back().point.x);
             if(search(parental_search_vec, each_ele, _field, stone_num+1) == 0) parental_search_vec.push_back(each_ele);
-            _field.remove_large_most_number_and_just_before_stone();
+            _field.remove_stone_basic();
             stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
     }
