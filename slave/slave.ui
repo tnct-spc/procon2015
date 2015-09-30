@@ -417,6 +417,19 @@
     <string>公式へ送信</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox_7">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>470</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>new_beam</string>
+   </property>
+  </widget>
   <action name="problem_load_action">
    <property name="text">
     <string>問題読み込み</string>
