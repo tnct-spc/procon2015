@@ -110,7 +110,7 @@ public:
     /*その他*/
 
     //アクセッサ
-    size_t empty_zk();//get_score()を同じ.なんのためにあるのかわからない
+    size_t empty_zk() const;//get_score()を同じ.なんのためにあるのかわからない
     size_t get_block_num() const;//何かが配置されている(空白以外)マスの数を返す
     double evaluate_normalized_complexity() const;
 
@@ -173,7 +173,7 @@ private:
         void make_bit();//bitデータの作成
     void init_edge();
 };
-inline size_t field_type::empty_zk(){
+inline size_t field_type::empty_zk() const{
     return get_score();
 }
 inline size_t field_type::get_block_num() const
