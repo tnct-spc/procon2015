@@ -27,19 +27,19 @@ public:
     // fieldを内部で変更するけど元に戻すからヘーキヘーキ
     double inline const move_goodness(field_type &field, process_type const& process, stone_type &next_stone) const
     {
-        double ret;
-        ret += w_contact_move * normalized_contact(field, process);
-        field.put_stone(process.stone, process.position.y, process.position.x);
-        ret += w_nextbranches * nextbranches(field, next_stone);
-        ret += w_complexity * field.evaluate_normalized_complexity();
-        field.remove_large_most_number_and_just_before_stone(); // ?????
-        return ret;
+        double evaluation_value = 0.0;
+        evaluation_value += w_contact_move * normalized_contact(field, process);
+        field.put_stone_basic(process.stone, process.position.y, process.position.x);
+        evaluation_value += w_nextbranches * nextbranches(field, next_stone);
+        evaluation_value += w_complexity * field.evaluate_normalized_complexity();
+        field.remove_stone_basic();
+        return evaluation_value;
     }
 
     // パスするとき
     // 引数: 操作前のフィールド、行おうとしている操作、残りの石のzk数(暫定)
     // (残りの石のzk数: 行おうとしている操作の後の残りの石のzkの合計)
-    bool inline const should_pass(field_type field, process_type process, size_t rem_stone_zk) const
+    bool inline const should_pass(field_type const& field, process_type const& process, size_t rem_stone_zk) const
     {
         if(rem_stone_zk < field.empty_zk())
             return false;
