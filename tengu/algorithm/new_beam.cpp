@@ -30,7 +30,7 @@ new_beam::~new_beam()
 void new_beam::run()
 {
     qDebug("new_beam start");
-
+/*
     //はじめに置く石の場所、角度、反転分のループ
     for(int y = 1-STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1-STONE_SIZE; x  < FIELD_SIZE; ++x) for(int angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -41,6 +41,44 @@ void new_beam::run()
             one_try(origin_problem,y,x,angle,side);
         }
     }
+    */
+    only_one_try(origin_problem);
+
+}
+
+//はじめに置く石から探索を開始する
+void new_beam::only_one_try(problem_type problem)
+{
+    std::cout << "start only one try." << std::endl;
+    for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
+    {
+        search_type next;//1層目用　空のまま渡す
+        std::vector<search_type> search_vec;
+        search(search_vec, std::move(next), problem.field, stone_num);
+
+        if(search_vec .size() == 0) continue;
+
+        for(std::size_t i = 0; i < search_vec .size(); ++i)
+        {
+            auto max = std::min_element(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs)
+            {
+                return lhs.score > rhs.score;
+            });
+            problem.stones.at(stone_num).set_side(max->stones_info_vec[0].side).set_angle(max->stones_info_vec[0].angle);
+            if(eval.should_pass(problem.field,
+                                {problem.stones.at(stone_num),{max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x}},
+                                get_rem_stone_zk(stone_num+1))== true)
+            {
+                max->score *= -1;
+                continue;
+            }
+            problem.field.put_stone_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
+            std::cout << stone_num << "th stone putted" << std::endl;
+            break;
+        }
+    }
+    qDebug("emit only one try. score = %3zu",problem.field.get_score());
+    answer_send(problem.field);
 }
 
 //はじめに置く場所、角度、反転を固定しての試行1回
@@ -51,7 +89,6 @@ void new_beam::one_try(problem_type problem, int y, int x, std::size_t const ang
     //1個目
     problem.field.put_stone_basic(problem.stones.front(),y,x);
 
-    //search_type next;//1層目用　空のまま渡す
     //2個目以降
     for(std::size_t stone_num = 1; stone_num < problem.stones.size(); ++stone_num)
     {
@@ -63,7 +100,7 @@ void new_beam::one_try(problem_type problem, int y, int x, std::size_t const ang
 
         for(std::size_t i = 0; i < search_vec .size(); ++i)
         {
-            auto max = std::min_element(search_vec .begin(),search_vec .end(),[](const search_type& lhs, const search_type& rhs)
+            auto max = std::min_element(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs)
             {
                 return lhs.score > rhs.score;
             });
@@ -87,7 +124,7 @@ void new_beam::one_try(problem_type problem, int y, int x, std::size_t const ang
 }
 
 //おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
-int new_beam::search(std::vector<search_type>& parental_search_vec, search_type s, field_type& _field, std::size_t const stone_num)
+int new_beam::search(std::vector<search_type>& parental_search_vec, search_type parent, field_type& _field, std::size_t const stone_num)
 {
     if(stone_num == origin_problem.stones.size() - 1) return 0;
     int count = 0;
@@ -108,7 +145,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
-                if(s.stones_info_vec.size() == 0)
+                if(parent.stones_info_vec.size() == 0)
                 {
                     search_vec.emplace_back(
                             std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
@@ -118,8 +155,8 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                 else
                 {
                     search_vec.emplace_back(
-                            s.stones_info_vec,
-                            s.score + score
+                            parent.stones_info_vec,
+                            parent.score + score
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -131,18 +168,18 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                     {
                         return lhs.score < rhs.score;
                     });
-                if(s.stones_info_vec.size() == 0 && (worst->score <= score)) //1層目　保持している中の最悪手より良い
+                if(parent.stones_info_vec.size() == 0 && (worst->score <= score)) //1層目　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
                             std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
                             score
                         );
                 }
-                else if(s.stones_info_vec.size() > 0 && (worst->score <= s.score + score)) //2層目以上　保持している中の最悪手より良い
+                else if(parent.stones_info_vec.size() > 0 && (worst->score <= parent.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
-                            s.stones_info_vec,
-                            s.score + score
+                            parent.stones_info_vec,
+                            parent.score + score
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -161,7 +198,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
     if(search_vec.size() > 3) search_vec.resize(3);
 
     //最下層だったら結果を親ベクトルに入れる
-    if(s.stones_info_vec.size()+1 >= search_depth || stone_num >= ALL_STONES_NUM-1)
+    if(parent.stones_info_vec.size()+1 >= search_depth || stone_num >= ALL_STONES_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(parental_search_vec));
     }

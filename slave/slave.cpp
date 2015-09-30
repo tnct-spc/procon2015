@@ -101,7 +101,7 @@ void Slave::clicked_run_button(){
     ui->checkBox_4->isChecked() ? enable_algo.at(4) = true : enable_algo.at(4) = false;
     ui->checkBox_5->isChecked() ? enable_algo.at(5) = true : enable_algo.at(5) = false;
     ui->checkBox_6->isChecked() ? enable_algo.at(6) = true : enable_algo.at(6) = false;
-    ui->checkBox_7->isChecked() ? enable_algo.at(6) = true : enable_algo.at(7) = false;
+    ui->checkBox_7->isChecked() ? enable_algo.at(7) = true : enable_algo.at(7) = false;
     algo_manager = new algorithm_manager(_problem,enable_algo);
     algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);

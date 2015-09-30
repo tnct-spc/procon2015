@@ -46,6 +46,7 @@ private:
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
+    void only_one_try(problem_type problem);
     int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
     int get_rem_stone_zk(int stone_num);
 };
