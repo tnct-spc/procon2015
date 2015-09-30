@@ -63,6 +63,7 @@ private:
     double const w_nextbranches; // 次の石がおける数
     // 閾値
     double const t_contact_pass; // 接辺の数(正規化)
+public: // うーん
     // 評価関数
     double normalized_contact(field_type const& field, process_type const& process) const; // 接辺の数(正規化)
     int nextbranches(field_type const& field, stone_type &stone) const; // 次の石がおける数、stoneを内部で変更するけど元に戻すからヘーキヘーキ
