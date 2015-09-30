@@ -126,10 +126,8 @@ void new_beam::one_try(problem_type problem, int y, int x, std::size_t const ang
 //おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
 int new_beam::search(std::vector<search_type>& parental_search_vec, search_type parent, field_type& _field, std::size_t const stone_num)
 {
-    if(stone_num == origin_problem.stones.size() - 1) return 0;
     int count = 0;
     stone_type stone = origin_problem.stones.at(stone_num);
-    stone_type next_stone = origin_problem.stones.at(stone_num+1);
     std::vector<search_type> search_vec;
 
     //おける可能性がある場所すべてにおいてみる
@@ -141,7 +139,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
         {
             count++;
             _field.put_stone_basic(stone,y,x);
-            double const score = eval.move_goodness(_field,{stone,{y,x}},next_stone);
+            double const score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             //置けたら接してる辺を数えて配列に挿入
             if(search_vec.size() < 14) //14個貯まるまでは追加する
             {
@@ -220,7 +218,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
 int new_beam::get_rem_stone_zk(int stone_num)
 {
     int sum = 0;
-    for(int i = stone_num; i < origin_problem.stones.size(); ++i)
+    for(std::size_t i = stone_num; i < origin_problem.stones.size(); ++i)
     {
         sum += origin_problem.stones.at(i).get_area();
     }
