@@ -143,16 +143,20 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
             {
                 if(parent.stones_info_vec.size() == 0)
                 {
+                    //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
+                    //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
                     search_vec.emplace_back(
                             std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
-                            score
+                            score,
+                            3
                         );
                 }
                 else
                 {
                     search_vec.emplace_back(
                             parent.stones_info_vec,
-                            score
+                            score,
+                            parent.search_depth
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -166,16 +170,20 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                     });
                 if(parent.stones_info_vec.size() == 0 && (worst->score <= score)) //1層目　保持している中の最悪手より良い
                 {
+                    //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
+                    //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
                     search_vec.emplace_back(
                             std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
-                            score
+                            score,
+                            3
                         );
                 }
                 else if(parent.stones_info_vec.size() > 0 && (worst->score <= parent.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
                             parent.stones_info_vec,
-                            score
+                            score,
+                            parent.search_depth
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
