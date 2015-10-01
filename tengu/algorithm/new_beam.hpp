@@ -10,12 +10,13 @@ class new_beam : public algorithm_type
     Q_OBJECT
 public:
     new_beam(problem_type _problem);
+    new_beam(problem_type _problem,evaluator eval);
     ~new_beam();
     void run();
 
 private:
 
-    evaluator eval = evaluator(-10,1,1,0.5);
+    evaluator eval = evaluator();
     static constexpr std::size_t MAX_SEARCH_DEPTH = 3;
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;

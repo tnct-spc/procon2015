@@ -7,6 +7,7 @@
 #include "tengu.hpp"
 #include <iostream>
 #include <limits>
+#include "evaluator.hpp"
 algorithm_manager::algorithm_manager(QObject *parent) : QObject(parent)
 {
 }
@@ -27,7 +28,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(4))algo_vec.push_back(new yrange(problem));
     if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
     if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
-    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem));
+    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(-10,1,1,0.5)));
 
     for(auto algo : algo_vec){
         algo->setParent(this);

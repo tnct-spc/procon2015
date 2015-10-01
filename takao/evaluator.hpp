@@ -1,19 +1,23 @@
 #ifndef EVALUATOR_HPP
 #define EVALUATOR_HPP
-#include <QObject>
 #include <field_type.hpp>
-
 /*
  * 評価関数クラス
  * コンストラクタでパラメータ(重み)を受け取る
  * コメントにある仕様は暫定
  */
 
-class evaluator : public QObject
+class evaluator
 {
-    Q_OBJECT
 public:
-    evaluator(evaluator const&);
+    evaluator() :
+        w_complexity(0),
+        w_contact_move(0),
+        w_nextbranches(0),
+        t_contact_pass(0)
+    {
+
+    }
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
         w_contact_move(w_contact_move_),

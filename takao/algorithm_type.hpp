@@ -4,6 +4,7 @@
 #include "field_type.hpp"
 #include <QThread>
 #include <mutex>
+#include "evaluator.hpp"
 // アルゴリズムの基底クラス
 // テンプレートのほうがいい?
 class algorithm_type : public QThread
@@ -20,6 +21,7 @@ class algorithm_type : public QThread
         problem_type problem;
         std::string algorithm_name;
         static std::mutex ans_emit_mtx;
+        evaluator _eval;
         //static int _best_score;
         void answer_send(field_type ans);
     signals:
