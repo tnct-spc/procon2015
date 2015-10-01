@@ -13,7 +13,7 @@ void algorithm_type::print_text(std::string str){
 }
 void algorithm_type::answer_send(field_type ans){
     if(problem.field.get_has_limit()==false && problem.field.is_stones_contact()==false){
-        print_text("***error!*** Format TIGAU!");
+        print_text("***error!*** Format error in slave. The answer has not contact stone.");
         return;
     }
     ans_emit_mtx.lock();
