@@ -69,7 +69,7 @@ void sticky_algo::run(){
     std::vector<evalated_field> pattern;
     pattern.push_back({problem.field,0});
     for(auto& _stone : problem.stones){
-        pattern = eval_pattern(std::move(_stone),std::move(pattern),200);
+        pattern = eval_pattern(std::move(_stone),std::move(pattern),20);
         qDebug() << count--;
     }
     int64_t time = et.elapsed();
