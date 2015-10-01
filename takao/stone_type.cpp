@@ -194,7 +194,7 @@ void stone_type::make_bit()
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }
 
-void stone_type::print_stone()
+void stone_type::print_stone() const
 {
     for(auto const& each : raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90))
     {

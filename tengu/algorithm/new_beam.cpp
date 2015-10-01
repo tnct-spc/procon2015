@@ -50,8 +50,8 @@ void new_beam::only_one_try(problem_type problem)
     std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
-        origin_problem.stones.at(stone_num).print_stone();
-        std::cout << "side length = " << origin_problem.stones.at(stone_num).get_side_length() << std::endl;
+        //origin_problem.stones.at(stone_num).print_stone();
+        //std::cout << "side length = " << origin_problem.stones.at(stone_num).get_side_length() << std::endl;
         search_type next;//1層目用　空のまま渡す
         std::vector<search_type> search_vec;
         search(search_vec, std::move(next), problem.field, stone_num);
