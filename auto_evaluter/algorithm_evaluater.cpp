@@ -68,8 +68,8 @@ void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> nam
 std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
-    //simple_algorithm algo(problem);
-    sticky_algo algo(problem);
+    simple_algorithm algo(problem);
+    //sticky_algo algo(problem);
     algorithm_type::_best_score = std::numeric_limits<int>::max();
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
