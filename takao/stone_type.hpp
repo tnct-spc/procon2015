@@ -55,7 +55,7 @@ public:
     std::string str() const;
         uint64_t const&get_bit_plain_stones(int x, int flip, int rotate, int y) const;
         bit_stones_type const& get_raw_bit_plain_stones() const;
-    void print_stone();
+    void print_stone() const;
     void init_stone();
 private:
     int nth;

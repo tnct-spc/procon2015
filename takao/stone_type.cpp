@@ -60,10 +60,28 @@ void stone_type::init_stone()
     make_bit();
 
     //side_length
-    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))side_length++;
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))side_length++;
+         if((i == 0 || i == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " i" << std::endl;
+             side_length++;
+         }
+         if((j == 0 || j == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " j "<< std::endl;
+             side_length++;
+         }
+         if(j < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
+         if(i < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
     }
 
     //area
@@ -175,7 +193,7 @@ void stone_type::make_bit()
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }
 
-void stone_type::print_stone()
+void stone_type::print_stone() const
 {
     for(auto const& each : raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90))
     {
@@ -243,24 +261,37 @@ std::string stone_type::str() const
 bool stone_type::_has_hole(raw_stone_type stone)
 {
     auto stone_ = stone;
-    for (size_t i = 0; i < stone.size(); i++)
-        for (size_t j = 0; j < stone.at(i).size(); j++)
-            if (!stone.at(i).at(j)) {
-                /* set adjacent blocks */
-                if (_is_in_stone(i + 1, j))
-                    stone_.at(i + 1).at(j) = 1;
-                if (_is_in_stone(i - 1, j))
-                    stone_.at(i - 1).at(j) = 1;
-                if (_is_in_stone(i, j + 1))
-                    stone_.at(i).at(j + 1) = 1;
-                if (_is_in_stone(i, j - 1))
-                    stone_.at(i).at(j - 1) = 1;
+
+    // stoneの(y, x)を見て，周り全てがstone_.at(i).at(j)==1に達すれば穴
+    // 隣に拡散して再帰する
+    std::function<bool(raw_stone_type&, std::size_t const, std::size_t const)> is_hole;
+    is_hole = [&is_hole, this](raw_stone_type& stone, std::size_t const y, std::size_t const x) -> bool
+    {
+        // 指定されたzkの確認
+        if (stone.at(y).at(x)) return true; // 探索済み or zkである
+        else stone.at(y).at(x) = 2;         // 探索済みフラグ
+
+        // 1つでも端に達すれば穴ではないが，そうでなければ再帰して確認
+        bool result = true;
+        result = result && ((!_is_in_stone(y + 1, x)) ? false : is_hole(stone, y + 1, x));
+        result = result && ((!_is_in_stone(y - 1, x)) ? false : is_hole(stone, y - 1, x));
+        result = result && ((!_is_in_stone(y, x + 1)) ? false : is_hole(stone, y, x + 1));
+        result = result && ((!_is_in_stone(y, x - 1)) ? false : is_hole(stone, y, x - 1));
+
+        return result;
+    };
+
+    bool result = false;
+    for (std::size_t i = 0; i < stone_.size(); i++)
+    {
+        for (std::size_t j = 0; j < stone_.at(i).size(); j++)
+        {
+            if (!stone_.at(i).at(j)) // まだ見てないzkかどうか
+            {
+                result = result || is_hole(stone_, i, j);
             }
+        }
+    }
 
-    int sum = 0;
-    for(auto i = stone_.begin(); i < stone_.end(); i++)
-        for(auto j = i->begin(); j < i->end(); j++)
-            sum += *j;
-
-    return sum != STONE_SIZE * STONE_SIZE;
+    return result;
 }
