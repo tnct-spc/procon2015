@@ -36,6 +36,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(4))algo_vec.push_back(new yrange(problem));
     if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
     if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
+    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem));
 
     for(auto algo : algo_vec){
         algo->setParent(this);
@@ -65,6 +66,7 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(4))emit send_text("yrange動作");
     if(enable_algorithm_list.at(5))emit send_text("yrange2動作");
     if(enable_algorithm_list.at(6))emit send_text("read_ahead動作");
+    if(enable_algorithm_list.at(7))emit send_text("new_beam動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();
