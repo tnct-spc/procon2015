@@ -75,7 +75,7 @@ void new_beam::only_one_try(problem_type problem)
             break;
         }
     }
-    qDebug("emit only one try. score = %3zu",problem.field.get_score());
+    qDebug("emit only one try. score = %3d",problem.field.get_score());
     answer_send(problem.field);
 }
 
@@ -117,7 +117,7 @@ void new_beam::one_try(problem_type problem, int y, int x, std::size_t const ang
     }
 
     std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-    qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,angle,flip.c_str(), problem.field.get_score());
+    qDebug("emit starting by %2d,%2d %3lu %s score = %3d",y,x,angle,flip.c_str(), problem.field.get_score());
     answer_send(problem.field);
 }
 
