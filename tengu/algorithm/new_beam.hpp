@@ -35,8 +35,7 @@ private:
         double score = -1;
         int search_depth = 0;
 
-        search_type(std::vector<stones_info_type> stones_info_vec,double score):stones_info_vec(stones_info_vec),score(score){}
-        search_type(std::vector<stones_info_type> stones_info_vec,double score, std::size_t search_depth_):stones_info_vec(stones_info_vec),score(score),search_depth(search_depth_){}
+        search_type(std::vector<stones_info_type> stones_info_vec_,double score_, std::size_t search_depth_):stones_info_vec(stones_info_vec_),score(score_),search_depth(search_depth_){}
         search_type(){}
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
