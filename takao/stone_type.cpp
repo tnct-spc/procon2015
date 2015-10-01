@@ -60,7 +60,6 @@ void stone_type::init_stone()
     make_bit();
 
     //side_length
-    std::cout << "count start " << std::endl;
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
          if((i == 0 || i == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)

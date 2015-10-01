@@ -39,7 +39,7 @@ void new_beam::run()
             one_try(origin_problem,y,x,angle,side);
         }
     }
-    */
+*/
     only_one_try(origin_problem);
 
 }
@@ -158,7 +158,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                     search_vec.emplace_back(
                             parent.stones_info_vec,
                             score,
-                            parent.search_depth
+                            3
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -179,13 +179,14 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                             score,
                             3
                         );
+
                 }
                 else if(parent.stones_info_vec.size() > 0 && (worst->score <= parent.score + score)) //2層目以上　保持している中の最悪手より良い
                 {
                     search_vec.emplace_back(
                             parent.stones_info_vec,
                             score,
-                            parent.search_depth
+                            3
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -204,6 +205,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
     if(search_vec.size() > 3) search_vec.resize(3);
 
     //最下層だったら結果を親ベクトルに入れる
+    //if(parent.search_depth != 3) std::cout << "search_depth = " << search_vec.back().search_depth << std::endl;
     if(parent.stones_info_vec.size()+1 >= MAX_SEARCH_DEPTH || stone_num >= ALL_STONES_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(parental_search_vec));
