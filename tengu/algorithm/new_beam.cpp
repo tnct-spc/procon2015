@@ -152,7 +152,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                 {
                     search_vec.emplace_back(
                             parent.stones_info_vec,
-                            parent.score + score
+                            score
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
@@ -175,7 +175,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
                 {
                     search_vec.emplace_back(
                             parent.stones_info_vec,
-                            parent.score + score
+                            score
                        );
                     search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
                 }
