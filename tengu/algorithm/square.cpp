@@ -7,15 +7,7 @@
 square::square(problem_type _problem)
 {
     algorithm_name = "square";
-    qDebug("not parallel");
     original_problem = _problem;
-    _mode = 0;
-}
-square::square(problem_type _problem, int mode)
-{
-    algorithm_name = "square";
-    original_problem = _problem;
-    _mode = mode;
 }
 
 square::~square()
@@ -27,35 +19,22 @@ void square::run()
 {
         QElapsedTimer et;
         et.start();
-        qDebug("@square start direction%d",_mode);
+        qDebug("@square start direction");
         problem=original_problem;
         //Make answer
         //problem.field.cancellation_of_restriction();
         for(stone_type stone : problem.stones){
-            solve(stone,_mode);
+            solve(stone);
         }
         //解答の送信
-        qDebug("@square emit direction%d",_mode);
+        qDebug("@square emit direction");
         int64_t time = et.elapsed();
         print_text(std::to_string(time));
         answer_send(problem.field);
 }
 
-void square::direction_change(int *dy, int *dx, int direction)
+void square::solve(stone_type stone)
 {
-    int temp;
-    if(direction%4 >= 2) *dy=39-*dy;//上下反転
-    if(direction%2 == 1) *dx=39-*dx;//左右反転
-    if(direction >= 4){//向き回転
-        temp=*dy;
-        *dy=*dx;
-        *dx=temp;
-    }
-}
-
-void square::solve(stone_type stone, int direction)
-{
-    int y,x;
     //init
     for(int i=0;i<34;i++){
         for(int j=0;j<34;j++){
