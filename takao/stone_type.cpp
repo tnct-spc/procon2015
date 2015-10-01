@@ -60,10 +60,28 @@ void stone_type::init_stone()
     make_bit();
 
     //side_length
-    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))side_length++;
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))side_length++;
+         if((i == 0 || i == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " i" << std::endl;
+             side_length++;
+         }
+         if((j == 0 || j == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " j "<< std::endl;
+             side_length++;
+         }
+         if(j < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
+         if(i < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
     }
 
     //area
@@ -175,7 +193,7 @@ void stone_type::make_bit()
         raw_data_set.at(i) = _rotate(raw_data_set.at(4), (i - 4) * 90);
 }
 
-void stone_type::print_stone()
+void stone_type::print_stone() const
 {
     for(auto const& each : raw_data_set.at(static_cast<unsigned>(current_side)*4 + current_angle / 90))
     {

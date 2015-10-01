@@ -25,8 +25,14 @@ double evaluator::normalized_contact(field_type const& field, process_type const
         // right
         sum += _mm_popcnt_u64(field_bits[posy + i] & stone_bits[posx + 2][flip][rotate][i]);
     }
-    //std::cout << "sum = " << static_cast<double>(sum) << std::endl;
-    //std::cout << "side length = " << process.stone.get_side_length() << std::endl;
+    /*
+    if(sum > process.stone.get_side_length())
+    {
+        process.stone.print_stone();
+        std::cout << "sum = " << static_cast<double>(sum) << std::endl;
+        std::cout << "side length = " << process.stone.get_side_length() << std::endl;
+    }
+    */
     return static_cast<double>(sum) / process.stone.get_side_length();
 }
 
