@@ -60,10 +60,29 @@ void stone_type::init_stone()
     make_bit();
 
     //side_length
-    for(int i = 0; i < STONE_SIZE -1; ++i) for(int j = 0; j < STONE_SIZE - 1; ++j)
+    std::cout << "count start " << std::endl;
+    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))side_length++;
-         if(raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))side_length++;
+         if((i == 0 || i == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " i" << std::endl;
+             side_length++;
+         }
+         if((j == 0 || j == STONE_SIZE -1) && raw_data_set.at(0).at(i).at(j) == 1)
+         {
+             //std::cout << i << " " << j << " j "<< std::endl;
+             side_length++;
+         }
+         if(j < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i).at(j+1))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
+         if(i < STONE_SIZE -1 && raw_data_set.at(0).at(i).at(j) != raw_data_set.at(0).at(i+1).at(j))
+         {
+             //std::cout << i << " " << j << std::endl;
+             side_length++;
+         }
     }
 
     //area
