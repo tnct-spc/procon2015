@@ -8,5 +8,6 @@
 #include "algorithm/sticky_algo.hpp"
 #include "algorithm/square.hpp"
 #include "algorithm/read_ahead.hpp"
+#include "algorithm/new_beam.hpp"
 
 #endif // TENGU_HPP
