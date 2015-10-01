@@ -15,8 +15,6 @@ new_beam::new_beam(problem_type _problem)
 {
     origin_problem = _problem;
     algorithm_name = "new_beam";
-
-    search_depth = 3;
     ALL_STONES_NUM = origin_problem.stones.size();
 
 }
@@ -196,7 +194,7 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
     if(search_vec.size() > 3) search_vec.resize(3);
 
     //最下層だったら結果を親ベクトルに入れる
-    if(parent.stones_info_vec.size()+1 >= search_depth || stone_num >= ALL_STONES_NUM-1)
+    if(parent.stones_info_vec.size()+1 >= MAX_SEARCH_DEPTH || stone_num >= ALL_STONES_NUM-1)
     {
         std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(parental_search_vec));
     }

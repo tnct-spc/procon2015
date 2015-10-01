@@ -18,16 +18,16 @@ public:
         point_type point;
         std::size_t angle;
         stone_type::Sides side;
-        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){};
-        stones_info_type(){};
+        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){}
+        stones_info_type(){}
     };
 
     struct search_type
     {
         std::vector<stones_info_type> stones_info_vec;
         double score = -1;
-        search_type(std::vector<stones_info_type> stones_info_vec,double score):stones_info_vec(stones_info_vec),score(score){};
-        search_type(){};
+        search_type(std::vector<stones_info_type> stones_info_vec,double score):stones_info_vec(stones_info_vec),score(score){}
+        search_type(){}
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
             return lhs.stones_info_vec[0].point == rhs.stones_info_vec[0].point &&
@@ -42,7 +42,7 @@ public:
 private:
 
     evaluator eval = evaluator(-10,1,1,0.5);
-    std::size_t search_depth = 3;
+    static constexpr std::size_t MAX_SEARCH_DEPTH = 3;
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
