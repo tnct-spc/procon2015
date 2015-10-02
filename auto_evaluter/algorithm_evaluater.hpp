@@ -23,12 +23,12 @@ class algorithm_evaluater : public QObject
 public:
     explicit algorithm_evaluater(QObject *parent = 0);
 //private:
-    std::vector<problem_type> load_problem_fires();
-    std::vector<field_type> evaluate(problem_type);
+    std::vector<std::tuple<std::string, problem_type> > load_problem_fires();
+    std::vector<field_type> evaluate(problem_type, evaluator _eval);
     void save_answer(std::tuple<std::string, field_type> named_answer);
     void save_problem(std::tuple<std::string, problem_type> named_problem);
-    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer);
-    std::tuple<std::string,problem_type> make_problem(std::string problem_name);
+    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double,double> params);
+    std::vector<std::tuple<std::string, problem_type> > make_problem();
     algorithm_type* _algorithm;
     QStringList filelist;
     std::vector<problem_type> problem_vector;
@@ -39,9 +39,25 @@ public slots:
     void get_answer(field_type ans);
     void run();
 private:
+    void main_process(std::tuple<std::string,problem_type> named_problem, evaluator _eval, std::tuple<double, double, double, double> params);
     std::mutex mtx;
     int loop_num = 100;
     QCoreApplication* app;
+    double static constexpr w_complexity_start = 0;
+    double static constexpr w_complexity_step = 10;
+    double static constexpr w_complexity_end = 1;
+
+    double static constexpr w_contact_move_start = 0;
+    double static constexpr w_contact_move_step = 10;
+    double static constexpr w_contact_move_end = 1;
+
+    double static constexpr w_nextbranches_start = 0;
+    double static constexpr w_nextbranches_step = 10;
+    double static constexpr w_nextbranches_end = 1;
+
+    double static constexpr w_contact_pass_start = 0;
+    double static constexpr w_contact_pass_step = 10;
+    double static constexpr w_contact_pass_end = 1;
 };
 
 #endif // ALGORITHM_EVALUATER_HPP
