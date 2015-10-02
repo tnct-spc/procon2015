@@ -5,7 +5,6 @@
 #include <array>
 #include <queue>
 #include <memory>
-#include <map>
 #include <vector>
 
 struct node
@@ -30,8 +29,13 @@ struct node
         //printf("Construct %c\n", c);
     }
 
-    node(node *parent):
-        parent(parent)
+    node(node *_parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score):
+        parent(_parent),
+        stone_num(_stone_num),
+        point(_point),
+        angle(_angle),
+        side(_side),
+        score(_score)
     {
         //printf("Construct %c\n", c);
     }

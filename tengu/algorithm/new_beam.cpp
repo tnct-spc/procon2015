@@ -102,13 +102,13 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
             {
                 nodes.emplace_back(
-                            std::shared_ptr<node>(new node(
-                                                 parent,
-                                                 point_type{y,x},
-                                                 angle,
-                                                 static_cast<stone_type::Sides>(side),
-                                                 score)
-                                             )
+                            new node(
+                                parent,
+                                stone_num,
+                                point_type{y,x},
+                                angle,
+                                static_cast<stone_type::Sides>(side),
+                                score)
                             );
             }
             else
@@ -122,6 +122,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                 {
                     //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
                     //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
+                    //NOET:最悪手と置き換えたいのだが、新たにnewして良いのか
                     *worst = std::shared_ptr<node>(new node(
                                                        parent,
                                                        stone_num,
@@ -137,7 +138,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
     }
 
 
-    //探索の最下層だったら結果を親ベクトルに入れる
+    //探索の最下層だったら結果をresult_vec入れる
     //std::cout << "search_depth = " << parent.search_depth << std::endl;
     if(parent->stone_num - now_put_stone_num > parent->search_depth || stone_num >= ALL_STONES_NUM-1)
     {
@@ -162,7 +163,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             _field.put_stone_basic(stone,each_node->point.y,each_node->point.x);
             if(search(_field, stone_num+1, each_node) == 0) result_vec.push_back(std::move(each_node));
             _field.remove_stone_basic();
-            //stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
     }
     return count;
