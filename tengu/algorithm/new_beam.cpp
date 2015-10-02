@@ -50,31 +50,29 @@ void new_beam::only_one_try(problem_type problem)
     std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
-        //origin_problem.stones.at(stone_num).print_stone();
-        //std::cout << "side length = " << origin_problem.stones.at(stone_num).get_side_length() << std::endl;
-        search_type next;//1層目用　空のまま渡す
-        next.search_depth = MAX_SEARCH_DEPTH;
-        std::vector<search_type> search_vec;
-        search(search_vec, std::move(next), problem.field, stone_num);
+        node root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,0));
+        search(problem.field, stone_num, root);
 
-        if(search_vec .size() == 0) continue;
+        if(result_vec.size() == 0) continue;
 
-        for(std::size_t i = 0; i < search_vec .size(); ++i)
+        for(std::size_t i = 0; i < result_vec.size(); ++i)
         {
-            auto max = std::min_element(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs)
+            auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
             {
                 return lhs.score > rhs.score;
             });
-            problem.stones.at(stone_num).set_side(max->stones_info_vec[0].side).set_angle(max->stones_info_vec[0].angle);
+            problem.stones.at(stone_num).set_side(max->side).set_angle(max->angle);
             if(eval.should_pass(problem.field,
-                                {problem.stones.at(stone_num),{max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x}},
+                                {problem.stones.at(stone_num),{max->point.y, max->point.x}},
                                 get_rem_stone_zk(stone_num+1))== true)
             {
+                /*TODO:スコアは負の値も取りうる*/
                 max->score *= -1;
                 continue;
             }
-            problem.field.put_stone_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
+            problem.field.put_stone_basic(problem.stones.at(stone_num), max->point.y, max->point.x);
             std::cout << stone_num << "th stone putted" << std::endl;
+            result_vec.clear();
             break;
         }
     }
@@ -82,54 +80,12 @@ void new_beam::only_one_try(problem_type problem)
     answer_send(problem.field);
 }
 
-//はじめに置く場所、角度、反転を固定しての試行1回
-void new_beam::one_try(problem_type problem, int y, int x, std::size_t const angle, int const side)
-{
-    problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-
-    //1個目
-    problem.field.put_stone_basic(problem.stones.front(),y,x);
-
-    //2個目以降
-    for(std::size_t stone_num = 1; stone_num < problem.stones.size(); ++stone_num)
-    {
-        search_type next;//1層目用　空のまま渡す
-        std::vector<search_type> search_vec;
-        search(search_vec, std::move(next), problem.field, stone_num);
-
-        if(search_vec .size() == 0) continue;
-
-        for(std::size_t i = 0; i < search_vec .size(); ++i)
-        {
-            auto max = std::min_element(search_vec.begin(),search_vec.end(),[](const search_type& lhs, const search_type& rhs)
-            {
-                return lhs.score > rhs.score;
-            });
-            problem.stones.at(stone_num).set_side(max->stones_info_vec[0].side).set_angle(max->stones_info_vec[0].angle);
-            if(eval.should_pass(problem.field,
-                                {problem.stones.at(stone_num),{max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x}},
-                                get_rem_stone_zk(stone_num+1))== true)
-            {
-                max->score *= -1;
-                continue;
-            }
-            problem.field.put_stone_basic(problem.stones.at(stone_num), max->stones_info_vec[0].point.y, max->stones_info_vec[0].point.x);
-            std::cout << stone_num << "th stone putted" << std::endl;
-            break;
-        }
-    }
-
-    std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-    qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,angle,flip.c_str(), problem.field.get_score());
-    answer_send(problem.field);
-}
-
 //おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
-int new_beam::search(std::vector<search_type>& parental_search_vec, search_type parent, field_type& _field, std::size_t const stone_num)
+int new_beam::search(field_type& _field, std::size_t const stone_num, node parent)
 {
     int count = 0;
-    stone_type stone = origin_problem.stones.at(stone_num);
-    std::vector<search_type> search_vec;
+    stone_type& stone = origin_problem.stones.at(stone_num);
+    std::vector<node> nodes;
 
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
@@ -140,87 +96,70 @@ int new_beam::search(std::vector<search_type>& parental_search_vec, search_type 
         {
             count++;
             _field.put_stone_basic(stone,y,x);
-            double const score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+            const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             //置けたら接してる辺を数えて配列に挿入
-            if(search_vec.size() < 14) //14個貯まるまでは追加する
+            if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
             {
-                if(parent.stones_info_vec.size() == 0)
-                {
-                    //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
-                    //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
-                    search_vec.emplace_back(
-                            std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
-                            score,
-                            3
+                nodes.emplace_back(
+                        parent,
+                        point_type{y,x},
+                        angle,
+                        static_cast<stone_type::Sides>(side),
+                        score
                         );
-                }
-                else
-                {
-                    search_vec.emplace_back(
-                            parent.stones_info_vec,
-                            score,
-                            3
-                       );
-                    search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
-                }
             }
             else
             {
                 //保持している中での最悪手
-                auto worst = std::min_element(search_vec.begin(),search_vec.end(),[](auto const&lhs, auto const& rhs)
+                auto worst = std::min_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
                     {
                         return lhs.score < rhs.score;
                     });
-                if(parent.stones_info_vec.size() == 0 && (worst->score <= score)) //1層目　保持している中の最悪手より良い
+                if(worst->score < score) //保持している中の最悪手より良い
                 {
                     //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
                     //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
-                    search_vec.emplace_back(
-                            std::vector<stones_info_type>{{point_type{y,x},angle,static_cast<stone_type::Sides>(side)}},
-                            score,
-                            3
-                        );
-
-                }
-                else if(parent.stones_info_vec.size() > 0 && (worst->score <= parent.score + score)) //2層目以上　保持している中の最悪手より良い
-                {
-                    search_vec.emplace_back(
-                            parent.stones_info_vec,
-                            score,
-                            3
-                       );
-                    search_vec.back().stones_info_vec.emplace_back(point_type{y,x},angle,static_cast<stone_type::Sides>(side));
+                    *worst = node(
+                        parent,
+                        stone_num,
+                        point_type{y,x},
+                        angle,
+                        static_cast<stone_type::Sides>(side),
+                        score
+                    );
                 }
             }
             _field.remove_stone_basic();
         }
     }
 
-    //uniqueのためにsortが必要
-    std::sort(search_vec.begin(),search_vec.end(),[&](const search_type& lhs, const search_type& rhs)
-        {
-            return lhs.score > rhs.score;
-        });
-    search_vec.erase(std::unique(search_vec.begin(), search_vec.end()), search_vec.end());
-    //上位3つだけ残す
-    if(search_vec.size() > 3) search_vec.resize(3);
 
     //探索の最下層だったら結果を親ベクトルに入れる
     //std::cout << "search_depth = " << parent.search_depth << std::endl;
-    if(static_cast<int>(parent.stones_info_vec.size()+1) >= parent.search_depth || stone_num >= ALL_STONES_NUM-1)
+    if(parent.stone_num - now_put_stone_num > parent.search_depth || stone_num >= ALL_STONES_NUM-1)
     {
-        std::copy(search_vec.begin(),search_vec.end(),std::back_inserter(parental_search_vec));
+        auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
+        {
+            return lhs.score < rhs.score;
+        });
+
+        auto grand = &parent;
+        while(grand->stone_num == now_put_stone_num)
+        {
+            grand = &grand->parent;
+        }
+        result_vec.push_back(*max);
     }
     //そうでなければ石を置いて潜る、帰ってきたら石を取り除く
     else
     {
-        for(auto& each_ele : search_vec)
+        for(auto& each_node : nodes)
         {
-            stone.set_angle(each_ele.stones_info_vec.back().angle).set_side(each_ele.stones_info_vec.back().side);
-            _field.put_stone_basic(stone,each_ele.stones_info_vec.back().point.y,each_ele.stones_info_vec.back().point.x);
-            if(search(parental_search_vec, each_ele, _field, stone_num+1) == 0) parental_search_vec.push_back(each_ele);
+            stone.set_angle(each_node.angle).set_side(each_node.side);
+            _field.put_stone_basic(stone,each_node.point.y,each_node.point.x);
+            if(search(_field, stone_num+1, each_node) == 0) result_vec.push_back(each_node);
             _field.remove_stone_basic();
-            stone.set_angle(0).set_side(stone_type::Sides::Head);
+            //stone.set_angle(0).set_side(stone_type::Sides::Head);
         }
     }
     return count;

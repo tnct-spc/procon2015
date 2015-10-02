@@ -4,6 +4,43 @@
 #include "evaluator.hpp"
 #include <array>
 #include <queue>
+#include <memory>
+#include <map>
+#include <vector>
+
+struct node
+{
+    std::shared_ptr<node> parent;
+
+    std::size_t stone_num;
+    point_type point;
+    std::size_t angle;
+    stone_type::Sides side;
+    std::size_t search_depth;
+    double score;
+
+    node(std::shared_ptr<node> _parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score):
+        parent(_parent),
+        stone_num(_stone_num),
+        point(_point),
+        angle(_angle),
+        side(_side),
+        score(_score)
+    {
+        //printf("Construct %c\n", c);
+    }
+
+    node(node *parent):
+        parent(parent)
+    {
+        //printf("Construct %c\n", c);
+    }
+
+    ~node()
+    {
+        //printf("Destruct %c\n", c);
+    }
+};
 
 class new_beam : public algorithm_type
 {
@@ -17,39 +54,16 @@ private:
 
     evaluator eval = evaluator(-10,1,1,0.5);
     static constexpr std::size_t MAX_SEARCH_DEPTH = 4;
+    static constexpr std::size_t MAX_SEARCH_WIDTH = 20;
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;
+    std::size_t now_put_stone_num = 0;
 
-    struct stones_info_type
-    {
-        point_type point;
-        std::size_t angle;
-        stone_type::Sides side;
-        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){}
-        stones_info_type(){}
-    };
-
-    struct search_type
-    {
-        std::vector<stones_info_type> stones_info_vec;
-        double score = -1;
-        int search_depth = 0;
-
-        search_type(std::vector<stones_info_type> stones_info_vec_,double score_, std::size_t search_depth_):stones_info_vec(stones_info_vec_),score(score_),search_depth(search_depth_){}
-        search_type(){}
-        friend inline bool operator== (search_type const& lhs, search_type const& rhs)
-        {
-            return lhs.stones_info_vec[0].point == rhs.stones_info_vec[0].point &&
-                   lhs.stones_info_vec[0].angle == rhs.stones_info_vec[0].angle &&
-                   lhs.stones_info_vec[0].side == rhs.stones_info_vec[0].side &&
-                   lhs.stones_info_vec.size() == rhs.stones_info_vec.size() &&
-                   lhs.score == rhs.score;
-        }
-    };
+    std::vector<node> result_vec;
 
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
     void only_one_try(problem_type problem);
-    int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
+    int search(field_type& _field, std::size_t const stone_num, node parent);
     int get_rem_stone_zk(int stone_num);
 };
 
