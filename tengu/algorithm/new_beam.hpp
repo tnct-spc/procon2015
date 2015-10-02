@@ -59,11 +59,11 @@ private:
     problem_type origin_problem;
     std::size_t now_put_stone_num = 0;
 
-    std::vector<node> result_vec;
+    std::vector<std::shared_ptr<node>> result_vec;
 
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
     void only_one_try(problem_type problem);
-    int search(field_type& _field, std::size_t const stone_num, node parent);
+    int search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent);
     int get_rem_stone_zk(int stone_num);
 };
 
