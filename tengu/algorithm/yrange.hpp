@@ -3,12 +3,13 @@
 #define YRANGE_HPP
 #include <takao.hpp>
 #include <array>
+#include <QElapsedTimer>
 
 class yrange : public algorithm_type
 {
     Q_OBJECT
 public:
-    yrange(problem_type _problem);
+    yrange(problem_type _problem, int time_limit);
     ~yrange();
     void run();
 
@@ -28,6 +29,10 @@ private:
     search_type search(field_type& _field, stone_type& stone);
     int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search, stone_type const& stone);
+
+    //Time
+    QElapsedTimer limit_timer;
+    const int time_limit;
 };
 
 

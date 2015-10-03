@@ -11,7 +11,7 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem)
+yrange::yrange(problem_type _problem, int time_limit):time_limit(time_limit)
 {
     algorithm_name = "yrange";
     pre_problem = _problem;
@@ -23,6 +23,7 @@ yrange::~yrange()
 
 void yrange::run()
 {
+    limit_timer.start();
     qDebug("yrange start");
 /*
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
@@ -73,13 +74,20 @@ void yrange::run()
                 {
                     problem_type problem = pre_problem;
                     problem.field.put_stone_basic(pre_problem.stones[stone_num],y,x);
+                    //Start Solve
                     one_try(problem, stone_num);
+                    //Send
                     answer_send(problem.field);
 
                     //-----------------------------------------------------------------------------------------------------------
+                    int t = static_cast<int>(limit_timer.elapsed());
+                    if(t > time_limit){
+                        qDebug("time limit!");
+                        return;
+                    }
                     int const score = problem.field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
-                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d",stone_num, y,x,angle,flip.c_str(), score);
+                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d",stone_num, y,x,angle,flip.c_str(), score,t);
                     if(best_score > score)
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
