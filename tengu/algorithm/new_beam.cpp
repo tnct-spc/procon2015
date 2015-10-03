@@ -53,27 +53,18 @@ void new_beam::only_one_try(problem_type problem)
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
         std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,0));
-        std::cout << "stone_num = " << stone_num << std::endl;
+        //std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
-        std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
+        //std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
 
         for(std::size_t i = 0; i < result_vec.size(); ++i)
         {
-            for(auto& each_node : result_vec)
-            {
-                if(each_node == NULL) std::cout << "NULL" << std::endl;
-                else
-                {
-                    std::cout << "each_node score = " << each_node->score << " depth = " << each_node->stone_num - stone_num << std::endl;
-                }
-            }
-
             auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
             {
                 return lhs->score < rhs->score;
             });
-            std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
+            //std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
 
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
@@ -82,12 +73,11 @@ void new_beam::only_one_try(problem_type problem)
                 std::cout << "first _put = NULL" << std::endl;
                 continue;
             }
-            if(first_put)
+            //if(first_put)
             while(first_put->stone_num > now_put_stone_num)
             {
                 first_put = first_put->parent;
             }
-            std::cout << "decied first_put" << std::endl;
 
             problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
             if(eval.should_pass(problem.field,
@@ -96,7 +86,7 @@ void new_beam::only_one_try(problem_type problem)
             {
                 /*TODO:スコアは負の値も取りうる*/
                 max->get()->score = -999999;
-                std::cout << "pass" << std::endl;
+                //std::cout << "pass" << std::endl;
                 continue;
             }
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
@@ -130,7 +120,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             double score;
             if(stone_num == origin_problem.stones.size() - 1)
             {
-                std::cout << "last stone" << std::endl;
+                //std::cout << "last stone" << std::endl;
                 eval.move_goodness(_field,{stone,{y,x}});
             }
             else
@@ -197,7 +187,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             _field.remove_stone_basic();
         }
     }
-    std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;
+    //std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;
     return nodes.size();
 }
 
