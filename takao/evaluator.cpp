@@ -14,25 +14,24 @@ double evaluator::normalized_contact(field_type const& field, process_type const
     int const posx = process.position.x;
     int const posy = process.position.y;
 
-    int sum = 0;
-    for(int i = 0; i < 8; i++) {
-        // upper
-        sum += _mm_popcnt_u64(field_bits[posy + i - 1] & stone_bits[posx + 1][flip][rotate][i]);
-        // under
-        sum += _mm_popcnt_u64(field_bits[posy + i + 1] & stone_bits[posx + 1][flip][rotate][i]);
-        // left
-        sum += _mm_popcnt_u64(field_bits[posy + i] & stone_bits[posx ][flip][rotate][i]);
-        // right
-        sum += _mm_popcnt_u64(field_bits[posy + i] & stone_bits[posx + 2][flip][rotate][i]);
+#ifdef QT_DEBUG
+    if(!field.is_puttable(process.stone, posy, posx))
+        throw std::runtime_error("normalized_contact: この石は敷けません 。石を敷く前のfieldを渡してね");
+#endif
+    uint64_t sum = 0;
+    for(int i = 0; i < 8; i++) { // i行目を見る
+        sum += _mm_popcnt_u64(field_bits[posy + 16 + i - 1] & stone_bits[posx + 7 + 1][flip][rotate][i]);
+        sum += _mm_popcnt_u64(field_bits[posy + 16 + i + 1] & stone_bits[posx + 7 + 1][flip][rotate][i]);
+        sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1 - 1][flip][rotate][i]);
+        sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1 + 1][flip][rotate][i]);
     }
-    /*
-    if(sum > process.stone.get_side_length())
-    {
+#ifdef QT_DEBUG
+    if(sum > process.stone.get_side_length()) {
         process.stone.print_stone();
         std::cout << "sum = " << static_cast<double>(sum) << std::endl;
         std::cout << "side length = " << process.stone.get_side_length() << std::endl;
     }
-    */
+#endif
     return static_cast<double>(sum) / process.stone.get_side_length();
 }
 

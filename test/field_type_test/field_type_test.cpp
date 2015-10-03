@@ -208,7 +208,7 @@ void field_type_test::get_score_test_data()
 void field_type_test::get_score_test()
 {
     QFETCH(field_type, field);
-    QFETCH(int, score);
+    QFETCH(size_t, score);
 
     QCOMPARE(field.get_score(), score);
 }

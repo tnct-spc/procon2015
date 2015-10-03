@@ -92,7 +92,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const a
     }
 
     std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-    qDebug("emit starting by %2d,%2d %3lu %s score = %3d",y,x,angle,flip.c_str(), problem.field.get_score());
+    qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,angle,flip.c_str(), problem.field.get_score());
     emit answer_ready(problem.field);
 }
 
