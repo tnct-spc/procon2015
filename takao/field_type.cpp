@@ -32,7 +32,7 @@ void field_type::cancellation_of_restriction()
     int p_nth;
     stone_type::Sides p_side;
     int p_angle90;
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         p_stone = processes[i].stone;
         p_side = processes[i].stone.get_side();
         p_angle90 = processes[i].stone.get_angle()/90;
@@ -93,12 +93,11 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
 #endif
     int stone_nth = stone.get_nth();
     is_placed_stone[stone_nth-1]=true;
-    int processes_size = processes.size();
 
     /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
 
     for(int i=0;i<64;i++){
-        bit_sides_field_just_before[processes_size][i] = bit_sides_field[i];
+        bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
     }
 
     //フィールドに石を、サイドフィールドに石の辺を置く
@@ -175,7 +174,7 @@ bool field_type::is_placed(stone_type const& stone) const
 }
 
 //現在の状態における得点を返す
-int field_type::get_score() const
+size_t field_type::get_score() const
 {
     uint64_t sum = 0;
     for(int i = 16; i < 48; i ++)
@@ -415,7 +414,7 @@ field_type& field_type::remove_large_most_number_stone()
     //Search large most number
     int most_large_stone_nth = 1;
     int large_stone_at=0;
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         if(processes[i].stone.get_nth() > most_large_stone_nth){
             most_large_stone_nth = processes[i].stone.get_nth();
             large_stone_at = i;
@@ -464,7 +463,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
 
     //Search stone
     int stone_processes_at=0;
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         if(processes[i].stone.get_nth() == stone_nth){
             stone_processes_at = i;
             break;
@@ -489,7 +488,7 @@ field_type& field_type::remove_stone(stone_type const& stone)
     int p_nth;
     stone_type::Sides p_side;
     int p_angle90;
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         p_stone = processes[i].stone;
         p_side = processes[i].stone.get_side();
         p_angle90 = processes[i].stone.get_angle()/90;
@@ -527,7 +526,7 @@ std::vector<stone_type> field_type::search_not_in_contact_stones()
     int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
 
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         is_contact_flag=false;
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;//一番若い石
@@ -556,7 +555,7 @@ bool field_type::is_stones_contact()
     int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
 
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         is_contact_flag=false;
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;//一番若い石
@@ -583,7 +582,7 @@ std::vector<stone_type> field_type::search_cannot_be_in_contact_stones()
     std::vector<stone_type> result;
     int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;
         for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)
@@ -606,7 +605,7 @@ bool field_type::is_stones_can_contact()
 {
     int stone_nth;
     int min_stone_nth = processes_min_stone_nth();
-    for(int i=0;i<processes_size();i++){
+    for(size_t i=0;i<processes.size();i++){
         stone_nth = processes[i].stone.get_nth();
         if(min_stone_nth==stone_nth) continue;
         for(size_t y = 0; y < 32; ++y) for(size_t x = 0; x < 32; ++x)

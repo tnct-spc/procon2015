@@ -17,7 +17,7 @@ void algorithm_type::answer_send(field_type ans){
         return;
     }
     ans_emit_mtx.lock();
-    if(ans.get_score() < _best_score){
+    if(ans.get_score() < static_cast<size_t>(_best_score)){
         _best_score = ans.get_score();
         emit answer_ready(ans);
         //50ms待つ

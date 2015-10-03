@@ -67,7 +67,7 @@ void yrange::run()
         if(problem.field.list_of_stones().size() == 0) continue;
         answer_send(problem.field);
         std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %3lu %s score = %3d",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());
+        qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());
         print_text((boost::format("score = %d")%problem.field.get_score()).str());
     }
 }

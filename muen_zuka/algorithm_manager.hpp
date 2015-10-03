@@ -24,7 +24,7 @@ private:
     std::vector<bool> enable_algorithm_list;
     std::mutex mtx;
     problem_type problem;
-    int best_zk = INT_MAX;
+    u_int64_t best_zk = std::numeric_limits<u_int64_t>::max();
 
 signals:
     void answer_ready(field_type ans);
