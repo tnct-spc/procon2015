@@ -20,6 +20,12 @@ new_beam::new_beam(problem_type _problem)
     ALL_STONES_NUM = origin_problem.stones.size();
 
 }
+new_beam::new_beam(problem_type _problem, evaluator eval):eval(eval)
+{
+    origin_problem = _problem;
+    algorithm_name = "new_beam";
+    ALL_STONES_NUM = origin_problem.stones.size();
+}
 
 new_beam::~new_beam()
 {

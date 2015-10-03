@@ -1,85 +1,99 @@
 #include "algorithm_evaluater.hpp"
 #include <tengu.hpp>
 #include <QThread>
-#define LOAD_TO_FILE
+#include <QDebug>
+#define LOAD_FROM_FILE
+#define SAVE_ANSWER
+#define RENAME_RECORD
 algorithm_evaluater::algorithm_evaluater(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<field_type>();
 }
-std::vector<problem_type> algorithm_evaluater::load_problem_fires(){
-    std::vector<problem_type> problem_vector;
-    QDir q_dir("../problems");
-    if(!q_dir.exists()){
-        q_dir.mkpath("../problems");
-        std::cout << "ディレクトリがねぇよ" << std::endl;
-        return problem_vector;
-    }
+std::vector<std::tuple<std::string,problem_type>> algorithm_evaluater::load_problem_fires(){
+    std::vector<std::tuple<std::string,problem_type>> named_problem_vector;
+    QDir q_dir("../../procon2015/problems");
     filelist = q_dir.entryList();
-    QStringList::const_iterator f_itr;
-    //qDebug() << filelist;
-    for (f_itr = filelist.constBegin(); f_itr != filelist.constEnd(); ++f_itr){
-        QFile file(QString("../problems/").append(*f_itr));
-        //qDebug() << file.fileName();
+    for(auto filename : filelist){
+        QFile file(QString("../../procon2015/problems/").append(filename));
         if(!file.open(QIODevice::ReadOnly))continue;
         qDebug() << file.fileName();
         QTextStream in(&file);
-        problem_vector.push_back(problem_type(in.readAll().toStdString()));
-     }
-     return problem_vector;
-}
-std::tuple<std::string,problem_type> algorithm_evaluater::make_problem(std::string problem_name){
-    int rows, cols;
-    int obstacles;
-    int min_zk, max_zk; // per stone
-    std::random_device seed_gen;
-    std::default_random_engine engine(seed_gen());
-
-    std::uniform_int_distribution<int> dist_size(1, FIELD_SIZE);
-    rows = dist_size(engine);
-    cols = dist_size(engine);
-    std::uniform_int_distribution<int> dist_obs(0, std::min(50, rows * cols));
-    obstacles = dist_obs(engine);
-    min_zk = 1;
-    max_zk = 16;
-
-    field_type field(obstacles, cols, rows);
-    //field.set_random(obstacles, cols, rows);
-    std::vector<stone_type> stones;
-    int stone_num = 1; //初期値は1
-    int const minimum_zk = field.empty_zk();
-    std::cout << "empty blocks: " << minimum_zk << std::endl;
-    for(int total_zk = 0; total_zk < minimum_zk; ) {
-        std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
-        int const zk = dist_zk(engine);
-        stone_type stone(zk,stone_num);
-        stone_num ++;
-        total_zk += stone.get_area();
-        stones.push_back(stone);
+        named_problem_vector.push_back(std::make_tuple(file.fileName().toStdString(),problem_type(in.readAll().toStdString())));
     }
-    field.set_provided_stones(stones.size());
-    problem_type problem(field, stones);
-    return std::make_tuple(problem_name,problem);
+     return named_problem_vector;
+}
+std::vector<std::tuple<std::string,problem_type>> algorithm_evaluater::make_problem(){
+    std::vector<std::tuple<std::string,problem_type>> named_problem_vcetor;
+    for(int i = 0; i < loop_num; i++)
+    {
+        int rows, cols;
+        int obstacles;
+        int min_zk, max_zk; // per stone
+        int max_stone_num;
+        std::random_device seed_gen;
+        std::default_random_engine engine(seed_gen());
+
+        std::uniform_int_distribution<int> dist_size(20, FIELD_SIZE);
+        rows = dist_size(engine);
+        cols = dist_size(engine);
+        std::uniform_int_distribution<int> dist_obs(0, std::min(50, rows * cols -1));
+        obstacles = dist_obs(engine);
+        min_zk = 1;
+        max_zk = 16;
+        std::uniform_int_distribution<int> dist_stone_num(1,256);
+        max_stone_num = dist_stone_num(engine);
+        field_type field(obstacles, cols, rows);
+        std::vector<stone_type> stones;
+        for(int stone_num = 1; stone_num < max_stone_num; stone_num ++) {
+            std::uniform_int_distribution<int> dist_zk(min_zk, max_zk);
+            int const zk = dist_zk(engine);
+            stone_type stone(zk,stone_num);
+            stones.push_back(stone);
+        }
+        field.set_provided_stones(stones.size());
+        problem_type problem(field, stones);
+        named_problem_vcetor.push_back(std::make_tuple(std::string("../../procon2015/problems/prob") + std::to_string(i) + ".txt",problem));
+        save_problem(named_problem_vcetor.back());
+    }
+    return named_problem_vcetor;
 }
 
 void algorithm_evaluater::save_answer(std::tuple<std::string,field_type> named_answer){
-    QFile file(QString(std::get<0>(named_answer).c_str()).append("ans.txt"));
+    //問題のような名前の回答の名前
+    QString answer_name_like_problem_name = std::get<0>(named_answer).c_str();
+    int pos = answer_name_like_problem_name.indexOf("problems");
+    answer_name_like_problem_name.replace(pos,13,"answers/ans");
+    qDebug() << answer_name_like_problem_name;
+    QFile file(answer_name_like_problem_name);
     if(!file.open(QIODevice::WriteOnly))return;
     QTextStream out(&file);
     out << std::get<1>(named_answer).get_answer().c_str();
+    file.close();
 }
 void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> named_problem){
-    QFile file(QString(std::get<0>(named_problem).c_str()).append("prob.txt"));
+    QFile file(QString(std::get<0>(named_problem).c_str()));
     if(!file.open(QIODevice::WriteOnly))return;
     QTextStream out(&file);
     out << std::get<1>(named_problem).str().c_str();
+    file.close();
 }
 
-std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
+std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     QEventLoop eventloop;
     std::vector<field_type> ans_vector;
-    //simple_algorithm algo(problem);
-    sticky_algo algo(problem);
+    /********************************/
+    /********************************/
+    /********************************/
+    /********************************/
+    /********************************/
+    simple_algorithm algo(problem);
+    //sticky_algo algo(problem);
+    /********************************/
+    /********************************/
+    /********************************/
+    /********************************/
+    /********************************/
     algorithm_type::_best_score = std::numeric_limits<int>::max();
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
@@ -94,41 +108,45 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem){
     return ans_vector;
 }
 void algorithm_evaluater::run(){
-    std::vector<std::tuple<std::string,field_type>> named_answers;
-#ifdef LOAD_TO_FILE
+    QDir ans_dir("../../procon2015/answers");
+    QDir prob_dir("../../procon2015/problems");
+    if(!ans_dir.exists())ans_dir.mkpath("../../procon2015/answers");
+    if(!prob_dir.exists())prob_dir.mkpath("../../procon2015/problems");
+
     std::vector<std::tuple<std::string,problem_type>> named_problems;
-    auto prob_vec = load_problem_fires();
-    int i = 0;
-    for(auto prob : prob_vec){
-        named_problems.push_back(make_tuple(std::string("q") += std::to_string(i),prob));
-        i++;
-    }
-    loop_num = i;
-#endif
-    for(int prob_num = 0; prob_num < loop_num;prob_num++){
-        qDebug() << "a" << prob_num;
-#ifdef LOAD_TO_FILE
-        auto named_problem = named_problems.at(prob_num);
-#else
-        auto named_problem = make_problem(std::to_string(prob_num));
-#endif
-        save_problem(named_problem);
-        auto answers = evaluate(std::get<1>(named_problem));
-        for(int ans_num = 0; ans_num < answers.size();ans_num++){
-            auto named_answer = std::make_tuple((std::get<0>(named_problem)) += std::string("-") += std::to_string(ans_num),answers.at(ans_num));
-            named_answers.push_back(named_answer);
-            save_answer(named_answer);
-            save_record(named_problem,named_answer);
-        }
+    //named_problems = make_problem();
+    named_problems = load_problem_fires();
+    for(auto named_problem : named_problems){
+        qDebug() << std::get<0>(named_problem).c_str();
+        for(double w_complexity = w_complexity_start; w_complexity <= w_complexity_end; w_complexity += w_complexity_step)
+            for(double w_contact_move = w_contact_move_start; w_contact_move <= w_contact_move_end; w_contact_move += w_contact_move_step)
+                for(double w_nextbranches = w_nextbranches_start; w_nextbranches <= w_nextbranches_end; w_nextbranches += w_nextbranches_step)
+                    for(double w_contact_pass = w_contact_pass_start; w_contact_pass <= w_contact_pass_end; w_contact_pass += w_contact_pass_step)
+                        main_process(named_problem,evaluator(w_complexity,w_contact_move,w_nextbranches,w_contact_pass),std::make_tuple(w_complexity,w_contact_move,w_nextbranches,w_contact_pass));
     }
     QCoreApplication::exit(0);
 }
-
-void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer){
-    QFile record_file("recodes.txt");
+void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double,double> params){
+    QFile record_file("../../procon2015/recodes.txt");
     record_file.open(QIODevice::Append);
     QTextStream out(&record_file);
-    out << "answer :" << std::get<0>(named_answer).c_str()  << " problem :" << std::get<0>(named_problem).c_str() << " score :" << std::get<1>(named_answer).get_score() << endl;
+    //回答番号,問題番号,スコア,石の数,w_complexity,w_contact_move_start,w_nextbranches_start,w_contact_pass_start
+    out << std::get<0>(named_answer).c_str() << ","
+        << std::get<0>(named_problem).c_str() << ","
+        << std::get<1>(named_answer).get_score() << ","
+        << std::get<1>(named_answer).get_stone_num() << ","
+        << QString::number(std::get<0>(params)) << ","
+        << QString::number(std::get<1>(params)) << ","
+        << QString::number(std::get<2>(params)) << ","
+        << QString::number(std::get<3>(params))
+        << endl;
+}
+void algorithm_evaluater::main_process(std::tuple<std::string, problem_type> named_problem, evaluator _eval, std::tuple<double,double,double,double> params){
+    auto answers = evaluate(std::get<1>(named_problem),_eval);
+    auto best_ans = std::min_element(answers.begin(),answers.end(),[](auto const &t1, auto const &t2){return t1.get_score() < t2.get_score();});
+    auto named_answer = std::make_tuple((std::get<0>(named_problem)),*best_ans);
+    save_answer(named_answer);
+    save_record(named_problem,named_answer,params);
 }
 
 void algorithm_evaluater::get_answer(field_type ans){

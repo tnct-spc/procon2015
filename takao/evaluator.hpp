@@ -1,7 +1,7 @@
 #ifndef EVALUATOR_HPP
 #define EVALUATOR_HPP
-#include <QObject>
 #include <field_type.hpp>
+#include <limits>
 
 /*
  * 評価関数クラス
@@ -9,11 +9,16 @@
  * コメントにある仕様は暫定
  */
 
-class evaluator : public QObject
+class evaluator
 {
-    Q_OBJECT
 public:
-    evaluator(evaluator const&);
+    evaluator() :
+        w_complexity(0),
+        w_contact_move(0),
+        w_nextbranches(0),
+        t_contact_pass(0)
+    {
+    }
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
         w_contact_move(w_contact_move_),
@@ -22,10 +27,14 @@ public:
     {
     }
 
+    // 定数
+    double static constexpr max_value = std::numeric_limits<double>::max();
+    double static constexpr min_value = std::numeric_limits<double>::min();
+
     // おいた時
     // 引数: 置く前のフィールド、行おうとしている操作、そのさらに次の石
     // fieldを内部で変更するけど元に戻すからヘーキヘーキ
-    double inline const move_goodness(field_type &field, process_type const& process, stone_type &next_stone) const
+    double inline move_goodness(field_type &field, process_type const& process, stone_type &next_stone) const
     {
         double evaluation_value = 0.0;
         evaluation_value += w_contact_move * normalized_contact(field, process);
@@ -37,7 +46,7 @@ public:
     }
 
     // 上に同じ、最後の石専用 (next_stoneをとらない)
-    double inline const move_goodness(field_type &field, const process_type &process) const
+    double inline move_goodness(field_type &field, const process_type &process) const
     {
         double evaluation_value = 0.0;
         evaluation_value += w_contact_move * normalized_contact(field, process);
@@ -50,7 +59,7 @@ public:
     // パスするとき
     // 引数: 操作前のフィールド、行おうとしている操作、残りの石のzk数(暫定)
     // (残りの石のzk数: 行おうとしている操作の後の残りの石のzkの合計)
-    bool inline const should_pass(field_type const& field, process_type const& process, size_t rem_stone_zk) const
+    bool inline should_pass(field_type const& field, process_type const& process, size_t rem_stone_zk) const
     {
         if(rem_stone_zk < field.empty_zk())
             return false;

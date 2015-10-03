@@ -9,19 +9,16 @@ class square : public algorithm_type
     Q_OBJECT
 public:
     square(problem_type _problem);
-    square(problem_type _problem, int mode);
     ~square();
     void run();
 
 private:
     problem_type original_problem;
-    int _mode;
 
-    void solve(stone_type stone, int direction);
+    void solve(stone_type stone);
     void put_stone_side(stone_type& stone,int dy,int dx);
     void put_stone_hole(stone_type& stone,int dy,int dx);
     int count_hole();
-    void direction_change(int *dy, int *dx, int direction);
     int is_depression_or_hole_or_none(int dy, int dx, int size);
     int count_side(stone_type const& stone, int dy, int dx);
 

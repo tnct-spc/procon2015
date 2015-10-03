@@ -6,6 +6,7 @@
 #include "QString"
 #include "QElapsedTimer"
 #include <boost/range/algorithm_ext/erase.hpp>
+#include "field_type.hpp"
 sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),problem(_problem)
 {
     algorithm_name = "sticky";
@@ -23,58 +24,47 @@ double sticky_algo::eval(field_type& field,const stone_type& stone, int pos_y, i
     field.remove_stone_basic();
     return score;
 }
-std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vector<evalated_field> pattern, int search_width){
-    for(auto _eval_field : pattern){
+std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type stone, std::vector<field_with_score_type> pattern, int search_width){
+    result_stone.clear();
+    for(field_with_score_type _eval_field : pattern){
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle < 4;angle++,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             double score = eval(_eval_field.field,stone,dy,dx);
-            if(score >= 0){
-                if(result_stone.size() < search_width){
-                    result_stone.push_back(putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score});
+            bool should_pass;
+            //std::numeric_limits<double>::min()が無効値
+            if(score == std::numeric_limits<double>::min())continue;
+            if(result_stone.size() < search_width){
+                if(should_pass){
+                    result_stone.push_back({_eval_field.field,_eval_field.score});
                 }else{
-                    auto max_result = std::max_element(result_stone.begin(),result_stone.end(),
-                                                                         [](auto const &t1, auto const &t2) {
-                                                                                 return t1.score < t2.score;
-                    });
-                    if(max_result->score > score){
-                        *max_result = putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score};
+                    field_type _field = _eval_field.field;
+                    result_stone.push_back({_field.put_stone_basic(stone,dy,dx),score});
+                }
+            }else{
+                auto worst_score_field = std::max_element(result_stone.begin(),result_stone.end(),[](auto const &t1, auto const &t2){return t1.score < t2.score;});
+                if(should_pass){
+                    if(_eval_field.score < worst_score_field->score){
+                        *worst_score_field = {_eval_field.field,_eval_field.score};
+                    }
+                }else{
+                    if(score < worst_score_field->score){
+                        field_type _field = _eval_field.field;
+                        *worst_score_field = {_field.put_stone_basic(stone,dy,dx),score};
                     }
                 }
             }
         }
     }
-    int search_size = std::min(static_cast<int>(result_stone.size()),search_width);
-    std::vector<evalated_field> return_field_vactor;
-    return_field_vactor.reserve(search_size);
-    //qDebug() << result_stone.size();
-    for(int i = 0; i < search_size; i++){
-        //qDebug() << "angle" << result_stone.at(i).angle << "side" << result_stone.at(i).flip << "y" << result_stone.at(i).y << "x" << result_stone.at(i).x;
-        result_stone.at(i).e_field.field.put_stone_basic(
-              std::move(stone.set_angle(result_stone.at(i).angle).set_side(static_cast<stone_type::Sides>(result_stone.at(i).flip))),
-              result_stone.at(i).y,result_stone.at(i).x);
-        result_stone.at(i).e_field.score = result_stone.at(i).score;
-        return_field_vactor.push_back(std::move(result_stone.at(i).e_field));
-    }
-    if(result_stone.size() == 0){
-        return std::move(pattern);
-    }
-    result_stone.clear();
-    return std::move(return_field_vactor);
+    if(result_stone.size() == 0)return std::move(pattern);
+    return result_stone;
 }
 
 void sticky_algo::run(){
-
-    QElapsedTimer et;
-    et.start();
-    int count = problem.stones.size();
-    std::vector<evalated_field> pattern;
+    std::vector<field_with_score_type> pattern;
     pattern.push_back({problem.field,0});
     for(auto& _stone : problem.stones){
-        pattern = eval_pattern(std::move(_stone),std::move(pattern),200);
-        qDebug() << count--;
+        pattern = eval_pattern(std::move(_stone),std::move(pattern),20);
     }
-    int64_t time = et.elapsed();
-    print_text(std::to_string(time));
-    evalated_field best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {
+    field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {
         return t1.field.get_score() < t2.field.get_score();
     });
     answer_send(best_ans.field);
