@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
+#include <exception>
+#include <stdexcept>
 #include <boost/format.hpp>
 #include <QFile>
 #include <QVector>
@@ -51,28 +53,27 @@ void new_beam::only_one_try(problem_type problem)
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
         std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,0));
+        std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
-        std::cout << "再帰抜けた" << std::endl;
+        std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
 
         for(std::size_t i = 0; i < result_vec.size(); ++i)
         {
-/*
             for(auto& each_node : result_vec)
             {
                 if(each_node == NULL) std::cout << "NULL" << std::endl;
                 else
                 {
-                    std::cout << "each_node score = " << each_node->score;
-                    std::cout << "depth = " << each_node->stone_num - stone_num << std::endl;
+                    std::cout << "each_node score = " << each_node->score << " depth = " << each_node->stone_num - stone_num << std::endl;
                 }
             }
-*/
+
             auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
             {
                 return lhs->score < rhs->score;
             });
-            std::cout << "max score = " << max->get()->score << "decied max" << std::endl;
+            std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
 
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
@@ -81,10 +82,12 @@ void new_beam::only_one_try(problem_type problem)
                 std::cout << "first _put = NULL" << std::endl;
                 continue;
             }
+            if(first_put)
             while(first_put->stone_num > now_put_stone_num)
             {
                 first_put = first_put->parent;
             }
+            std::cout << "decied first_put" << std::endl;
 
             problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
             if(eval.should_pass(problem.field,
@@ -97,9 +100,9 @@ void new_beam::only_one_try(problem_type problem)
                 continue;
             }
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
+            std::cout << stone_num << "th stone putted" << std::endl;
             break;
         }
-        std::cout << stone_num << "th stone putted" << std::endl;
         result_vec.clear();
         now_put_stone_num++;
     }
@@ -114,6 +117,8 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
 
+    if(result_vec.size() == 0)
+
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -121,7 +126,18 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
-            const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+            //const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+            double score;
+            if(stone_num == origin_problem.stones.size() - 1)
+            {
+                std::cout << "last stone" << std::endl;
+                eval.move_goodness(_field,{stone,{y,x}});
+            }
+            else
+            {
+                eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+            }
+
             //置けたら接してる辺を数えて配列に挿入
             if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
             {
@@ -134,6 +150,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                                 static_cast<stone_type::Sides>(side),
                                 score)
                             );
+                if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
             else
             {
@@ -146,12 +163,10 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                 {
                     //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
                     //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
-                    //NOET:最悪手と置き換えたいのだが、新たにnewして良いのか
                     worst->get()->point = {y,x};
                     worst->get()->angle = angle;
                     worst->get()->side = static_cast<stone_type::Sides>(side);
                     worst->get()->score = score;
-
                 }
             }
         }
