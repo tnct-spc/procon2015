@@ -26,10 +26,10 @@ void algorithm_type::answer_send(field_type ans){
     ans_emit_mtx.unlock();
 }
 
-int algorithm_type::get_rem_stone_zk(int stone_num)
+int algorithm_type::get_rem_stone_zk(stone_type stone)
 {
     int sum = 0;
-    for(std::size_t i = stone_num; i < problem.stones.size(); ++i)
+    for(std::size_t i = stone.get_nth() - 1; i < problem.stones.size(); ++i)
     {
         sum += problem.stones.at(i).get_area();
     }
