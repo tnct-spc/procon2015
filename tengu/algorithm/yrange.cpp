@@ -62,26 +62,31 @@ void yrange::run()
 
     for(std::size_t stone_num = 0; stone_num < pre_problem.stones.size(); ++stone_num)
     {
-        for(int y : start_y) for(int x : start_x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+        for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
         {
-            pre_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-            if(pre_problem.field.is_puttable_basic(pre_problem.stones[stone_num],y,x) == true)
+            int y = start_y[j];
+            int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
+            for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
             {
-                problem_type problem = pre_problem;
-                problem.field.put_stone_basic(pre_problem.stones[stone_num],y,x);
-                one_try(problem, stone_num);
-                answer_send(problem.field);
-
-                //-----------------------------------------------------------------------------------------------------------
-                int const score = problem.field.get_score();
-                std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-                qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d",stone_num, y,x,angle,flip.c_str(), score);
-                if(best_score > score)
+                pre_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+                if(pre_problem.field.is_puttable_basic(pre_problem.stones[stone_num],y,x) == true)
                 {
-                    print_text((boost::format("score = %d")%problem.field.get_score()).str());
-                    best_score = score;
+                    problem_type problem = pre_problem;
+                    problem.field.put_stone_basic(pre_problem.stones[stone_num],y,x);
+                    one_try(problem, stone_num);
+                    answer_send(problem.field);
+
+                    //-----------------------------------------------------------------------------------------------------------
+                    int const score = problem.field.get_score();
+                    std::string const flip = side == 0 ? "Head" : "Tail";
+                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d",stone_num, y,x,angle,flip.c_str(), score);
+                    if(best_score > score)
+                    {
+                        print_text((boost::format("score = %d")%problem.field.get_score()).str());
+                        best_score = score;
+                    }
+                    //-----------------------------------------------------------------------------------------------------------
                 }
-                //-----------------------------------------------------------------------------------------------------------
             }
         }
     }
