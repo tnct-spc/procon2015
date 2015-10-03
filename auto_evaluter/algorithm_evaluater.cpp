@@ -139,7 +139,7 @@ void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> name
         << QString::number(std::get<2>(params))
         << endl;
 }
-void algorithm_evaluater::main_process(std::tuple<std::string, problem_type> named_problem, evaluator _eval, std::tuple<double,double,double,double> params){
+void algorithm_evaluater::main_process(std::tuple<std::string, problem_type> named_problem, evaluator _eval, std::tuple<double,double,double> params){
     auto answers = evaluate(std::get<1>(named_problem),_eval);
     auto best_ans = std::min_element(answers.begin(),answers.end(),[](auto const &t1, auto const &t2){return t1.get_score() < t2.get_score();});
     auto named_answer = std::make_tuple((std::get<0>(named_problem)),*best_ans);

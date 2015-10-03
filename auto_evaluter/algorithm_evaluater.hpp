@@ -27,7 +27,7 @@ public:
     std::vector<field_type> evaluate(problem_type, evaluator _eval);
     void save_answer(std::tuple<std::string, field_type> named_answer);
     void save_problem(std::tuple<std::string, problem_type> named_problem);
-    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double,double> params);
+    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double> params);
     std::vector<std::tuple<std::string, problem_type> > make_problem();
     algorithm_type* _algorithm;
     QStringList filelist;
