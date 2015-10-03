@@ -24,6 +24,7 @@ class algorithm_type : public QThread
         evaluator _eval;
         //static int _best_score;
         void answer_send(field_type ans);
+        int get_rem_stone_zk(int stone_num);
     signals:
         void answer_ready(field_type ans);
         //void print_text(std::string str);
