@@ -57,8 +57,8 @@ public:
 private:
 
     evaluator eval = evaluator(-10,1,1,0.5);
-    static constexpr std::size_t MAX_SEARCH_DEPTH = 4;
-    static constexpr std::size_t MAX_SEARCH_WIDTH = 20;
+    static constexpr std::size_t MAX_SEARCH_DEPTH = 3;
+    static constexpr std::size_t MAX_SEARCH_WIDTH = 3;
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;
     std::size_t now_put_stone_num = 0;
