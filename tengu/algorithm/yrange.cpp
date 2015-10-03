@@ -58,40 +58,46 @@ void yrange::run()
 
     std::array<int,39> start_y{{24,-7,29,13,-1,9,30,19,15,-4,18,17,20,-2,23,10,4,-6,7,-5,31,3,8,21,5,16,-3,0,11,22,14,27,2,26,28,1,12,6,25}};
     std::array<int,39> start_x{{5,19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
+    int best_score = FIELD_SIZE * FIELD_SIZE;
 
-    for(int y : start_y) for(int x : start_x) for(std::size_t rotate = 0; rotate < 8; ++rotate)
+    for(std::size_t stone_num = 0; stone_num < pre_problem.stones.size(); ++stone_num)
     {
-        problem_type problem = pre_problem;
-        //if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
-        one_try(problem, y, x, rotate);
-        if(problem.field.list_of_stones().size() == 0) continue;
-        answer_send(problem.field);
-        std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
-        qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());
-        print_text((boost::format("score = %d")%problem.field.get_score()).str());
+        for(int y : start_y) for(int x : start_x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+        {
+            pre_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+            if(pre_problem.field.is_puttable_basic(pre_problem.stones[stone_num],y,x) == true)
+            {
+                problem_type problem = pre_problem;
+                problem.field.put_stone_basic(pre_problem.stones[stone_num],y,x);
+                one_try(problem, stone_num);
+                answer_send(problem.field);
+
+                //-----------------------------------------------------------------------------------------------------------
+                int const score = problem.field.get_score();
+                std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
+                qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d",stone_num, y,x,angle,flip.c_str(), score);
+                if(best_score > score)
+                {
+                    print_text((boost::format("score = %d")%problem.field.get_score()).str());
+                    best_score = score;
+                }
+                //-----------------------------------------------------------------------------------------------------------
+            }
+        }
     }
 }
 
-void yrange::one_try(problem_type& problem, int y, int x, std::size_t const rotate)
+void yrange::one_try(problem_type& problem, std::size_t stone_num)
 {
-    problem.stones.at(0).rotate(rotate / 2  * 90);
-    if(rotate %2 == 1) problem.stones.at(0).flip();
-
-    if(problem.field.is_puttable_basic(problem.stones.front(),y,x) == true)
+    //２個目以降
+    for(; stone_num < problem.stones.size(); ++stone_num)
     {
-        //1個目
-        problem.field.put_stone_basic(problem.stones.front(),y,x);
-
-        //２個目以降
-        for(std::size_t ishi = 1; ishi < problem.stones.size(); ++ishi)
-        {
-            stone_type& each_stone = problem.stones.at(ishi);
-            search_type next = std::move(search(problem.field,each_stone));
-            if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-            if(pass(next,each_stone) == true) continue;
-            each_stone.set_angle(next.angle).set_side(next.side);
-            problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
-        }
+        stone_type& each_stone = problem.stones.at(stone_num);
+        search_type next = std::move(search(problem.field,each_stone));
+        if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
+        if(pass(next,each_stone) == true) continue;
+        each_stone.set_angle(next.angle).set_side(next.side);
+        problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
 }
 
@@ -159,6 +165,70 @@ int yrange::get_island(field_type::raw_field_type field)
         if(field.at(i).at(j) == 0) recurision(i,j,num--);
     }
     return -1 * num - 2;
+    /*
+    int label = -2;
+    int count1, count2,count3 = 0;
+
+    //次の空白を見つけ、そこを--labelにして帰る
+    auto next_find = [&label, &field]()
+    {
+        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
+        {
+            if(field[i][j] == 0)
+            {
+                field[i][j] = --label;
+                return;
+            }
+        }
+        return;
+    };
+
+    //ただのラベリング　再帰だと遅いらし
+    while(label < count3)
+    {
+        count3 = label;
+        next_find();
+        count1 = 0;
+        count2 = -1;
+        while(count1 > count2)
+        {
+            count2 = count1;
+            for(int i = 0; i < FIELD_SIZE - 1; ++i) for(int j = 0; j < FIELD_SIZE - 1; ++j)
+            {
+                if(field[i][j] == label)
+                {
+                    if(field[i][j+1] == 0)
+                    {
+                        field[i][j+1] = field[i][j];
+                        count1++;
+                    }
+                    if(field[i+1][j] == 0)
+                    {
+                        field[i+1][j] = field[i][j];
+                        count1++;
+                    }
+                }
+            }
+            for(int i = FIELD_SIZE - 1; i > 0; --i) for(int j = FIELD_SIZE - 1; j > 0; --j)
+            {
+                if(field[i][j] == label)
+                {
+                    if(field[i][j-1] == 0)
+                    {
+                        field[i][j-1] = field[i][j];
+                        count1++;
+                    }
+                    if(field[i-1][j] == 0)
+                    {
+                        field[i-1][j] = field[i][j];
+                        count1++;
+                    }
+                }
+            }
+        }
+     }
+     return -1 * label -2;
+     */
 }
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
