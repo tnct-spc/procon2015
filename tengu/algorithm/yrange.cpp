@@ -238,6 +238,6 @@ int yrange::get_island(field_type::raw_field_type field)
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.33) return true;
+    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
     else return false;
 }
