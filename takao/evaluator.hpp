@@ -1,6 +1,8 @@
 #ifndef EVALUATOR_HPP
 #define EVALUATOR_HPP
 #include <field_type.hpp>
+#include <limits>
+
 /*
  * 評価関数クラス
  * コンストラクタでパラメータ(重み)を受け取る
@@ -16,7 +18,6 @@ public:
         w_nextbranches(0),
         t_contact_pass(0)
     {
-
     }
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
@@ -25,6 +26,10 @@ public:
         t_contact_pass(t_contact_pass_)
     {
     }
+
+    // 定数
+    double static constexpr max_value = std::numeric_limits<double>::max();
+    double static constexpr min_value = std::numeric_limits<double>::min();
 
     // おいた時
     // 引数: 置く前のフィールド、行おうとしている操作、そのさらに次の石
