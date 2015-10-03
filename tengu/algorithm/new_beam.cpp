@@ -53,7 +53,7 @@ void new_beam::only_one_try(problem_type problem)
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
         std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,0));
-        //std::cout << "stone_num = " << stone_num << std::endl;
+        std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
         //std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
@@ -66,6 +66,12 @@ void new_beam::only_one_try(problem_type problem)
             });
             //std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
 
+            if(max->get()->stone_num < stone_num)
+            {
+                std::cout << "dame" << std::endl;
+                continue;
+            }
+
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
             if(first_put == NULL)
@@ -73,9 +79,10 @@ void new_beam::only_one_try(problem_type problem)
                 std::cout << "first _put = NULL" << std::endl;
                 continue;
             }
-            //if(first_put)
+            std::cout << first_put->stone_num << std::endl;
             while(first_put->stone_num > now_put_stone_num)
             {
+                std::cout << first_put->stone_num << std::endl;
                 first_put = first_put->parent;
             }
 
@@ -88,6 +95,10 @@ void new_beam::only_one_try(problem_type problem)
                 max->get()->score = -999999;
                 //std::cout << "pass" << std::endl;
                 continue;
+            }
+            if(problem.field.is_puttable_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x) == false)
+            {
+                std::cout << "can't put" << std::endl;
             }
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
             std::cout << stone_num << "th stone putted" << std::endl;
@@ -116,16 +127,17 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
+            if(stone_num >= 33) std::cout << "haitta" << std::endl;
             //const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             double score;
             if(stone_num == origin_problem.stones.size() - 1)
             {
                 //std::cout << "last stone" << std::endl;
-                eval.move_goodness(_field,{stone,{y,x}});
+                score = eval.move_goodness(_field,{stone,{y,x}});
             }
             else
             {
-                eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+                score = eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             }
 
             //置けたら接してる辺を数えて配列に挿入
@@ -151,8 +163,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                     });
                 if(worst->get()->score < score) //保持している中の最悪手より良い
                 {
-                    //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
-                    //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
                     worst->get()->point = {y,x};
                     worst->get()->angle = angle;
                     worst->get()->side = static_cast<stone_type::Sides>(side);
@@ -162,9 +172,10 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         }
     }
 
+    for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
+
 
     //探索の最下層だったら結果をresult_vec入れる
-    //if(parent->stone_num - now_put_stone_num > parent->search_depth || stone_num >= ALL_STONES_NUM-1)
     if(parent->stone_num - now_put_stone_num >= MAX_SEARCH_DEPTH - 2 || stone_num >= ALL_STONES_NUM-1)
     {
         auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
