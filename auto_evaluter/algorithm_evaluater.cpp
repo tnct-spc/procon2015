@@ -118,27 +118,25 @@ void algorithm_evaluater::run(){
     named_problems = load_problem_fires();
     for(auto named_problem : named_problems){
         qDebug() << std::get<0>(named_problem).c_str();
-        for(double w_complexity = w_complexity_start; w_complexity <= w_complexity_end; w_complexity += w_complexity_step)
-            for(double w_contact_move = w_contact_move_start; w_contact_move <= w_contact_move_end; w_contact_move += w_contact_move_step)
-                for(double w_nextbranches = w_nextbranches_start; w_nextbranches <= w_nextbranches_end; w_nextbranches += w_nextbranches_step)
-                    for(double w_contact_pass = w_contact_pass_start; w_contact_pass <= w_contact_pass_end; w_contact_pass += w_contact_pass_step)
-                        main_process(named_problem,evaluator(w_complexity,w_contact_move,w_nextbranches,w_contact_pass),std::make_tuple(w_complexity,w_contact_move,w_nextbranches,w_contact_pass));
+        for(double param_a = param_a_start; param_a <= param_a_end; param_a += param_a_step)
+            for(double param_b = param_b_start; param_b <= param_b_end; param_b += param_b_step)
+                for(double t_contact_pass = t_contact_pass_start; t_contact_pass <= t_contact_pass_end; t_contact_pass += t_contact_pass_step)
+                    main_process(named_problem,evaluator(param_a,param_b,t_contact_pass),std::make_tuple(param_a,param_b,t_contact_pass));
     }
     QCoreApplication::exit(0);
 }
-void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double,double> params){
+void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double> params){
     QFile record_file("../../procon2015/recodes.txt");
     record_file.open(QIODevice::Append);
     QTextStream out(&record_file);
-    //回答番号,問題番号,スコア,石の数,w_complexity,w_contact_move_start,w_nextbranches_start,w_contact_pass_start
+    //回答番号,問題番号,スコア,石の数,param_a,param_b,t_contact_pass
     out << std::get<0>(named_answer).c_str() << ","
         << std::get<0>(named_problem).c_str() << ","
         << std::get<1>(named_answer).get_score() << ","
         << std::get<1>(named_answer).get_stone_num() << ","
         << QString::number(std::get<0>(params)) << ","
         << QString::number(std::get<1>(params)) << ","
-        << QString::number(std::get<2>(params)) << ","
-        << QString::number(std::get<3>(params))
+        << QString::number(std::get<2>(params))
         << endl;
 }
 void algorithm_evaluater::main_process(std::tuple<std::string, problem_type> named_problem, evaluator _eval, std::tuple<double,double,double,double> params){

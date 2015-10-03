@@ -24,10 +24,13 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone,
                 bool should_pass;
                     if(non_next_stone){
                         score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}));
+                        //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
                         should_pass = false;
                     }else{
                         score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}),next_stone);
+                        //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
                         should_pass = _evaluator.should_pass(_eval_field.field,process_type(stone,{dy,dx}),get_rem_stone_zk(stone));
+                        //should_pass = false;
                     }
                 //ビームサーチの幅制限
                 if(stone_placement_vector.size() < search_width){
@@ -64,6 +67,8 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone,
 }
 
 void sticky_algo::run(){
+    QElapsedTimer timer;
+    timer.start();
     std::vector<field_with_score_type> pattern;
     pattern.emplace_back(problem.field,0);
     size_t cnt = problem.stones.size();
@@ -71,13 +76,21 @@ void sticky_algo::run(){
         //最後の石の時
         print_text(std::to_string(cnt--));
         if(stone_itr + 1 == problem.stones.end()){
-            pattern = eval_pattern(*stone_itr,*stone_itr,true,std::move(pattern),20);
+            pattern = eval_pattern(*stone_itr,*stone_itr,true,std::move(pattern),5);
         }else{
-            pattern = eval_pattern(*stone_itr,*(stone_itr+1),false,std::move(pattern),20);
+            pattern = eval_pattern(*stone_itr,*(stone_itr+1),false,std::move(pattern),5);
         }
     }
     field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {
         return t1.field.get_score() < t2.field.get_score();
     });
+    int time = timer.elapsed();
+    print_text(std::to_string(time) + "msかかった");
     answer_send(best_ans.field);
+}
+double sticky_algo::light_eval(field_type &field, process_type process){
+    field.put_stone_basic(process.stone,process.position.y,process.position.x);
+    double score = field.evaluate_normalized_complexity();
+    field.remove_stone_basic();
+    return score;
 }

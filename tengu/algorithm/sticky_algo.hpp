@@ -41,10 +41,12 @@ public:
 
 private:
     evaluator _evaluator = evaluator(-10,1,1,0.5);
+    double light_eval(field_type& field,process_type process);
     const problem_type origin_problem;
     problem_type problem;
     std::vector<field_with_score_type> eval_pattern(stone_type& stone,stone_type& next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width);
     std::vector<field_with_score_type> result_stone;
+
 };
 
 #endif // STICKY_ALGO_HPP
