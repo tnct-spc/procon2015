@@ -19,10 +19,25 @@ public:
         t_contact_pass(0)
     {
     }
+    /*
+     * コンストラクタ(値を直接受け取るバージョン)
+     */
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
         w_contact_move(w_contact_move_),
         w_nextbranches(w_nextbranches_),
+        t_contact_pass(t_contact_pass_)
+    {
+    }
+    /*
+     * コンストラクタ(値を比で受け取るバージョン)
+     * 0.0 <= w_{complexity,contact_move}_rel <= 1.0 かつ
+     * 0.0 <= w_complexity_rel + w_contact_move_rel <= 1.0
+     */
+    evaluator(double w_complexity_rel_, double w_contact_move_rel_, double t_contact_pass_) :
+        w_complexity(-w_complexity_rel_),
+        w_contact_move(w_contact_move_rel_),
+        w_nextbranches(1.0 - w_complexity_rel_ - w_contact_move_rel_),
         t_contact_pass(t_contact_pass_)
     {
     }
