@@ -14,56 +14,66 @@ sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),probl
 sticky_algo::~sticky_algo(){
 
 }
-std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type stone, stone_type next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width){
+std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone, stone_type& next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width){
     result_stone.clear();
-    for(field_with_score_type _eval_field : pattern){
-        for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle < 4;angle++,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
-            double score;
-            bool should_pass;
-            if(non_next_stone){
-                score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}));
-                should_pass = false;
-            }else{
-                score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}),next_stone);
-                should_pass = _evaluator.should_pass(_eval_field.field,process_type(stone,{dy,dx}),get_rem_stone_zk(/*吉川の修正待ち*/));
-            }
-            //std::numeric_limits<double>::min()が無効値
-            if(score == std::numeric_limits<double>::min())continue;
-            if(result_stone.size() < search_width){
-                if(should_pass){
-                    result_stone.push_back({_eval_field.field,_eval_field.score});
-                }else{
-                    field_type _field = _eval_field.field;
-                    result_stone.push_back({_field.put_stone_basic(stone,dy,dx),score});
-                }
-            }else{
-                auto worst_score_field = std::max_element(result_stone.begin(),result_stone.end(),[](auto const &t1, auto const &t2){return t1.score < t2.score;});
-                if(should_pass){
-                    if(_eval_field.score < worst_score_field->score){
-                        *worst_score_field = {_eval_field.field,_eval_field.score};
+    std::vector<stone_params_type> stone_placement_vector;
+    for(field_with_score_type& _eval_field : pattern){
+        for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle <= 270;angle += 90,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
+            if(_eval_field.field.is_puttable_basic(stone,dy,dx)){
+                double score;
+                bool should_pass;
+                    if(non_next_stone){
+                        score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}));
+                        should_pass = false;
+                    }else{
+                        score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}),next_stone);
+                        should_pass = _evaluator.should_pass(_eval_field.field,process_type(stone,{dy,dx}),get_rem_stone_zk(stone));
+                    }
+                //ビームサーチの幅制限
+                if(stone_placement_vector.size() < search_width){
+                    if(should_pass){
+                        stone_placement_vector.emplace_back(dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field);
+                    }else{
+                        stone_placement_vector.emplace_back(dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field);
                     }
                 }else{
-                    if(score < worst_score_field->score){
-                        field_type _field = _eval_field.field;
-                        *worst_score_field = {_field.put_stone_basic(stone,dy,dx),score};
+                    auto worst_stone_param = std::min_element(stone_placement_vector.begin(),stone_placement_vector.end(),[](auto const &t1, auto const &t2){return t1.score < t2.score;});
+                    if(should_pass){
+                        if(_eval_field.score > worst_stone_param->score){
+                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
+                        }
+                    }else{
+                        if(score > worst_stone_param->score){
+                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field};
+                        }
                     }
                 }
             }
         }
     }
+    for(stone_params_type& stone_params : stone_placement_vector){
+        if(stone_params.pass){
+            result_stone.emplace_back(*(stone_params.field),stone_params.score);
+        }else{
+            field_type field = *(stone_params.field);
+            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.angle).set_side(stone_params.side),stone_params.dy,stone_params.dx),stone_params.score});
+        }
+    }
     if(result_stone.size() == 0)return std::move(pattern);
-    return result_stone;
+    return std::move(result_stone);
 }
 
 void sticky_algo::run(){
     std::vector<field_with_score_type> pattern;
-    pattern.push_back({problem.field,0});
+    pattern.emplace_back(problem.field,0);
+    size_t cnt = problem.stones.size();
     for(auto stone_itr = problem.stones.begin();stone_itr != problem.stones.end();stone_itr++){
         //最後の石の時
+        print_text(std::to_string(cnt--));
         if(stone_itr + 1 == problem.stones.end()){
-            pattern = eval_pattern(*stone_itr,*stone_itr,true,pattern,20);
+            pattern = eval_pattern(*stone_itr,*stone_itr,true,std::move(pattern),20);
         }else{
-            pattern = eval_pattern(*stone_itr,*(stone_itr+1),false,pattern,20);
+            pattern = eval_pattern(*stone_itr,*(stone_itr+1),false,std::move(pattern),20);
         }
     }
     field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {
