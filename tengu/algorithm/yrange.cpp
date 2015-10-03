@@ -23,6 +23,18 @@ yrange::~yrange()
 
 void yrange::run()
 {
+    //制限時間まで解く→完成次第送信
+    print_text("解答開始");
+    solve();
+    //最良だった解答のテコ入れ→完成次第送信
+    print_text("テコ入れ開始");
+    improve();
+    //exit
+    print_text("終了");
+}
+
+void yrange::solve()
+{
     limit_timer.start();
     qDebug("yrange start");
 /*
@@ -79,12 +91,12 @@ void yrange::run()
                     //Send
                     answer_send(problem.field);
 
+                    //----------------------------------------------------------------------------------------------------------
                     int t = static_cast<int>(limit_timer.elapsed());
                     if(t > time_limit){
                         qDebug("time limit!");
                         return;
                     }
-                    //勝敗には関係ない表示するためだけのコード-----------------------------------------------------------------------
                     int const score = problem.field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
                     qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d",stone_num, y,x,angle,flip.c_str(), score,t);
@@ -92,6 +104,8 @@ void yrange::run()
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
                         best_score = score;
+                        //Save processes
+                        std::copy(problem.field.get_processes().begin(),problem.field.get_processes().end(),std::back_inserter(best_processes));
                     }
                     //-----------------------------------------------------------------------------------------------------------
                 }
@@ -248,4 +262,9 @@ bool yrange::pass(search_type const& search, stone_type const& stone)
 {
     if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
     else return false;
+}
+
+void yrange::improve()
+{
+    return;
 }
