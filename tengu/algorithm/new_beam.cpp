@@ -64,20 +64,24 @@ void new_beam::only_one_try(problem_type problem)
                 if(each_node == NULL) std::cout << "NULL" << std::endl;
                 else
                 {
-                    std::cout << "each_node score = " << each_node->score << std::endl;
+                    std::cout << "each_node score = " << each_node->score;
                     std::cout << "depth = " << each_node->stone_num - stone_num << std::endl;
                 }
             }
 
             auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
             {\
-                return lhs->score > rhs->score;
+                return lhs->score < rhs->score;
             });
-
-            std::cout << "decied max" << std::endl;
+            std::cout << "max score = " << max->get()->score << "decied max" << std::endl;
 
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
+            if(first_put == NULL)
+            {
+                std::cout << "first _put = NULL" << std::endl;
+                continue;
+            }
             while(first_put->stone_num > now_put_stone_num)
             {
                 first_put = first_put->parent;
@@ -89,11 +93,10 @@ void new_beam::only_one_try(problem_type problem)
                                 get_rem_stone_zk(stone_num+1))== true)
             {
                 /*TODO:スコアは負の値も取りうる*/
-                first_put->score *= -1;
+                max->get()->score = -999999;
                 std::cout << "pass" << std::endl;
                 continue;
             }
-            std::cout << "put stone" << std::endl;
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
             std::cout << stone_num << "th stone putted" << std::endl;
             result_vec.clear();
@@ -121,7 +124,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
             count++;
-            _field.put_stone_basic(stone,y,x);
             const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             //置けたら接してる辺を数えて配列に挿入
             if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
@@ -165,7 +167,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
                 }
             }
-            _field.remove_stone_basic();
         }
     }
 
