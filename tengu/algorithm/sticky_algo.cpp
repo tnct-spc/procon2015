@@ -28,7 +28,7 @@ std::vector<evalated_field> sticky_algo::eval_pattern(stone_type stone, std::vec
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle < 4;angle++,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             double score = eval(_eval_field.field,stone,dy,dx);
             if(score >= 0){
-                if((short)result_stone.size() < search_width){
+                if(result_stone.size() < search_width){
                     result_stone.push_back(putted_evalated_field{flip,angle*90,dy,dx,std::move(_eval_field),score});
                 }else{
                     auto max_result = std::max_element(result_stone.begin(),result_stone.end(),
