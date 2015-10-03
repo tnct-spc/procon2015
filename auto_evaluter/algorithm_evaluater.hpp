@@ -43,17 +43,20 @@ private:
     std::mutex mtx;
     int loop_num = 100;
     QCoreApplication* app;
-    double static constexpr t_contact_pass_start = 0;
-    double static constexpr t_contact_pass_step = 10;
-    double static constexpr t_contact_pass_end = 1;
-
-    double static constexpr param_a_start = 0;
-    double static constexpr param_a_step = 10;
-    double static constexpr param_a_end = 1;
-
-    double static constexpr param_b_start = 0;
-    double static constexpr param_b_step = 10;
-    double static constexpr param_b_end = 1;
+    //t_contact_passのとりうる範囲は0~1です
+    double static constexpr t_contact_pass_start = 0.0;
+    double static constexpr t_contact_pass_step = 0.1;
+    double static constexpr t_contact_pass_end = 1.0;
+    //param_aのとりうる範囲は0~1です
+    //param_a + param_b <= 1 にしてください
+    double static constexpr param_a_start = 0.0;
+    double static constexpr param_a_step = 0.1;
+    double static constexpr param_a_end = 1.0;
+    //param_bのとりうる範囲は0~1です
+    //param_a + param_b <= 1 にしてください
+    double static constexpr param_b_start = 0.0;
+    double static constexpr param_b_step = 0.1;
+    double static constexpr param_b_end = 1.0;
 };
 
 #endif // ALGORITHM_EVALUATER_HPP

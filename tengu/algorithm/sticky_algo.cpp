@@ -11,6 +11,10 @@ sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),probl
 {
     algorithm_name = "sticky";
 }
+sticky_algo::sticky_algo(problem_type _problem, evaluator _eval) : origin_problem(_problem),problem(_problem),_evaluator(_eval)
+{
+    algorithm_name = "sticky";
+}
 sticky_algo::~sticky_algo(){
 
 }

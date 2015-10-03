@@ -87,8 +87,8 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem,evalu
     /********************************/
     /********************************/
     /********************************/
-    simple_algorithm algo(problem);
-    //sticky_algo algo(problem);
+    //simple_algorithm algo(problem);
+    sticky_algo algo(problem,_eval);
     /********************************/
     /********************************/
     /********************************/
@@ -112,16 +112,25 @@ void algorithm_evaluater::run(){
     QDir prob_dir("../../procon2015/problems");
     if(!ans_dir.exists())ans_dir.mkpath("../../procon2015/answers");
     if(!prob_dir.exists())prob_dir.mkpath("../../procon2015/problems");
-
+    #ifdef _OPENMP
+    qDebug() << "using OpenMP";
+    #else
+    qDebug() << "unusing OpenMP";
+    #endif
     std::vector<std::tuple<std::string,problem_type>> named_problems;
     //named_problems = make_problem();
     named_problems = load_problem_fires();
     for(auto named_problem : named_problems){
         qDebug() << std::get<0>(named_problem).c_str();
-        for(double param_a = param_a_start; param_a <= param_a_end; param_a += param_a_step)
-            for(double param_b = param_b_start; param_b <= param_b_end; param_b += param_b_step)
-                for(double t_contact_pass = t_contact_pass_start; t_contact_pass <= t_contact_pass_end; t_contact_pass += t_contact_pass_step)
+        #pragma omp parallel for
+        for(double t_contact_pass = t_contact_pass_start; t_contact_pass <= t_contact_pass_end; t_contact_pass += t_contact_pass_step){
+            for(double param_a = param_a_start; param_a <= param_a_end; param_a += param_a_step){
+                for(double param_b = param_b_start; param_b <= param_b_end; param_b += param_b_step){
+                    if(param_a + param_b > 1.0)break;
                     main_process(named_problem,evaluator(param_a,param_b,t_contact_pass),std::make_tuple(param_a,param_b,t_contact_pass));
+                }
+            }
+        }
     }
     QCoreApplication::exit(0);
 }

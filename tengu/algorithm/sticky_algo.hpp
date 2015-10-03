@@ -36,6 +36,7 @@ class sticky_algo : public algorithm_type
     Q_OBJECT
 public:
     sticky_algo(problem_type _problem);
+    sticky_algo(problem_type _problem, evaluator _eval);
     ~sticky_algo();
     void run();
 
