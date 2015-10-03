@@ -114,8 +114,8 @@ void algorithm_evaluater::run(){
     if(!prob_dir.exists())prob_dir.mkpath("../../procon2015/problems");
 
     std::vector<std::tuple<std::string,problem_type>> named_problems;
-    named_problems = make_problem();
-    //named_problems = load_problem_fires();
+    //named_problems = make_problem();
+    named_problems = load_problem_fires();
     for(auto named_problem : named_problems){
         qDebug() << std::get<0>(named_problem).c_str();
         for(double w_complexity = w_complexity_start; w_complexity <= w_complexity_end; w_complexity += w_complexity_step)
