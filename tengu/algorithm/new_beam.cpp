@@ -111,7 +111,6 @@ void new_beam::only_one_try(problem_type problem)
 //おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
 int new_beam::search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent)
 {
-    int count = 0;
     stone_type& stone = origin_problem.stones.at(stone_num);
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
@@ -123,7 +122,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
-            count++;
             const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
             //置けたら接してる辺を数えて配列に挿入
             if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
@@ -180,7 +178,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         {
             return lhs->score < rhs->score;
         });
-        result_vec.push_back(std::move(*max));
+        if(*max != NULL) result_vec.push_back(std::move(*max));
     }
     //そうでなければ石を置いて潜る、帰ってきたら石を取り除く
     else
@@ -189,11 +187,16 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         {
             stone.set_angle(each_node->angle).set_side(each_node->side);
             _field.put_stone_basic(stone,each_node->point.y,each_node->point.x);
-            if(search(_field, stone_num+1, each_node) == 0) result_vec.push_back(std::move(each_node));
+            if(search(_field, stone_num+1, each_node) == 0)
+            {
+                std::cout << "iretai" << std::endl;
+                result_vec.emplace_back(each_node);
+            }
             _field.remove_stone_basic();
         }
     }
-    return count;
+    std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;
+    return nodes.size();
 }
 
 int new_beam::get_rem_stone_zk(int stone_num)
