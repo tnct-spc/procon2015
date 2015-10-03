@@ -14,7 +14,7 @@
 yrange::yrange(problem_type _problem)
 {
     algorithm_name = "yrange";
-    pre_problem = _problem;
+    origin_problem = _problem;
 }
 
 yrange::~yrange()
@@ -31,7 +31,7 @@ void yrange::run()
     {
         for(std::size_t rotate = 0; rotate < 8; ++rotate)
         {
-            data.push_back(std::make_tuple(pre_problem,l,m,rotate));
+            data.push_back(std::make_tuple(origin_problem,l,m,rotate));
         }
 
         QFuture<void> threads = QtConcurrent::map(
@@ -60,7 +60,7 @@ void yrange::run()
     std::array<int,39> start_x{{5,19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
     int best_score = FIELD_SIZE * FIELD_SIZE;
 
-    for(std::size_t stone_num = 0; stone_num < pre_problem.stones.size(); ++stone_num)
+    for(std::size_t stone_num = 0; stone_num < origin_problem.stones.size(); ++stone_num)
     {
         for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
         {
@@ -68,11 +68,11 @@ void yrange::run()
             int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
             for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
             {
-                pre_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-                if(pre_problem.field.is_puttable_basic(pre_problem.stones[stone_num],y,x) == true)
+                origin_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+                if(origin_problem.field.is_puttable_basic(origin_problem.stones[stone_num],y,x) == true)
                 {
-                    problem_type problem = pre_problem;
-                    problem.field.put_stone_basic(pre_problem.stones[stone_num],y,x);
+                    problem_type problem = origin_problem;
+                    problem.field.put_stone_basic(origin_problem.stones[stone_num],y,x);
                     one_try(problem, stone_num);
                     answer_send(problem.field);
 
