@@ -55,10 +55,9 @@ void new_beam::only_one_try(problem_type problem)
         search(problem.field, stone_num, root);
         std::cout << "再帰抜けた" << std::endl;
 
-        if(result_vec.size() == 0) continue;
-
         for(std::size_t i = 0; i < result_vec.size(); ++i)
         {
+/*
             for(auto& each_node : result_vec)
             {
                 if(each_node == NULL) std::cout << "NULL" << std::endl;
@@ -68,9 +67,9 @@ void new_beam::only_one_try(problem_type problem)
                     std::cout << "depth = " << each_node->stone_num - stone_num << std::endl;
                 }
             }
-
+*/
             auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
-            {\
+            {
                 return lhs->score < rhs->score;
             });
             std::cout << "max score = " << max->get()->score << "decied max" << std::endl;
@@ -98,11 +97,11 @@ void new_beam::only_one_try(problem_type problem)
                 continue;
             }
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
-            std::cout << stone_num << "th stone putted" << std::endl;
-            result_vec.clear();
-            now_put_stone_num++;
             break;
         }
+        std::cout << stone_num << "th stone putted" << std::endl;
+        result_vec.clear();
+        now_put_stone_num++;
     }
     qDebug("emit only one try. score = %3zu",problem.field.get_score());
     answer_send(problem.field);
@@ -148,16 +147,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                     //std::cout << eval.normalized_contact(_field,{stone,{y,x}}) << std::endl;
                     //std::cout << MAX_SEARCH_DEPTH - eval.normalized_contact(_field,{stone,{y,x}}) * MAX_SEARCH_DEPTH << std::endl;
                     //NOET:最悪手と置き換えたいのだが、新たにnewして良いのか
-                    /*
-                    *worst = std::shared_ptr<node>(new node(
-                                                       parent,
-                                                       stone_num,
-                                                       point_type{y,x},
-                                                       angle,
-                                                       static_cast<stone_type::Sides>(side),
-                                                       score)
-                                                   );
-                    */
                     worst->get()->point = {y,x};
                     worst->get()->angle = angle;
                     worst->get()->side = static_cast<stone_type::Sides>(side);
@@ -170,9 +159,8 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
 
     //探索の最下層だったら結果をresult_vec入れる
-    //std::cout << "search_depth = " << parent.search_depth << std::endl;
     //if(parent->stone_num - now_put_stone_num > parent->search_depth || stone_num >= ALL_STONES_NUM-1)
-    if(parent->stone_num - now_put_stone_num >= MAX_SEARCH_DEPTH - 1 || stone_num >= ALL_STONES_NUM-1)
+    if(parent->stone_num - now_put_stone_num >= MAX_SEARCH_DEPTH - 2 || stone_num >= ALL_STONES_NUM-1)
     {
         auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
         {
@@ -189,7 +177,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             _field.put_stone_basic(stone,each_node->point.y,each_node->point.x);
             if(search(_field, stone_num+1, each_node) == 0)
             {
-                std::cout << "iretai" << std::endl;
                 result_vec.emplace_back(each_node);
             }
             _field.remove_stone_basic();
