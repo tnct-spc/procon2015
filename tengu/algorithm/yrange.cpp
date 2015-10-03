@@ -76,7 +76,7 @@ void yrange::run()
                     one_try(problem, stone_num);
                     answer_send(problem.field);
 
-                    //-----------------------------------------------------------------------------------------------------------
+                    //勝敗には関係ない表示するためだけのコード-----------------------------------------------------------------------
                     int const score = problem.field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
                     qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d",stone_num, y,x,angle,flip.c_str(), score);
@@ -136,16 +136,16 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
     //おける可能性がある場所すべてにおいてみる
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
-        stone.set_angle(angle).set_side(side == 0 ? stone_type::Sides::Head : stone_type::Sides::Tail);
+        stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
         if(_field.is_puttable_basic(stone,i,j) == true)
         {
             _field.put_stone_basic(stone,i,j);
-            //置けたら接してる辺を数えて配列に挿入
+            //置けたら接してる辺を数えて良ければ置き換え
             int const score = evaluate(_field,stone,i,j);
             int const island = get_island(_field.get_raw_data());
             if(best.score < score || (best.score == score && best.island > island))
             {
-                best = {point_type{i,j}, angle, side == 0 ? stone_type::Sides::Head : stone_type::Sides::Tail, score, island};
+                best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
             }
             _field.remove_stone_basic();
         }
@@ -170,7 +170,7 @@ int yrange::get_island(field_type::raw_field_type field)
         if(field.at(i).at(j) == 0) recurision(i,j,num--);
     }
     return -1 * num - 2;
-    /*
+ /*
     int label = -2;
     int count1, count2,count3 = 0;
 
@@ -233,11 +233,11 @@ int yrange::get_island(field_type::raw_field_type field)
         }
      }
      return -1 * label -2;
-     */
+*/
 }
 
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.4) return true;
+    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.33) return true;
     else return false;
 }
