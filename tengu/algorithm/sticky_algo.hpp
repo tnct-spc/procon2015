@@ -6,7 +6,11 @@ public:
     field_type field;
     double score;
 };
-
+class eval_val{
+public:
+    double score;
+    bool should_pass;
+};
 class sticky_algo : public algorithm_type
 {
     Q_OBJECT
@@ -16,10 +20,10 @@ public:
     void run();
 
 private:
+    const evaluator _evaluator;
     const problem_type origin_problem;
     problem_type problem;
-    double eval(field_type &field, const stone_type &stone, int pos_y, int pos_x);
-    std::vector<field_with_score_type> eval_pattern(stone_type stone, std::vector<field_with_score_type> pattern, int search_width);
+    std::vector<field_with_score_type> eval_pattern(stone_type stone, stone_type next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width);
     std::vector<field_with_score_type> result_stone;
 };
 
