@@ -116,7 +116,7 @@ public:
     double evaluate_normalized_complexity() const;
 
     //現在の状態における得点を返す
-    size_t get_score() const;
+    int get_score() const;
 
     //置かれた石の一覧を表す配列を返す
     std::vector<stone_type> list_of_stones() const;
@@ -142,6 +142,10 @@ public:
     uint64_t inline const (&get_bit_plain_field() const)[64]
     {
         return bit_plain_field;
+    }
+
+    inline int processes_size(){
+        return processes.size();
     }
 
 private:

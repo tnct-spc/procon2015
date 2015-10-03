@@ -29,7 +29,7 @@ public:
     // おいた時
     // 引数: 置く前のフィールド、行おうとしている操作、そのさらに次の石
     // fieldを内部で変更するけど元に戻すからヘーキヘーキ
-    double inline const move_goodness(field_type &field, process_type const& process, stone_type &next_stone) const
+    double inline move_goodness(field_type &field, process_type const& process, stone_type &next_stone) const
     {
         double evaluation_value = 0.0;
         evaluation_value += w_contact_move * normalized_contact(field, process);
@@ -41,7 +41,7 @@ public:
     }
 
     // 上に同じ、最後の石専用 (next_stoneをとらない)
-    double inline const move_goodness(field_type &field, const process_type &process) const
+    double inline move_goodness(field_type &field, const process_type &process) const
     {
         double evaluation_value = 0.0;
         evaluation_value += w_contact_move * normalized_contact(field, process);
@@ -54,7 +54,7 @@ public:
     // パスするとき
     // 引数: 操作前のフィールド、行おうとしている操作、残りの石のzk数(暫定)
     // (残りの石のzk数: 行おうとしている操作の後の残りの石のzkの合計)
-    bool inline const should_pass(field_type const& field, process_type const& process, size_t rem_stone_zk) const
+    bool inline should_pass(field_type const& field, process_type const& process, size_t rem_stone_zk) const
     {
         if(rem_stone_zk < field.empty_zk())
             return false;
