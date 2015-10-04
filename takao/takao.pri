@@ -13,7 +13,8 @@ HEADERS += $$PWD/takao_global.hpp \
         $$PWD/algorithm_type.hpp \
         $$PWD/problem_type.hpp \
         $$PWD/evaluator.hpp \
-    $$PWD/answer_type.hpp
+    $$PWD/answer_type.hpp \
+    $$PWD/process_type.hpp
 
 SOURCES += \
     $$PWD/algorithm_type.cpp \
