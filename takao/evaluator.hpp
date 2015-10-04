@@ -84,7 +84,8 @@ public:
     // 先読みの深さ
     int inline search_depth(field_type const& field, process_type const& process)
     {
-        return max_search_depth * (1.0 - normalized_contact(field, process));
+        double x = (1.0 - normalized_contact(field, process));
+        return max_search_depth * x * x;
     }
 
 private:
