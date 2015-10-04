@@ -27,7 +27,7 @@ public:
     std::vector<field_type> evaluate(problem_type, evaluator _eval);
     void save_answer(std::tuple<std::string, field_type> named_answer);
     void save_problem(std::tuple<std::string, problem_type> named_problem);
-    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double,double> params);
+    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double> params);
     std::vector<std::tuple<std::string, problem_type> > make_problem();
     algorithm_type* _algorithm;
     QStringList filelist;
@@ -39,25 +39,24 @@ public slots:
     void get_answer(field_type ans);
     void run();
 private:
-    void main_process(std::tuple<std::string,problem_type> named_problem, evaluator _eval, std::tuple<double, double, double, double> params);
+    void main_process(std::tuple<std::string,problem_type> named_problem, evaluator _eval, std::tuple<double, double, double> params);
     std::mutex mtx;
     int loop_num = 100;
     QCoreApplication* app;
-    double static constexpr w_complexity_start = 0;
-    double static constexpr w_complexity_step = 10;
-    double static constexpr w_complexity_end = 1;
-
-    double static constexpr w_contact_move_start = 0;
-    double static constexpr w_contact_move_step = 10;
-    double static constexpr w_contact_move_end = 1;
-
-    double static constexpr w_nextbranches_start = 0;
-    double static constexpr w_nextbranches_step = 10;
-    double static constexpr w_nextbranches_end = 1;
-
-    double static constexpr w_contact_pass_start = 0;
-    double static constexpr w_contact_pass_step = 10;
-    double static constexpr w_contact_pass_end = 1;
+    //t_contact_passのとりうる範囲は0~1です
+    double static constexpr t_contact_pass_start = 0.0;
+    double static constexpr t_contact_pass_step = 0.1;
+    double static constexpr t_contact_pass_end = 1.0;
+    //param_aのとりうる範囲は0~1です
+    //param_a + param_b <= 1 にしてください
+    double static constexpr param_a_start = 0.0;
+    double static constexpr param_a_step = 0.1;
+    double static constexpr param_a_end = 1.0;
+    //param_bのとりうる範囲は0~1です
+    //param_a + param_b <= 1 にしてください
+    double static constexpr param_b_start = 0.0;
+    double static constexpr param_b_step = 0.1;
+    double static constexpr param_b_end = 1.0;
 };
 
 #endif // ALGORITHM_EVALUATER_HPP

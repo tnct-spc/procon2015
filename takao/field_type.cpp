@@ -54,8 +54,9 @@ void field_type::cancellation_of_restriction()
 bool field_type::is_puttable_basic(const stone_type &stone, int y, int x) const
 {
     //まだ置かれていないか確かめる
+    #ifdef _DEBUGMODE
     if(is_placed(stone)==true)return false;
-
+    #endif
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
 

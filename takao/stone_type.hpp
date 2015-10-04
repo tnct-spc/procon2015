@@ -76,13 +76,13 @@ private:
 
         //#BitSystem
         //石のマスク(int64_t bit_stones[41][2][4][8];)
-        bit_stones_type bit_plain_stones;
+        bit_stones_type __attribute__((aligned(32))) bit_plain_stones;
         //bitデータの作成
         void make_bit();
     bool inline _is_in_stone(int y, int x);
     bool inline _is_in_stone(point_type p);
 
-};
+}__attribute__((aligned(32)));
 
 inline bool operator== (stone_type const& lhs, stone_type const& rhs)
 {
