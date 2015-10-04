@@ -14,7 +14,7 @@ class algorithm_manager : public QObject
     Q_OBJECT
 public:
     explicit algorithm_manager(QObject *parent = 0);
-    algorithm_manager(problem_type _problem, std::vector<bool> enable_algo);
+    algorithm_manager(problem_type _problem, std::vector<bool> enable_algo, int time_limit);
     ~algorithm_manager();
     int run_thread_num();
     void run();
