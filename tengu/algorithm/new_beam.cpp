@@ -101,6 +101,7 @@ void new_beam::only_one_try(problem_type problem)
             {
                 max->get()->score = eval.min_value;
                 //std::cout << "pass" << std::endl;
+                if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
                 continue;
             }
             /*
@@ -155,6 +156,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                                 stone_num == parent->stone_num ? eval.search_depth(_field, {stone,{y,x}}) : parent->search_depth
                                 )
                             );
+                if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
             else
