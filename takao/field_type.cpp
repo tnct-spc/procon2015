@@ -54,8 +54,9 @@ void field_type::cancellation_of_restriction()
 bool field_type::is_puttable_basic(const stone_type &stone, int y, int x) const
 {
     //まだ置かれていないか確かめる
+    #ifdef _DEBUGMODE
     if(is_placed(stone)==true)return false;
-
+    #endif
     //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
     stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
 
@@ -88,10 +89,10 @@ bool field_type::is_puttable_basic(const stone_type &stone, int y, int x) const
 
 field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
 {
-//#ifdef _DEBUGMODE
+#ifdef _DEBUGMODE
     if(is_placed(stone) == true)throw std::runtime_error("The stone is placed!");
     if(is_puttable_basic(stone,y,x) == false) std::runtime_error("The stone can't place!");
-//#endif
+#endif
     int stone_nth = stone.get_nth();
     is_placed_stone[stone_nth-1]=true;
 

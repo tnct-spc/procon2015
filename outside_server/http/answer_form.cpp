@@ -434,7 +434,7 @@ void AnswerForm::DecodeAnswer(QString rawdata){
     if(list.size()==1 && list[0]==""){
         answer_num_=0;
     }else{
-        answer_num_=list.size();
+        answer_num_=list.size() - 1;
     }
     while(flow_count<answer_num_){
         if(list[flow_count]==""){

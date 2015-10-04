@@ -19,10 +19,25 @@ public:
         t_contact_pass(0)
     {
     }
+    /*
+     * コンストラクタ(値を直接受け取るバージョン)
+     */
     evaluator(double w_complexity_, double w_contact_move_, double w_nextbranches_, double t_contact_pass_) :
         w_complexity(w_complexity_),
         w_contact_move(w_contact_move_),
         w_nextbranches(w_nextbranches_),
+        t_contact_pass(t_contact_pass_)
+    {
+    }
+    /*
+     * コンストラクタ(値を比で受け取るバージョン)
+     * 0.0 <= w_{complexity,contact_move}_rel <= 1.0 かつ
+     * 0.0 <= w_complexity_rel + w_contact_move_rel <= 1.0
+     */
+    evaluator(double w_complexity_rel_, double w_contact_move_rel_, double t_contact_pass_) :
+        w_complexity(-w_complexity_rel_),
+        w_contact_move(w_contact_move_rel_),
+        w_nextbranches(1.0 - w_complexity_rel_ - w_contact_move_rel_),
         t_contact_pass(t_contact_pass_)
     {
     }
@@ -66,6 +81,12 @@ public:
         return normalized_contact(field, process) < t_contact_pass;
     }
 
+    // 先読みの深さ
+    int inline search_depth(field_type const& field, process_type const& process)
+    {
+        return max_search_depth * (1.0 - normalized_contact(field, process));
+    }
+
 private:
     // 重み
     double const w_complexity; // 場の複雑さ(正規化)
@@ -73,11 +94,11 @@ private:
     double const w_nextbranches; // 次の石がおける数
     // 閾値
     double const t_contact_pass; // 接辺の数(正規化)
-public: // うーん
+    // 上限
+    int const max_search_depth = 15; // 先読みの深さ上限
     // 評価関数
     double normalized_contact(field_type const& field, process_type const& process) const; // 接辺の数(正規化)
     int nextbranches(field_type const& field, stone_type &stone) const; // 次の石がおける数、stoneを内部で変更するけど元に戻すからヘーキヘーキ
 };
 
 #endif // EVALUATOR_HPP
-
