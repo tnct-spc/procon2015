@@ -138,6 +138,11 @@ public:
 
     bool get_has_limit() const;
 
+    std::vector<process_type> const& get_processes()
+    {
+        return processes;
+    }
+
     // 配列の参照を返すょ
     uint64_t inline const (&get_bit_plain_field() const)[64]
     {

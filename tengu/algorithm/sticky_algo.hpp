@@ -41,6 +41,9 @@ public:
     void run();
 
 private:
+
+    static constexpr std::size_t SEARCH_WIDTH = 5;
+
     evaluator _evaluator = evaluator(-10,1,1,0.5);
     double light_eval(field_type& field,process_type process);
     const problem_type origin_problem;
