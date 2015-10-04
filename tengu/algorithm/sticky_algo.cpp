@@ -21,6 +21,7 @@ sticky_algo::~sticky_algo(){
 std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone, stone_type& next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width){
     result_stone.clear();
     std::vector<stone_params_type> stone_placement_vector;
+    stone_placement_vector.reserve(SEARCH_WIDTH);
     for(field_with_score_type& _eval_field : pattern){
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle <= 270;angle += 90,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             if(_eval_field.field.is_puttable_basic(stone,dy,dx)){
