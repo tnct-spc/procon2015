@@ -91,6 +91,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     int post_point=url_query.queryItemValue("point").toInt();
     QString post_problem_number=url_query.queryItemValue("quest_number");
     QString post_raw_answer_data=url_query.queryItemValue("answer");
+    QString slave_name = url_query.queryItemValue("id");
 
     //encode
     std::string post_answer_data_encoded = boost::algorithm::replace_all_copy(post_raw_answer_data.toStdString(),"%0D%0A","\r\n");
@@ -115,6 +116,11 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
         }
     }
     //Send
+    if(upload_flag){
+        qDebug("%s : send. score=%d",slave_name.toStdString().c_str(),answer_data.answer_point);
+    }else{
+        qDebug("%s : nosend. score=%d",slave_name.toStdString().c_str(),answer_data.answer_point);
+    }
     if(upload_flag){
         if(ui->checkBox_sendOfficialServer->isChecked()){
             net network(QString(""),get_sendurl());
