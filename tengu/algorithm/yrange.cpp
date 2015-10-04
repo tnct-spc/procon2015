@@ -97,9 +97,11 @@ void yrange::solve()
                         qDebug("time limit!");
                         return;
                     }
+                    static int emit_count=0;
+                    emit_count++;
                     int const score = problem.field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
-                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d",stone_num, y,x,angle,flip.c_str(), score,t);
+                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,t,emit_count);
                     if(best_score > score)
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
