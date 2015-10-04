@@ -20,7 +20,6 @@ SOURCES += \
     $$PWD/algorithm_type.cpp \
     $$PWD/field_type.cpp \
     $$PWD/placed_stone_type.cpp \
-    $$PWD/point_type.cpp \
     $$PWD/problem_type.cpp \
     $$PWD/stone_type.cpp \
     $$PWD/utils.cpp \

@@ -9,10 +9,12 @@
 #include <algorithm>
 #include <sstream>
 #include "field_type.hpp"
+#include "process_type.hpp"
 #include "utils.hpp"
 #include <immintrin.h>
 #include <QDebug>
 #include <cstdlib>
+
 void field_type::cancellation_of_restriction()
 {
     has_limit = false;
@@ -634,7 +636,7 @@ std::vector<stone_type> field_type::list_of_stones() const
     return result;
 }
 
- placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
+placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
 {
     auto nth = raw_data.at(y).at(x);
     if (nth == 0 || nth == -1) {
@@ -738,19 +740,22 @@ std::string field_type::get_answer()
 {
     std::string result;
     int prev_nth = 0;
-    int process_count=0;
+    int process_count = 0;
     //石の番号順にソート
-    std::sort(processes.begin(),processes.end(),[](process_type const &lhs,process_type const &rhs){return lhs.stone.get_nth()<rhs.stone.get_nth();});
-    for (auto const & process : processes)
-    {
+    std::sort(processes.begin(), processes.end(),
+              [](bit_process_type const &lhs, bit_process_type const &rhs) { return lhs.nth < rhs.nth; });
 
+    for (auto const & process : processes) {
         std::string line;
-
-        auto current_nth = process.stone.get_nth();
+        auto current_nth = process.nth;
 
         // スキップ分の改行を挿入する
-        for (int i = prev_nth + 1; i < current_nth; ++i) result.append("\r\n");
-        if(process_count!=0) result.append("\r\n");
+        for (int i = prev_nth + 1; i < current_nth; ++i)
+            result.append("\r\n");
+
+        if (process_count != 0)
+            result.append("\r\n");
+
         line += std::to_string(process.position.x)
                 + " "
                 + std::to_string(process.position.y)
@@ -762,11 +767,16 @@ std::string field_type::get_answer()
         prev_nth = current_nth;
         process_count++;
     }
-    for(std::size_t i = prev_nth;i <= provided_stones; i++)result.append("\r\n");
+    for (std::size_t i = prev_nth;i <= provided_stones; i++)
+        result.append("\r\n");
+
     //正しく動かない環境でのみADDITION_NEW_LINEを環境変数に書いてください.
-    if(std::getenv("ADDITION_NEW_LINE") != nullptr)result.append("\r\n");
+    if(std::getenv("ADDITION_NEW_LINE") != nullptr)
+        result.append("\r\n");
+
     return result;
 }
+
 void field_type::set_random(int const obstacle, int const col, int const row)
 {
     // fill outer zone

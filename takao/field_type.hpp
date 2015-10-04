@@ -2,6 +2,7 @@
 #define FIELD_TYPE
 #include "stone_type.hpp"
 #include "point_type.hpp"
+#include "process_type.hpp"
 #include "placed_stone_type.hpp"
 #include <array>
 #include <string>
@@ -126,7 +127,7 @@ private:
     bool has_limit;
 
     raw_field_type raw_data;
-    std::vector<process_type> processes;
+    std::vector<bit_process_type> processes;
     //渡された石の総数.get_answerで必要
     size_t provided_stones;
 
