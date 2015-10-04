@@ -137,17 +137,10 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
             //if(stone_num >= 33) std::cout << "haitta" << std::endl;
-            //const double score = stone_num == origin_problem.stones.size() - 1 ? eval.move_goodness(_field,{stone,{y,x}}) : eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
-            double score;
-            if(stone_num == origin_problem.stones.size() - 1)
-            {
-                //std::cout << "last stone" << std::endl;
-                score = eval.move_goodness(_field,{stone,{y,x}});
-            }
-            else
-            {
-                score = eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
-            }
+            // move_goodnessは2種類ある　最後の石かどうか判定が必要
+            const double score = stone_num == origin_problem.stones.size() - 1 ?
+                        eval.move_goodness(_field,{stone,{y,x}}) :
+                        eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
 
             //置けたら接してる辺を数えて配列に挿入
             if(nodes.size() < MAX_SEARCH_WIDTH) //MAX_SEARCH_WIDTH個貯まるまでは追加する
