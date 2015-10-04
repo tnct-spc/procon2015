@@ -2,6 +2,12 @@
 #include <tengu.hpp>
 #include <QThread>
 #include <QDebug>
+#include <QVector>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentMap>
+#include <QFuture>
+#include <QIODevice>
 #define LOAD_FROM_FILE
 #define SAVE_ANSWER
 #define RENAME_RECORD
@@ -13,7 +19,7 @@ algorithm_evaluater::algorithm_evaluater(QObject *parent) :
 std::vector<std::tuple<std::string,problem_type>> algorithm_evaluater::load_problem_fires(){
     std::vector<std::tuple<std::string,problem_type>> named_problem_vector;
     QDir q_dir("../../procon2015/problems");
-    filelist = q_dir.entryList();
+    QStringList filelist = q_dir.entryList();
     for(auto filename : filelist){
         QFile file(QString("../../procon2015/problems/").append(filename));
         if(!file.open(QIODevice::ReadOnly))continue;
@@ -79,9 +85,10 @@ void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> nam
     file.close();
 }
 
-std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
+field_type algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     QEventLoop eventloop;
-    std::vector<field_type> ans_vector;
+    field_type best_ans;
+    int best_score = std::numeric_limits<int>::max();
     /********************************/
     /********************************/
     /********************************/
@@ -94,10 +101,14 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem,evalu
     /********************************/
     /********************************/
     /********************************/
+    std::mutex mtx;
     algorithm_type::_best_score = std::numeric_limits<int>::max();
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
-        ans_vector.push_back(ans);
+        if(ans.get_score() < best_score){
+            best_ans = ans;
+            best_score = ans.get_score();
+        }
         mtx.unlock();
         eventloop.quit();
     });
@@ -105,55 +116,58 @@ std::vector<field_type> algorithm_evaluater::evaluate(problem_type problem,evalu
     algo.start();
     eventloop.exec();
     algo.wait();
-    return ans_vector;
+    return best_ans;
 }
 void algorithm_evaluater::run(){
     QDir ans_dir("../../procon2015/answers");
     QDir prob_dir("../../procon2015/problems");
     if(!ans_dir.exists())ans_dir.mkpath("../../procon2015/answers");
     if(!prob_dir.exists())prob_dir.mkpath("../../procon2015/problems");
-    #ifdef _OPENMP
-    qDebug() << "using OpenMP";
-    #else
-    qDebug() << "unusing OpenMP";
-    #endif
     std::vector<std::tuple<std::string,problem_type>> named_problems;
     //named_problems = make_problem();
     named_problems = load_problem_fires();
+    QVector<std::tuple<std::string,problem_type,double,double,double>> data;
     for(auto named_problem : named_problems){
-        qDebug() << std::get<0>(named_problem).c_str();
-        #pragma omp parallel for
+        //qDebug() << std::get<0>(named_problem).c_str();
         for(double t_contact_pass = t_contact_pass_start; t_contact_pass <= t_contact_pass_end; t_contact_pass += t_contact_pass_step){
             for(double param_a = param_a_start; param_a <= param_a_end; param_a += param_a_step){
                 for(double param_b = param_b_start; param_b <= param_b_end; param_b += param_b_step){
                     if(param_a + param_b > 1.0)break;
-                    main_process(named_problem,evaluator(param_a,param_b,t_contact_pass),std::make_tuple(param_a,param_b,t_contact_pass));
+                    data.push_back(std::make_tuple(std::get<0>(named_problem),std::get<1>(named_problem),param_a,param_b,t_contact_pass));
                 }
             }
         }
     }
+    QFuture<void> threads = QtConcurrent::map(
+        data,
+        [this](auto tup){
+            this->main_process(std::get<0>(tup),std::get<1>(tup),std::get<2>(tup),std::get<3>(tup),std::get<4>(tup));
+
+        });
+    qDebug() << "開始";
+    threads.waitForFinished();
     QCoreApplication::exit(0);
 }
-void algorithm_evaluater::save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double> params){
+void algorithm_evaluater::save_record(std::string prob_name, field_type answer, double param_a, double param_b, double t_pass){
+    file_mtx.lock();
     QFile record_file("../../procon2015/recodes.txt");
     record_file.open(QIODevice::Append);
     QTextStream out(&record_file);
-    //回答番号,問題番号,スコア,石の数,param_a,param_b,t_contact_pass
-    out << std::get<0>(named_answer).c_str() << ","
-        << std::get<0>(named_problem).c_str() << ","
-        << std::get<1>(named_answer).get_score() << ","
-        << std::get<1>(named_answer).get_stone_num() << ","
-        << QString::number(std::get<0>(params)) << ","
-        << QString::number(std::get<1>(params)) << ","
-        << QString::number(std::get<2>(params))
+    //回答番号,スコア,石の数,param_a,param_b,t_contact_pass
+    out << prob_name.c_str() << ","
+        << answer.get_score() << ","
+        << answer.get_stone_num() << ","
+        << QString::number(param_a) << ","
+        << QString::number(param_b) << ","
+        << QString::number(t_pass)
         << endl;
+    record_file.close();
+    file_mtx.unlock();
 }
-void algorithm_evaluater::main_process(std::tuple<std::string, problem_type> named_problem, evaluator _eval, std::tuple<double,double,double> params){
-    auto answers = evaluate(std::get<1>(named_problem),_eval);
-    auto best_ans = std::min_element(answers.begin(),answers.end(),[](auto const &t1, auto const &t2){return t1.get_score() < t2.get_score();});
-    auto named_answer = std::make_tuple((std::get<0>(named_problem)),*best_ans);
-    save_answer(named_answer);
-    save_record(named_problem,named_answer,params);
+void algorithm_evaluater::main_process(std::string prob_name, problem_type problem, double param_a, double param_b, double t_pass){
+    evaluator _eval(param_a,param_b,t_pass);
+    field_type answer = evaluate(problem,_eval);
+    save_record(prob_name, answer, param_a, param_b, t_pass);
 }
 
 void algorithm_evaluater::get_answer(field_type ans){

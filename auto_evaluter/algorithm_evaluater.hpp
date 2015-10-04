@@ -24,28 +24,23 @@ public:
     explicit algorithm_evaluater(QObject *parent = 0);
 //private:
     std::vector<std::tuple<std::string, problem_type> > load_problem_fires();
-    std::vector<field_type> evaluate(problem_type, evaluator _eval);
+    field_type evaluate(problem_type, evaluator _eval);
     void save_answer(std::tuple<std::string, field_type> named_answer);
     void save_problem(std::tuple<std::string, problem_type> named_problem);
-    void save_record(std::tuple<std::string, problem_type> named_problem, std::tuple<std::string, field_type> named_answer,std::tuple<double,double,double> params);
+    void save_record(std::string prob_name, field_type answer, double param_a, double param_b, double t_pass);
     std::vector<std::tuple<std::string, problem_type> > make_problem();
-    algorithm_type* _algorithm;
-    QStringList filelist;
-    std::vector<problem_type> problem_vector;
-    std::vector<field_type> answer_vector;
 signals:
 
 public slots:
     void get_answer(field_type ans);
     void run();
 private:
-    void main_process(std::tuple<std::string,problem_type> named_problem, evaluator _eval, std::tuple<double, double, double> params);
-    std::mutex mtx;
+    void main_process(std::string prob_name, problem_type problem, double param_a, double param_b, double t_pass);
     int loop_num = 100;
-    QCoreApplication* app;
+    std::mutex file_mtx;
     //t_contact_passのとりうる範囲は0~1です
     double static constexpr t_contact_pass_start = 0.0;
-    double static constexpr t_contact_pass_step = 0.1;
+    double static constexpr t_contact_pass_step = 100;
     double static constexpr t_contact_pass_end = 1.0;
     //param_aのとりうる範囲は0~1です
     //param_a + param_b <= 1 にしてください
