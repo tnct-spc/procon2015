@@ -112,7 +112,7 @@ void OutsideServer::ReserveAnswer(){
                     }
                 }else{
                     //[3]ステージに無いので空いている場所又はステージにある解答の中で一番得点が小さいものと交換する
-                    int append_minimum_stage_num;
+                    int append_minimum_stage_num = -1;
                     if(g_user_data.size()<=6){
                         append_minimum_stage_num=g_user_data.size()-1;
                     }else{
@@ -287,25 +287,48 @@ void OutsideServer::resizeEvent(QResizeEvent *event)
 
 void OutsideServer::push_go()
 {
-    game_stage_[0].GoAnswer();
+    game_stage_[ui->operation_target_number->text().toInt()-1].GoAnswer();
 }
 
 void OutsideServer::push_back()
 {
-    game_stage_[0].BackAnswer();
+    game_stage_[ui->operation_target_number->text().toInt()-1].BackAnswer();
+}
+
+void OutsideServer::push_go_last()
+{
+    game_stage_[ui->operation_target_number->text().toInt()-1].FillAnswer();
+}
+
+void OutsideServer::push_back_first()
+{
+    game_stage_[ui->operation_target_number->text().toInt()-1].ResetAnswer();
 }
 
 void OutsideServer::push_stop()
 {
-    game_stage_[0].stop_animation_timer();
+    game_stage_[ui->operation_target_number->text().toInt()-1].stop_animation_timer();
 }
 
 void OutsideServer::push_restart()
 {
-    game_stage_[0].restart_animation_timer();
+    game_stage_[ui->operation_target_number->text().toInt()-1].restart_animation_timer();
 }
 
-void OutsideServer::push_change_color()
+void OutsideServer::push_change_color1()
 {
-    for(int i=0;i<6;i++) if(game_stage_[i].is_start) game_stage_[i].ChangeColor();
+    static int sw = 0;
+    for(int i=0;i<6;i++) if(game_stage_[i].is_start) game_stage_[i].ChangeColor(sw);
+}
+
+void OutsideServer::push_change_color2()
+{
+    static int sw = 1;
+    for(int i=0;i<6;i++) if(game_stage_[i].is_start) game_stage_[i].ChangeColor(sw);
+}
+
+void OutsideServer::push_change_color3()
+{
+    static int sw = 2;
+    for(int i=0;i<6;i++) if(game_stage_[i].is_start) game_stage_[i].ChangeColor(sw);
 }
