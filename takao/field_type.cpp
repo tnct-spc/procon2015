@@ -112,6 +112,7 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
     }
 
     //ロウデータに置く
+    /*
     for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
     {
         if(stone.at(i,j) == 0)//石がないならどうでもいい
@@ -123,6 +124,7 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone_nth;
         }
     }
+    */
     processes.emplace_back(stone, point_type{y, x});
     return *this;
 }
@@ -146,6 +148,7 @@ field_type& field_type::remove_stone_basic()
     for(int i=0;i<64;i++){
         bit_sides_field[i] = bit_sides_field_just_before[processes_end][i];
     }
+    /*
     //remove from raw data
     int stone_position_x = processes[processes_end].position.x;
     int stone_position_y = processes[processes_end].position.y;
@@ -163,6 +166,7 @@ field_type& field_type::remove_stone_basic()
             }
         }
     }
+    */
 
     //remove stone from processes
     processes.erase(processes.end());
