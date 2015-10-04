@@ -58,7 +58,7 @@ void new_beam::only_one_try(problem_type problem)
     std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
-        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,eval.min_value));
+        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,eval.min_value,MAX_SEARCH_DEPTH));
         //std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
@@ -159,7 +159,8 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                                 point_type{y,x},
                                 angle,
                                 static_cast<stone_type::Sides>(side),
-                                score)
+                                score,
+                                MAX_SEARCH_DEPTH)
                             );
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
@@ -184,7 +185,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
     //for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
 
     //探索の最下層だったら結果をresult_vec入れる
-    if(parent->stone_num - now_put_stone_num >= MAX_SEARCH_DEPTH - 2 || stone_num >= ALL_STONES_NUM-1)
+    if(parent->stone_num - now_put_stone_num >= parent->search_depth - 2 || stone_num >= ALL_STONES_NUM-1)
     {
         auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
         {
