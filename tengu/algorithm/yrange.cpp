@@ -180,18 +180,21 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
 int yrange::get_island(field_type::raw_field_type field)
 {
     int num = -2;
-    std::function<void(int,int,int)> recurision = [&recurision,&field](int y, int x, int num) -> void
+    std::function<void(int,int)> recurision = [&num,&recurision,&field](int y, int x) -> void
     {
-        field.at(y).at(x) = num;
-        if(0 < y && field.at(y-1).at(x) == 0) recurision(y-1,x,num);
-        if(y < FIELD_SIZE - 1 && field.at(y+1).at(x) == 0) recurision(y+1,x,num);
-        if(0 < x && field.at(y).at(x-1) == 0) recurision(y,x-1,num);
-        if(x < FIELD_SIZE - 1 && field.at(y).at(x+1) == 0) recurision(y,x+1,num);
+        field[y][x] = num;
+        if(0 < y && field[y-1][x] == 0) recurision(y-1,x);
+        if(y < FIELD_SIZE - 1 && field[y+1][x] == 0) recurision(y+1,x);
+        if(0 < x && field[y][x-1] == 0) recurision(y,x-1);
+        if(x < FIELD_SIZE - 1 && field[y][x+1] == 0) recurision(y,x+1);
         return;
     };
     for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
     {
-        if(field.at(i).at(j) == 0) recurision(i,j,num--);
+        if(field[i][j] == 0){
+            num--;
+            recurision(i,j);
+        }
     }
     return -1 * num - 2;
  /*
