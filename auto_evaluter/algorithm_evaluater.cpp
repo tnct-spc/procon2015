@@ -105,8 +105,9 @@ field_type algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     /********************************/
     /********************************/
     /********************************/
-    simple_algorithm algo(problem);
+    //simple_algorithm algo(problem);
     //sticky_algo algo(problem,_eval);
+    new_beam algo(problem,_eval);
     /********************************/
     /********************************/
     /********************************/
