@@ -37,8 +37,10 @@ public:
     //
     void GoAnswer();
     void BackAnswer();
+    void ResetAnswer();
+    void FillAnswer();
     //
-    void ChangeColor();
+    void ChangeColor(int sw);
 
 private: 
     //me
@@ -70,12 +72,13 @@ private:
     void SetStone();
     //
     QBrush SetColorBrush();
+    QBrush SetColorBrush2();
     void ColorCheck(bool *isColor, QColor color, Qt::GlobalColor *colorList);
-    bool is_colorfull=false;
+    int colorfullmode=0;
 
 private slots:
     //Animation Answer
-    void AnswerAnimation();
+    int AnswerAnimation();
 };
 
 #endif // GAMESTAGE_H

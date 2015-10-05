@@ -30,9 +30,13 @@ public slots:
     void pnspinbutton_changed(QString num);
     void push_go();
     void push_back();
+    void push_go_last();
+    void push_back_first();
     void push_stop();
     void push_restart();
-    void push_change_color();
+    void push_change_color1();
+    void push_change_color2();
+    void push_change_color3();
     //func
     void ReserveAnswer();
 
