@@ -119,7 +119,7 @@ void yrange::solve()
 void yrange::one_try(problem_type& problem, std::size_t stone_num)
 {
     //２個目以降
-    for(; stone_num < problem.stones.size(); ++stone_num)
+    for(stone_num++; stone_num < problem.stones.size(); ++stone_num)
     {
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));

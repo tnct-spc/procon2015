@@ -38,6 +38,7 @@ void GameStage::IntializeStage(QGraphicsScene *field,int base_x,int base_y,int b
     //RankingTag
     f.setPixelSize(150);
     tag_ranking_ = field_->addText("",f);
+    tag_ranking_->setOpacity(0.6);
     tag_ranking_->setX(based_point_.x-40);
     tag_ranking_->setY(based_point_.y-50);
     tag_ranking_->setZValue(3);
@@ -114,7 +115,8 @@ void GameStage::StartAnswer(int answer_flow[256][5],int answer_num,QString useri
     is_start=true;
 }
 
-void GameStage::AnswerAnimation(){
+int GameStage::AnswerAnimation(){
+    int pass_count=0;
     while(1){
         if (stone_flow_count_ >= answer_num_){
             //show point
@@ -124,10 +126,12 @@ void GameStage::AnswerAnimation(){
             g_need_rankingtag_updated=true;
             //stop timer
             answer_animation_timer_->stop();
-            return;
+            stone_flow_count_ -=2;
+            return -1;
         }
         if(answer_flow_[stone_flow_count_][4]==0) break;
         stone_flow_count_++;//パスする
+        pass_count++;
     }
     /*反転させる*/
     if (answer_flow_[stone_flow_count_][2]){
@@ -186,10 +190,16 @@ void GameStage::AnswerAnimation(){
     /*設置*/
     //フィールドに置く
     QBrush *stoneBrush;
-    if(is_colorfull){
-        stoneBrush = new QBrush(SetColorBrush());
-    }else{
+    switch(colorfullmode){
+    case 0:
         stoneBrush = new QBrush(Qt::green);
+        break;
+    case 1:
+        stoneBrush = new QBrush(SetColorBrush());
+        break;
+    case 2:
+        stoneBrush = new QBrush(SetColorBrush2());
+        break;
     }
     for (int y = 0; y < 8; y++){
         for (int x = 0; x < 8; x++){
@@ -201,6 +211,7 @@ void GameStage::AnswerAnimation(){
         }
     }
     stone_flow_count_++;
+    return pass_count;
 }
 
 QBrush GameStage::SetColorBrush()
@@ -245,6 +256,35 @@ QBrush GameStage::SetColorBrush()
         }
     }
     return color_list[0];
+}
+QBrush GameStage::SetColorBrush2()
+{
+    int r=0,g=0,b=0;
+    static int count=0;
+    count+=1;
+    if(count==16*3)count=0;
+    if(0<=count && count<16){
+        r=256-16*count;
+        if(r==256)r=255;
+        g=16*count;
+        if(g==256)g=255;
+        b=0;
+    }else if(count<32){
+        r=0;
+        g=256-16*(count-16);
+        if(g==256)g=255;
+        b=16*(count-16);
+        if(b==256)b=255;
+    }else{
+        r=16*(count-32);
+        if(r==256)g=255;
+        g=0;
+        b=256-16*(count-32);
+        if(b==256)b=255;
+    }
+    QColor qc;
+    qc.setRgb(r,g,b,255);
+    return qc;
 }
 
 void GameStage::ColorCheck(bool *isColor, QColor color, Qt::GlobalColor *colorList)
@@ -298,33 +338,57 @@ void GameStage::GoAnswer()
 {
     SetStage();
     SetStone();
-    int put_stone_num = stone_flow_count_ + 1;
+    int put_stone_num = stone_flow_count_;
     stone_flow_count_ = 0;
-    for(int i=0;i<put_stone_num;i++){
-        AnswerAnimation();
+    for(int i=0;i<=put_stone_num;i++){
+        int skip = AnswerAnimation();
+        if(skip>0) i += skip;
+        if(skip==-1) break;
     }
 }
 void GameStage::BackAnswer()
 {
     SetStage();
     SetStone();
-    int put_stone_num = stone_flow_count_ - 1;
+    int put_stone_num = stone_flow_count_ - 2;
+    while(answer_flow_[put_stone_num][4]!=0) put_stone_num--;
     stone_flow_count_ = 0;
-    for(int i=0;i<put_stone_num;i++){
-        AnswerAnimation();
+    for(int i=0;i<=put_stone_num;i++){
+        int skip = AnswerAnimation();
+        if(skip>0) i += skip;
     }
 }
 
-void GameStage::ChangeColor()
+void GameStage::FillAnswer()
 {
-    if(is_colorfull) is_colorfull=false;
-    else is_colorfull=true;
+    SetStage();
+    SetStone();
+    stone_flow_count_ = 0;
+    for(int i=0;;i++){
+        int skip = AnswerAnimation();
+        if(skip>0) i += skip;
+        if(skip==-1) break;
+    }
+}
+
+void GameStage::ResetAnswer()
+{
+    SetStage();
+    SetStone();
+    stone_flow_count_ = 0;
+}
+
+void GameStage::ChangeColor(int sw)
+{
+    colorfullmode = sw;
 
     SetStage();
     SetStone();
-    int put_stone_num = stone_flow_count_;
+    int put_stone_num = stone_flow_count_ - 1;
     stone_flow_count_ = 0;
-    for(int i=0;i<put_stone_num;i++){
-        AnswerAnimation();
+    for(int i=0;i<=put_stone_num;i++){
+        int skip = AnswerAnimation();
+        if(skip>0) i += skip;
+        if(skip==-1) break;
     }
 }
