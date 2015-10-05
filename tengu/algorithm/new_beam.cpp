@@ -101,7 +101,9 @@ void new_beam::only_one_try(problem_type problem)
             {
                 max->get()->score = eval.min_value;
                 //std::cout << "pass" << std::endl;
+#ifdef QT_DEBUG
                 if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
+#endif
                 continue;
             }
             /*
@@ -111,7 +113,9 @@ void new_beam::only_one_try(problem_type problem)
             }
             */
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
+#ifdef QT_DEBUG
             std::cout << stone_num << "th stone putted" << std::endl;
+#endif
             break;
         }
         result_vec.clear();
@@ -156,7 +160,9 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                                 stone_num == parent->stone_num ? eval.search_depth(_field, {stone,{y,x}}) : parent->search_depth
                                 )
                             );
+#ifdef QT_DEBUG
                 if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
+#endif
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
             else
