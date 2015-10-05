@@ -17,7 +17,7 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 LIBS += -lboost_system
-SOURCES += field_type_test.cpp
+SOURCES +=
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 QMAKE_CXXFLAGS += -std=c++14

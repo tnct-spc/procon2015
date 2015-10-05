@@ -45,18 +45,7 @@ public:
 
     ~field_type() = default;
 
-
-    int upper_edge = 0; //上方から数えた障害物しかない行の数
-    int right_edge = 0; //右方から数えた障害物しかない列の数
-    int buttom_edge = 0;//下方から数えた障害物しかない行の数
-    int left_edge = 0;  //左方から数えた障害物しかない列の数
-
     /*石の設置・撤去関数*/
-
-    //制限解除(明示的に呼び出してください)
-    void cancellation_of_restriction();
-
-    /*制限解除前に使う関数*/
 
     //石を置けるか
     bool is_puttable_basic(stone_type const& stone, int y, int x) const;
@@ -64,49 +53,6 @@ public:
     field_type& put_stone_basic(stone_type const& stone, int y, int x);
     //石を取り除く
     field_type& remove_stone_basic();
-
-    /*制限解除後に使う関数*/
-
-    /**************/
-    /***石を置く***/
-    /**************/
-
-    //石を置けるか
-    bool is_puttable(stone_type const& stone, int y, int x) const;
-    //接していなくても石を置けるか
-    bool is_puttable_force(stone_type const& stone, int y, int x);
-    //石を置く
-    field_type& put_stone(stone_type const& stone, int y, int x);
-
-    /******************/
-    /***石を取り除く***/
-    /******************/
-
-    //一番番号の大きくて、一番最後に置いたを取り除く
-    field_type& remove_large_most_number_and_just_before_stone();
-    //一番番号の大きい石を取り除く
-    field_type& remove_large_most_number_stone();
-    //石を取り除けるか
-    bool is_removable(stone_type const& stone);
-    //接しているかどうか関係なく、石を取り除けるか
-    bool is_removable_force(stone_type const& stone);
-    //石を取り除く
-    field_type& remove_stone(stone_type const& stone);
-
-    /**************/
-    /***石を探す***/
-    /**************/
-
-    //自分より若い石に接していない石を探してすべて返す
-    std::vector<stone_type> search_not_in_contact_stones();
-    //すべての石が自分より若い石に接しているか確認する
-    bool is_stones_contact();
-    //自分より若い石に接することができない(制約違反)石を探してすべて返す
-    std::vector<stone_type> search_cannot_be_in_contact_stones();
-    //すべての石が自分より若い石に接することができるか確認する
-    bool is_stones_can_contact();
-
-
     /*その他*/
 
     //アクセッサ
@@ -121,22 +67,16 @@ public:
     //置かれた石の一覧を表す配列を返す
     std::vector<stone_type> list_of_stones() const;
 
-    // 引数の座標にある石を返す
-    placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
-
-    // bit化していない配列のアクセッサ
-    raw_field_type const& get_raw_data() const;
     // don't use this
     raw_field_type& set_raw_data();
 
     std::string get_answer();
 
-    void set_random(int const obstacle, int const col, int const row);
+    void set_random(raw_field_type raw_data,int const obstacle, int const col, int const row);
     std::string str();
     void set_provided_stones(size_t ps);
     void print_field();
 
-    bool get_has_limit() const;
     // 配列の参照を返すょ
     uint64_t inline const (&get_bit_plain_field() const)[64]
     {
@@ -144,34 +84,17 @@ public:
     }
 
 private:
-    bool has_limit;
-    bool first_stone_was_placed = false;
-    raw_field_type raw_data;
     std::vector<process_type> processes;
     //渡された石の総数.get_answerで必要
     size_t provided_stones;
-
-    //is_removableで必要
-    struct pair_type
-    {
-        int a;
-        int b;
-    };
-
-    int processes_min_stone_nth();
-
     bool is_placed_stone[256];
     //石が置かれているか否かを返す
     bool is_placed(stone_type const& stone) const;
 
-        //#BitSystem
-        uint64_t bit_plain_field[64];//普通のフィールド
-        uint64_t bit_sides_field[64];//石のサイドフィールド
-        uint64_t bit_sides_field_just_before[256][64];
-        uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
-        //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
-        void make_bit();//bitデータの作成
-    void init_edge();
+    uint64_t bit_plain_field[64];//普通のフィールド
+    uint64_t bit_sides_field[64];//石のサイドフィールド
+    uint64_t bit_sides_field_just_before[256][64];
+    void make_bit(const raw_field_type raw_data);//bitデータの作成
 };
 inline size_t field_type::empty_zk() const{
     return get_score();
