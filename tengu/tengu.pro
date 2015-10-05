@@ -19,7 +19,8 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/read_ahead.cpp \
     algorithm/square.cpp \
     algorithm/yrange2.cpp \
-    algorithm/new_beam.cpp
+    algorithm/new_beam.cpp \
+    algorithm/yrange_based_yayoi.cpp
 
 
 HEADERS += tengu.hpp\
@@ -31,7 +32,8 @@ HEADERS += tengu.hpp\
     algorithm/read_ahead.hpp \
     algorithm/square.hpp \
     algorithm/yrange2.hpp \
-    algorithm/new_beam.hpp
+    algorithm/new_beam.hpp \
+    algorithm/yrange_based_yayoi.h
 
 LIBS += -lQt5Concurrent
 
