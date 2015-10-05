@@ -9,8 +9,7 @@
 #include <QFuture>
 #include <QIODevice>
 #define LOAD_FROM_FILE
-#define SAVE_ANSWER
-#define RENAME_RECORD
+//#define SAVE_ANSWER
 algorithm_evaluater::algorithm_evaluater(QObject *parent) :
     QObject(parent)
 {
@@ -77,6 +76,18 @@ void algorithm_evaluater::save_answer(std::tuple<std::string,field_type> named_a
     out << std::get<1>(named_answer).get_answer().c_str();
     file.close();
 }
+void algorithm_evaluater::save_answer(std::string ans_name, field_type ans){
+    QString answer_name = ans_name.c_str();
+    int pos = answer_name.indexOf("problems");
+    answer_name.replace(pos,13,"answers/ans");
+    qDebug() << "save ans: " << answer_name;
+    QFile file(answer_name);
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << ans.get_answer().c_str();
+    file.close();
+}
+
 void algorithm_evaluater::save_problem(std::tuple<std::string, problem_type> named_problem){
     QFile file(QString(std::get<0>(named_problem).c_str()));
     if(!file.open(QIODevice::WriteOnly))return;
@@ -94,8 +105,8 @@ field_type algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     /********************************/
     /********************************/
     /********************************/
-    //simple_algorithm algo(problem);
-    sticky_algo algo(problem,_eval);
+    simple_algorithm algo(problem);
+    //sticky_algo algo(problem,_eval);
     /********************************/
     /********************************/
     /********************************/
@@ -123,9 +134,18 @@ void algorithm_evaluater::run(){
     QDir prob_dir("../../procon2015/problems");
     if(!ans_dir.exists())ans_dir.mkpath("../../procon2015/answers");
     if(!prob_dir.exists())prob_dir.mkpath("../../procon2015/problems");
+
+    QFile record_file("../../procon2015/recodes.txt");
+    record_file.open(QIODevice::Append);
+    QTextStream out(&record_file);
+    out << "----------new_record------------" << endl;
+    record_file.close();
     std::vector<std::tuple<std::string,problem_type>> named_problems;
-    //named_problems = make_problem();
+#ifdef LOAD_FROM_FILE
     named_problems = load_problem_fires();
+#else
+    named_problems = make_problem();
+#endif
     QVector<std::tuple<std::string,problem_type,double,double,double>> data;
     qDebug() << "開始";
     for(auto named_problem : named_problems){
@@ -144,6 +164,7 @@ void algorithm_evaluater::run(){
 
                     });
                 threads.waitForFinished();
+                data.clear();
                 }
             }
         }
@@ -177,6 +198,9 @@ void algorithm_evaluater::main_process(std::string prob_name, problem_type probl
     evaluator _eval(param_a,param_b,t_pass);
     field_type answer = evaluate(problem,_eval);
     save_record(prob_name, answer, param_a, param_b, t_pass);
+#ifdef SAVE_ANSWER
+    save_answer(prob_name,answer);
+#endif
 }
 
 void algorithm_evaluater::get_answer(field_type ans){

@@ -26,6 +26,7 @@ public:
     std::vector<std::tuple<std::string, problem_type> > load_problem_fires();
     field_type evaluate(problem_type, evaluator _eval);
     void save_answer(std::tuple<std::string, field_type> named_answer);
+    void save_answer(std::string ans_name, field_type ans);
     void save_problem(std::tuple<std::string, problem_type> named_problem);
     void save_record(std::string prob_name, field_type answer, double param_a, double param_b, double t_pass);
     std::vector<std::tuple<std::string, problem_type> > make_problem();
