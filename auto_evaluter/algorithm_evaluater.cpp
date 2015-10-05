@@ -127,6 +127,7 @@ void algorithm_evaluater::run(){
     //named_problems = make_problem();
     named_problems = load_problem_fires();
     QVector<std::tuple<std::string,problem_type,double,double,double>> data;
+    qDebug() << "開始";
     for(auto named_problem : named_problems){
         //qDebug() << std::get<0>(named_problem).c_str();
         for(double t_contact_pass = t_contact_pass_start; t_contact_pass <= t_contact_pass_end; t_contact_pass += t_contact_pass_step){
@@ -134,6 +135,15 @@ void algorithm_evaluater::run(){
                 for(double param_b = param_b_start; param_b <= param_b_end; param_b += param_b_step){
                     if(param_a + param_b > 1.0)break;
                     data.push_back(std::make_tuple(std::get<0>(named_problem),std::get<1>(named_problem),param_a,param_b,t_contact_pass));
+                }
+                if(data.size() > 32){
+                QFuture<void> threads = QtConcurrent::map(
+                    data,
+                    [this](auto tup){
+                        this->main_process(std::get<0>(tup),std::get<1>(tup),std::get<2>(tup),std::get<3>(tup),std::get<4>(tup));
+
+                    });
+                threads.waitForFinished();
                 }
             }
         }
@@ -144,7 +154,6 @@ void algorithm_evaluater::run(){
             this->main_process(std::get<0>(tup),std::get<1>(tup),std::get<2>(tup),std::get<3>(tup),std::get<4>(tup));
 
         });
-    qDebug() << "開始";
     threads.waitForFinished();
     QCoreApplication::exit(0);
 }
