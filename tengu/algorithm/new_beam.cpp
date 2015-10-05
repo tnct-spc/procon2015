@@ -185,8 +185,9 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 
     //for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
 
+    if(nodes.size() == 0) return 0;
     //探索の最下層だったら結果をresult_vec入れる
-    if(parent->stone_num - now_put_stone_num >= parent->search_depth - 2 || stone_num >= ALL_STONES_NUM-1)
+    else if(parent->stone_num - now_put_stone_num >= parent->search_depth - 2 || stone_num >= ALL_STONES_NUM-1)
     {
         auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
         {
