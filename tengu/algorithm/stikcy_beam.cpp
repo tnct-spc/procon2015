@@ -70,9 +70,33 @@ void sticky_beam::run()
         //保持するフィールドの数ループ
         for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
         {
-            std::cout << now_put_stone_num << std::endl;
             put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
         }
+
+        //今までの最悪値
+        auto worst_element = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
+        {
+            return lhs.score < rhs.score;
+        });
+        //際優良次男
+        auto const& best_second_son = std::max_element(second_sons.begin(),second_sons.end(),[](const auto& lhs, const auto& rhs)
+        {
+            return lhs.first_put->score < rhs.first_put->score;
+        });
+        //追加する場合
+        if(holding_problems.size() < HOLD_FIELD_NUM)
+        {
+
+        }
+        //置き換える場合
+        else if(worst_element->score < best_second_son->first_put->score)
+        {
+            worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
+            worst_element->problem.field.remove_stone_basic();
+            holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
+            worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num), best_second_son->first_put->point.y, best_second_son->first_put->point.x);
+        }
+        std::cout << now_put_stone_num << std::endl;
     }
 
     for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
@@ -121,12 +145,6 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         break;
     }
 
-    //今までの最悪値
-    double const worst_score = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
-    {
-        return lhs.score < rhs.score;
-    })->score;
-
     //次男が居れば保存する
     for(--i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -153,12 +171,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
             continue;
         }
 
-        //今までの最悪値より良ければ保存
-        if(first_put->score > worst_score)
-        {
-            second_sons.push_back({first_put,field_num});
-            break;
-        }
+        second_sons.push_back(node_with_field_num{first_put,field_num});
 
     }
     result_vec[field_num].clear();
