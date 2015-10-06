@@ -9,5 +9,6 @@
 #include "algorithm/square.hpp"
 #include "algorithm/read_ahead.hpp"
 #include "algorithm/new_beam.hpp"
+#include "algorithm/stikcy_beam.hpp"
 
 #endif // TENGU_HPP

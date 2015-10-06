@@ -58,7 +58,7 @@ void new_beam::only_one_try(problem_type problem)
     std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
-        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,eval.min_value,MAX_SEARCH_DEPTH));
+        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
         //std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
@@ -99,7 +99,7 @@ void new_beam::only_one_try(problem_type problem)
                                 {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
                                 get_rem_stone_zk(stone_num+1))== true)
             {
-                max->get()->score = eval.min_value;
+                max->get()->score = std::numeric_limits<double>::min();
                 //std::cout << "pass" << std::endl;
 #ifdef QT_DEBUG
                 if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;

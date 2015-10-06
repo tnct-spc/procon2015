@@ -32,23 +32,22 @@ sticky_beam::~sticky_beam()
 {
 }
 
-
+/*
 void sticky_beam::run(){
     QElapsedTimer timer;
     timer.start();
 
     std::vector<field_with_score_type> pattern;
     pattern.emplace_back(problem.field,0);
-    size_t cnt = problem.stones.size();
+    size_t rem_stone_num = problem.stones.size();
 
-    for(auto stone_itr = problem.stones.begin();stone_itr != problem.stones.end();stone_itr++)
+    for(auto stone_itr = problem.stones.begin(); stone_itr != problem.stones.end(); stone_itr++)
     {
-        //最後の石の時
-        if(stone_itr + 1 == problem.stones.end()) eval_pattern(*stone_itr,*stone_itr,true);
-        else eval_pattern(*stone_itr,*(stone_itr+1),false);
-        print_text(std::to_string(cnt--));
+        eval_pattern(*stone_itr,*stone_itr);
+        print_text(std::to_string(rem_stone_num--));
     }
-    field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  const& lhs, auto const& rhs)
+
+    field_with_score_type& best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  const& lhs, auto const& rhs)
     {
         return lhs.field.get_score() < rhs.field.get_score();
     });
@@ -57,8 +56,9 @@ void sticky_beam::run(){
     print_text(std::to_string(time) + "msかかった");
     answer_send(best_ans.field);
 }
-
-void sticky_beam::eval_pattern(stone_type& stone, stone_type& next_stone, bool non_next_stone)
+*/
+/*
+void sticky_beam::eval_pattern(stone_type& stone, stone_type& next_stone)
 {
     result_stone.clear();
     std::vector<stone_params_type> stone_placement_vector;
@@ -113,15 +113,16 @@ void sticky_beam::eval_pattern(stone_type& stone, stone_type& next_stone, bool n
         }
     }
 }
-
+*/
+/*
 double sticky_beam::light_eval(field_type &field, process_type process){
     field.put_stone_basic(process.stone,process.position.y,process.position.x);
     double score = field.evaluate_normalized_complexity();
     field.remove_stone_basic();
     return score;
 }
+*/
 
-/*
 void sticky_beam::run()
 {
     qDebug("sticky_beam start");
@@ -136,11 +137,11 @@ void sticky_beam::run()
             one_try(origin_problem,y,x,angle,side);
         }
     }
-///*
+*/
     only_one_try(origin_problem);
 
 }
-*/
+
 
 //はじめに置く石から探索を開始する
 void sticky_beam::only_one_try(problem_type problem)
@@ -148,8 +149,7 @@ void sticky_beam::only_one_try(problem_type problem)
     std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
-        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,eval.min_value,MAX_SEARCH_DEPTH));
-        //std::cout << "stone_num = " << stone_num << std::endl;
+        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
 
         search(problem.field, stone_num, root);
         //std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
@@ -160,27 +160,11 @@ void sticky_beam::only_one_try(problem_type problem)
             {
                 return lhs->score < rhs->score;
             });
-            //std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
-/*
-            if(max->get()->stone_num < stone_num)
-            {
-                std::cout << "dame" << std::endl;
-                continue;
-            }
-*/
+
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
-            /*
-            if(first_put == NULL)
-            {
-                std::cout << "first _put = NULL" << std::endl;
-                continue;
-            }
-            */
-            //std::cout << first_put->stone_num << std::endl;
             while(first_put->stone_num > now_put_stone_num)
             {
-                //std::cout << first_put->stone_num << std::endl;
                 first_put = first_put->parent;
             }
 
@@ -189,19 +173,13 @@ void sticky_beam::only_one_try(problem_type problem)
                                 {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
                                 get_rem_stone_zk(stone_num+1))== true)
             {
-                max->get()->score = eval.min_value;
-                //std::cout << "pass" << std::endl;
+                max->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
 #ifdef QT_DEBUG
                 if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
 #endif
                 continue;
             }
-            /*
-            if(problem.field.is_puttable_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x) == false)
-            {
-                std::cout << "can't put" << std::endl;
-            }
-            */
+
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
 #ifdef QT_DEBUG
             std::cout << stone_num << "th stone putted" << std::endl;

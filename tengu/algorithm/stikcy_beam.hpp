@@ -7,57 +7,52 @@
 #include <memory>
 #include <vector>
 
-struct node
-{
-    std::shared_ptr<node> parent;
-
-    std::size_t stone_num;
-    point_type point;
-    std::size_t angle;
-    stone_type::Sides side;
-    double score;
-    std::size_t search_depth;
-
-    node(std::shared_ptr<node> _parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
-        parent(_parent),
-        stone_num(_stone_num),
-        point(_point),
-        angle(_angle),
-        side(_side),
-        score(_score),
-        search_depth(_search_depth)
-    {
-        //printf("Construct %c\n", c);
-    }
-
-    node(node *_parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
-        parent(_parent),
-        stone_num(_stone_num),
-        point(_point),
-        angle(_angle),
-        side(_side),
-        score(_score),
-        search_depth(_search_depth)
-    {
-        //printf("Construct %c\n", c);
-    }
-
-    ~node()
-    {
-        //printf("Destruct %c\n", c);
-    }
-};
-
-class field_with_score_type{
-public:
-    field_with_score_type(field_type& field,double score):field(field),score(score){}
-    field_type field;
-    double score;
-};
-
 class sticky_beam : public algorithm_type
 {
     Q_OBJECT
+
+    struct node
+    {
+        std::shared_ptr<node> parent;
+
+        std::size_t stone_num;
+        point_type point;
+        std::size_t angle;
+        stone_type::Sides side;
+        double score;
+        std::size_t search_depth;
+
+        node(std::shared_ptr<node> _parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
+            parent(_parent),
+            stone_num(_stone_num),
+            point(_point),
+            angle(_angle),
+            side(_side),
+            score(_score),
+            search_depth(_search_depth)
+        {}
+
+        node(node *_parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
+            parent(_parent),
+            stone_num(_stone_num),
+            point(_point),
+            angle(_angle),
+            side(_side),
+            score(_score),
+            search_depth(_search_depth)
+        {}
+
+        ~node()
+        {}
+    };
+
+    class field_with_score_type{
+    public:
+        field_with_score_type(field_type& field,double score):field(field),score(score){}
+        field_type field;
+        double score;
+    };
+
 public:
     sticky_beam(problem_type _problem);
     sticky_beam(problem_type _problem,evaluator eval);
@@ -107,7 +102,7 @@ private:
 
     double light_eval(field_type& field,process_type process);
     problem_type problem;
-    void eval_pattern(stone_type& stone, stone_type& next_stone, bool non_next_stone);
+    void eval_pattern(stone_type& stone, stone_type& next_stone);
     std::vector<field_with_score_type> result_stone;
 
 
