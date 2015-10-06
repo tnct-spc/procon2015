@@ -83,9 +83,16 @@ void sticky_beam::run()
         {
             return lhs.first_put->score < rhs.first_put->score;
         });
+        holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
         //追加する場合
         if(holding_problems.size() < HOLD_FIELD_NUM)
         {
+            holding_problems.emplace_back(holding_problems[best_second_son->field_num]);
+            holding_problems.back().problem.field.remove_stone_basic();
+            holding_problems.back().problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
+                    best_second_son->first_put->point.y, best_second_son->first_put->point.x);
+
+            holding_problems.back().score = best_second_son->first_put->score;
 
         }
         //置き換える場合
@@ -93,8 +100,9 @@ void sticky_beam::run()
         {
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic();
-            holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
-            worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num), best_second_son->first_put->point.y, best_second_son->first_put->point.x);
+            worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
+                    best_second_son->first_put->point.y, best_second_son->first_put->point.x);
+            worst_element->score = best_second_son->first_put->score;
         }
         std::cout << now_put_stone_num << std::endl;
     }
