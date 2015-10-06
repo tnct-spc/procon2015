@@ -18,7 +18,10 @@ sticky_beam::sticky_beam(problem_type _problem)
     origin_problem = _problem;
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = origin_problem.stones.size();
-
+    for(std::size_t i = 0; i < HOLD_FIELD_NUM; ++i)
+    {
+        holding_problems[i] = {_problem,0};
+    }
 }
 
 sticky_beam::sticky_beam(problem_type _problem, evaluator eval):eval(eval)
@@ -26,6 +29,10 @@ sticky_beam::sticky_beam(problem_type _problem, evaluator eval):eval(eval)
     origin_problem = _problem;
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = origin_problem.stones.size();
+    for(std::size_t i = 0; i < HOLD_FIELD_NUM; ++i)
+    {
+        holding_problems[i] = {_problem,0};
+    }
 }
 
 sticky_beam::~sticky_beam()
@@ -126,43 +133,34 @@ double sticky_beam::light_eval(field_type &field, process_type process){
 void sticky_beam::run()
 {
     qDebug("sticky_beam start");
-/*
-    //はじめに置く石の場所、角度、反転分のループ
-    for(int y = 1-STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1-STONE_SIZE; x  < FIELD_SIZE; ++x) for(int angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+
+    //石の数ループ
+    for(; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
-        origin_problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-        //置ければ始める
-        if(origin_problem.field.is_puttable(origin_problem.stones.front(),y,x) == true)
+        //保持するフィールドの数ループ
+        for(std::size_t field_num = 0; field_num < HOLD_FIELD_NUM; ++field_num)
         {
-            one_try(origin_problem,y,x,angle,side);
+            std::cout << now_put_stone_num << std::endl;
+            put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
         }
     }
-*/
-    std::cout << "koko-1" << std::endl;
-    problem_type problem = origin_problem;
 
-    for(std::size_t stone_num = 0; stone_num < origin_problem.stones.size(); ++stone_num)
+    for(std::size_t field_num = 0; field_num < HOLD_FIELD_NUM; ++field_num)
     {
-        std::cout << stone_num << std::endl;
-        put_a_stone(problem, 0, stone_num);
-        now_put_stone_num++;
+        qDebug("emit only one try. score = %3zu",holding_problems[field_num].problem.field.get_score());
+        answer_send(holding_problems[field_num].problem.field);
     }
-    qDebug("emit only one try. score = %3zu",problem.field.get_score());
-    answer_send(problem.field);
-
 }
 
 
 //1つの石を置く候補を探索し、返す
 void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
 {
-    std::cout << "koko0" << std::endl;
     result_vec.clear();
     std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
 
-    search(problem.field, stone_num, root);
+    search(problem.field, field_num, stone_num, root);
 
-    std::cout << "koko" << std::endl;
     for(std::size_t i = 0; i < result_vec.size(); ++i)
     {
         auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
@@ -183,20 +181,20 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
                             get_rem_stone_zk(stone_num+1))== true)
         {
             max->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
-            if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
+            //if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
             continue;
         }
 
         problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
-        std::cout << stone_num << "th stone putted" << std::endl;
+        //std::cout << stone_num << "th stone putted" << std::endl;
         break;
     }
 }
 
-//おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る
-int sticky_beam::search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent)
+//おける場所の中から評価値の高いものつをMAX_SEARCH_WIDTH選びsearch_depthまで潜る
+int sticky_beam::search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent)
 {
-    stone_type& stone = origin_problem.stones.at(stone_num);
+    stone_type& stone = holding_problems[field_num].problem.stones.at(stone_num);
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
 
@@ -210,9 +208,9 @@ int sticky_beam::search(field_type& _field, std::size_t const stone_num, std::sh
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
             // move_goodnessは2種類ある　最後の石かどうか判定が必要
-            const double score = stone_num == origin_problem.stones.size() - 1 ?
+            const double score = stone_num == holding_problems[field_num].problem.stones.size() - 1 ?
                         eval.move_goodness(_field,{stone,{y,x}}) :
-                        eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
+                        eval.move_goodness(_field,{stone,{y,x}},holding_problems[field_num].problem.stones.at(stone_num+1));
 
             //MAX_SEARCH_WIDTH個貯まるまでは追加する
             if(nodes.size() < MAX_SEARCH_WIDTH)
@@ -229,7 +227,7 @@ int sticky_beam::search(field_type& _field, std::size_t const stone_num, std::sh
                                 )
                             );
 #ifdef QT_DEBUG
-                if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
+                //if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
 #endif
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
@@ -270,7 +268,7 @@ int sticky_beam::search(field_type& _field, std::size_t const stone_num, std::sh
         {
             stone.set_angle(each_node->angle).set_side(each_node->side);
             _field.put_stone_basic(stone,each_node->point.y,each_node->point.x);
-            if(search(_field, stone_num+1, each_node) == 0)
+            if(search(_field, field_num, stone_num+1, each_node) == 0)
             {
                 result_vec.emplace_back(each_node);
             }

@@ -46,10 +46,11 @@ class sticky_beam : public algorithm_type
         {}
     };
 
-    class field_with_score_type{
+    class problem_with_score_type{
     public:
-        field_with_score_type(field_type& field,double score):field(field),score(score){}
-        field_type field;
+        problem_with_score_type(problem_type _problem,double _score):problem(_problem),score(_score){}
+        problem_with_score_type(){}
+        problem_type problem;
         double score;
     };
 
@@ -69,11 +70,11 @@ private:
     problem_type origin_problem;
     std::size_t now_put_stone_num = 0;
 
-    std::vector<field_with_score_type> holding_fields;
+    std::array<problem_with_score_type, HOLD_FIELD_NUM> holding_problems;
     std::vector<std::shared_ptr<node>> result_vec;
 
     void put_a_stone(problem_type& problem, int field_num, int stone_num);
-    int search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent);
+    int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky
     class stone_params_type{
@@ -103,7 +104,7 @@ private:
     double light_eval(field_type& field,process_type process);
     problem_type problem;
     void eval_pattern(stone_type& stone, stone_type& next_stone);
-    std::vector<field_with_score_type> result_stone;
+    std::vector<problem_with_score_type> result_stone;
 
 
 };
