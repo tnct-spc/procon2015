@@ -58,71 +58,7 @@ void sticky_beam::run(){
     answer_send(best_ans.field);
 }
 */
-/*
-void sticky_beam::eval_pattern(stone_type& stone, stone_type& next_stone)
-{
-    result_stone.clear();
-    std::vector<stone_params_type> stone_placement_vector;
-    stone_placement_vector.reserve(MAX_SEARCH_WIDTH);
-    for(field_with_score_type& _eval_field : holding_fields)
-    {
-        for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle <= 270;angle += 90,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++)
-        {
-            if(_eval_field.field.is_puttable_basic(stone,dy,dx))
-            {
-                double score;
-                bool should_pass;
-                if(non_next_stone){
-                    score = eval.move_goodness(_eval_field.field,process_type(stone,{dy,dx}));
-                    //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
-                    should_pass = false;
-                }else{
-                    score = eval.move_goodness(_eval_field.field,process_type(stone,{dy,dx}),next_stone);
-                    //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
-                    should_pass = eval.should_pass(_eval_field.field,process_type(stone,{dy,dx}),get_rem_stone_zk(stone));
-                    //should_pass = false;
-                }
-                //ビームサーチの幅制限
-                if(stone_placement_vector.size() < MAX_SEARCH_WIDTH)
-                {
-                    if(should_pass){
-                        stone_placement_vector.emplace_back(dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field);
-                    }else{
-                        stone_placement_vector.emplace_back(dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field);
-                    }
-                }else{
-                    auto worst_stone_param = std::min_element(stone_placement_vector.begin(),stone_placement_vector.end(),[](auto const &t1, auto const &t2){return t1.score < t2.score;});
-                    if(should_pass){
-                        if(_eval_field.score > worst_stone_param->score){
-                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
-                        }
-                    }else{
-                        if(score > worst_stone_param->score){
-                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field};
-                        }
-                    }
-                }
-            }
-        }
-    }
-    for(stone_params_type& stone_params : stone_placement_vector){
-        if(stone_params.pass){
-            result_stone.emplace_back(*(stone_params.field),stone_params.score);
-        }else{
-            field_type field = *(stone_params.field);
-            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.angle).set_side(stone_params.side),stone_params.dy,stone_params.dx),stone_params.score});
-        }
-    }
-}
-*/
-/*
-double sticky_beam::light_eval(field_type &field, process_type process){
-    field.put_stone_basic(process.stone,process.position.y,process.position.x);
-    double score = field.evaluate_normalized_complexity();
-    field.remove_stone_basic();
-    return score;
-}
-*/
+
 
 void sticky_beam::run()
 {
@@ -137,15 +73,6 @@ void sticky_beam::run()
             std::cout << now_put_stone_num << std::endl;
             put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
         }
-        for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num) result_vec[field_num].clear();
-        /*
-        for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
-        {
-            holding_problems[field_num].problem.field
-            std::cout << now_put_stone_num << std::endl;
-            put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
-        }
-        */
     }
 
     for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
@@ -159,36 +86,82 @@ void sticky_beam::run()
 //1つの石を置く
 void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
 {
+    std::size_t i = 0;
     std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
 
     search(problem.field, field_num, stone_num, root);
 
-    for(std::size_t i = 0; i < result_vec[field_num].size(); ++i)
+    //自分の長男残す
+    for(i = 0; i < result_vec[field_num].size(); ++i)
     {
-        auto max = std::max_element(result_vec[field_num].begin(),result_vec[field_num].end(),[](const auto& lhs, const auto& rhs)
+        auto eldest_son = std::max_element(result_vec[field_num].begin(),result_vec[field_num].end(),[](const auto& lhs, const auto& rhs)
         {
             return lhs->score < rhs->score;
         });
 
         // 親を遡りはじめに置いた石のnodeを得る
-        auto first_put= *max;
+        auto first_put= *eldest_son;
         while(first_put->stone_num > now_put_stone_num)
         {
             first_put = first_put->parent;
         }
 
+        //パスすべきなら次へ
         problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
         if(eval.should_pass(problem.field,
                             {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
                             get_rem_stone_zk(stone_num+1))== true)
         {
-            max->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
+            eldest_son->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
             continue;
         }
 
+        //長男を置く
         problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
         break;
     }
+
+    //今までの最悪値
+    double const worst_score = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
+    {
+        return lhs.score < rhs.score;
+    })->score;
+
+    //次男が居れば保存する
+    for(--i = 0; i < result_vec[field_num].size(); ++i)
+    {
+        auto second_son = std::max_element(result_vec[field_num].begin(),result_vec[field_num].end(),[](const auto& lhs, const auto& rhs)
+        {
+            return lhs->score < rhs->score;
+        });
+
+
+        // 親を遡りはじめに置いた石のnodeを得る
+        auto first_put= *second_son;
+        while(first_put->stone_num > now_put_stone_num)
+        {
+            first_put = first_put->parent;
+        }
+
+        //パスすべきなら次へ
+        problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
+        if(eval.should_pass(problem.field,
+                            {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
+                            get_rem_stone_zk(stone_num+1))== true)
+        {
+            second_son->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
+            continue;
+        }
+
+        //今までの最悪値より良ければ保存
+        if(first_put->score > worst_score)
+        {
+            second_sons.push_back({first_put,field_num});
+            break;
+        }
+
+    }
+    result_vec[field_num].clear();
 }
 
 //おける場所の中から評価値の高いものつをMAX_SEARCH_WIDTH選びsearch_depthまで潜る
