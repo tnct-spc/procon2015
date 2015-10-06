@@ -35,6 +35,7 @@ void yrange::run()
 
 void yrange::solve()
 {
+    problem_type base_problem = origin_problem;
     limit_timer.start();
     qDebug("yrange start");
 /*
@@ -73,7 +74,7 @@ void yrange::solve()
     std::array<int,39> start_x{{5,19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
     int best_score = FIELD_SIZE * FIELD_SIZE;
 
-    for(std::size_t stone_num = 0; stone_num < origin_problem.stones.size(); ++stone_num)
+    for(std::size_t stone_num = 0; stone_num < base_problem.stones.size(); ++stone_num)
     {
         for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
         {
@@ -81,12 +82,12 @@ void yrange::solve()
             int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
             for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
             {
-                origin_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-                if(origin_problem.field.is_puttable_basic(origin_problem.stones[stone_num],y,x) == true)
+                base_problem.stones[stone_num].set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+                if(base_problem.field.is_puttable_basic(base_problem.stones[stone_num],y,x) == true)
                 {
                     //Start Solve
-                    problem_type problem = origin_problem;
-                    problem.field.put_stone_basic(origin_problem.stones[stone_num],y,x);
+                    problem_type problem = base_problem;
+                    problem.field.put_stone_basic(base_problem.stones[stone_num],y,x);
                     one_try(problem, stone_num);
                     //Send
                     answer_send(problem.field);
