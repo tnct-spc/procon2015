@@ -138,59 +138,59 @@ void sticky_beam::run()
         }
     }
 */
-    only_one_try(origin_problem);
+    std::cout << "koko-1" << std::endl;
+    problem_type problem = origin_problem;
 
-}
-
-
-//はじめに置く石から探索を開始する
-void sticky_beam::only_one_try(problem_type problem)
-{
-    std::cout << "start only one try." << std::endl;
-    for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
+    for(std::size_t stone_num = 0; stone_num < origin_problem.stones.size(); ++stone_num)
     {
-        std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
-
-        search(problem.field, stone_num, root);
-        //std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
-
-        for(std::size_t i = 0; i < result_vec.size(); ++i)
-        {
-            auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
-            {
-                return lhs->score < rhs->score;
-            });
-
-            // 親を遡りはじめに置いた石のnodeを得る
-            auto first_put= *max;
-            while(first_put->stone_num > now_put_stone_num)
-            {
-                first_put = first_put->parent;
-            }
-
-            problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
-            if(eval.should_pass(problem.field,
-                                {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
-                                get_rem_stone_zk(stone_num+1))== true)
-            {
-                max->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
-#ifdef QT_DEBUG
-                if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
-#endif
-                continue;
-            }
-
-            problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
-#ifdef QT_DEBUG
-            std::cout << stone_num << "th stone putted" << std::endl;
-#endif
-            break;
-        }
-        result_vec.clear();
+        std::cout << stone_num << std::endl;
+        put_a_stone(problem, 0, stone_num);
         now_put_stone_num++;
     }
     qDebug("emit only one try. score = %3zu",problem.field.get_score());
     answer_send(problem.field);
+
+}
+
+
+//1つの石を置く候補を探索し、返す
+void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
+{
+    std::cout << "koko0" << std::endl;
+    result_vec.clear();
+    std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
+
+    search(problem.field, stone_num, root);
+
+    std::cout << "koko" << std::endl;
+    for(std::size_t i = 0; i < result_vec.size(); ++i)
+    {
+        auto max = std::max_element(result_vec.begin(),result_vec.end(),[](const auto& lhs, const auto& rhs)
+        {
+            return lhs->score < rhs->score;
+        });
+
+        // 親を遡りはじめに置いた石のnodeを得る
+        auto first_put= *max;
+        while(first_put->stone_num > now_put_stone_num)
+        {
+            first_put = first_put->parent;
+        }
+
+        problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
+        if(eval.should_pass(problem.field,
+                            {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
+                            get_rem_stone_zk(stone_num+1))== true)
+        {
+            max->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
+            if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
+            continue;
+        }
+
+        problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
+        std::cout << stone_num << "th stone putted" << std::endl;
+        break;
+    }
 }
 
 //おける場所の中から評価値の高いもの3つを選びsearch_depthまで潜る

@@ -64,6 +64,7 @@ private:
     evaluator eval = evaluator();
     static constexpr std::size_t MAX_SEARCH_DEPTH = 15;
     static constexpr std::size_t MAX_SEARCH_WIDTH = 3;
+    static constexpr std::size_t HOLD_FIELD_NUM = 1;
     std::size_t ALL_STONES_NUM;
     problem_type origin_problem;
     std::size_t now_put_stone_num = 0;
@@ -71,8 +72,7 @@ private:
     std::vector<field_with_score_type> holding_fields;
     std::vector<std::shared_ptr<node>> result_vec;
 
-    void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
-    void only_one_try(problem_type problem);
+    void put_a_stone(problem_type& problem, int field_num, int stone_num);
     int search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky
