@@ -65,13 +65,13 @@ private:
     evaluator eval = evaluator();
     static constexpr std::size_t MAX_SEARCH_DEPTH = 15;
     static constexpr std::size_t MAX_SEARCH_WIDTH = 3;
-    static constexpr std::size_t HOLD_FIELD_NUM = 1;
+    static constexpr std::size_t HOLD_FIELD_NUM = 2;
     std::size_t ALL_STONES_NUM;
-    problem_type origin_problem;
     std::size_t now_put_stone_num = 0;
 
-    std::array<problem_with_score_type, HOLD_FIELD_NUM> holding_problems;
-    std::vector<std::shared_ptr<node>> result_vec;
+    std::vector<problem_with_score_type> holding_problems;
+    std::vector<problem_with_score_type> result_holding_problems;
+    std::array<std::vector<std::shared_ptr<node>>,HOLD_FIELD_NUM> result_vec;
 
     void put_a_stone(problem_type& problem, int field_num, int stone_num);
     int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
