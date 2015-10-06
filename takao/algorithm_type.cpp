@@ -35,3 +35,13 @@ int algorithm_type::get_rem_stone_zk(stone_type& stone)
     }
     return sum;
 }
+
+int algorithm_type::get_rem_stone_zk(int stone_num)
+{
+    int sum = 0;
+    for(std::size_t i = stone_num; i < problem.stones.size(); ++i)
+    {
+        sum += problem.stones.at(i).get_area();
+    }
+    return sum;
+}
