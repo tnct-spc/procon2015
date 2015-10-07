@@ -85,6 +85,7 @@ void stone_type::init_stone()
     }
 
     //area
+    area = 0;
     for(auto const& each_raw_data:get_raw_data())
     {
         area += std::count(each_raw_data.begin(),each_raw_data.end(),1);

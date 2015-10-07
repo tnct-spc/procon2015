@@ -172,8 +172,8 @@ private:
 
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
+        uint64_t bit_plain_field_only_stones[64];
         uint64_t bit_sides_field[64];//石のサイドフィールド
-        uint64_t bit_sides_field_just_before[256][64];
         uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
         void make_bit();//bitデータの作成

@@ -98,13 +98,10 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
 
     /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
 
-    for(int i=0;i<64;i++){
-        bit_sides_field_just_before[processes.size()][i] = bit_sides_field[i];
-    }
-
     //フィールドに石を、サイドフィールドに石の辺を置く
     for(int i=0;i<8;i++){
         bit_plain_field[16+y+i] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//add stone
+        bit_plain_field_only_stones[16+y+i] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//add stone
         bit_sides_field[16+y+i+1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//upper
         bit_sides_field[16+y+i-1] |= (stone).get_bit_plain_stones(x+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//under
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//left
@@ -141,10 +138,17 @@ field_type& field_type::remove_stone_basic()
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
         bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
+        bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] = ((bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
-        bit_sides_field[i] = bit_sides_field_just_before[processes_end][i];
+        bit_sides_field[i] = 0;
+    }
+    for(int i=0;i<64;i++){
+        if(i!=0) bit_sides_field[i+1] |= bit_plain_field_only_stones[i];//upper
+        if(i!=63) bit_sides_field[i-1] |= bit_plain_field_only_stones[i];//under
+        bit_sides_field[i] |= bit_plain_field_only_stones[i]<<1;//left
+        bit_sides_field[i] |= bit_plain_field_only_stones[i]>>1;//right
     }
     //remove from raw data
     int stone_position_x = processes[processes_end].position.x;
@@ -818,6 +822,7 @@ void field_type::make_bit()
     //make bit plain field
     for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
+        bit_plain_field_only_stones[i] = 0;
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
