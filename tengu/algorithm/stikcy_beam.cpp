@@ -73,6 +73,8 @@ void sticky_beam::run()
             put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
         }
 
+        //次男が居ない
+        if(second_sons.size() == 0) continue;
         //今までの最悪値
         auto worst_element = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
         {
@@ -113,6 +115,8 @@ void sticky_beam::run()
     {
         qDebug("emit only one try. score = %3zu",holding_problems[field_num].problem.field.get_score());
         answer_send(holding_problems[field_num].problem.field);
+        std::cout << holding_problems[field_num].problem.field.get_answer() << std::endl;
+        std::cout << std::endl;
     }
 }
 
@@ -121,6 +125,9 @@ void sticky_beam::run()
 void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
 {
     std::size_t i = 0;
+    std::shared_ptr<node> first_put1;
+    std::shared_ptr<node> first_put2;
+
     std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
 
     search(problem.field, field_num, stone_num, root);
@@ -134,16 +141,16 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         });
 
         // 親を遡りはじめに置いた石のnodeを得る
-        auto first_put= *eldest_son;
-        while(first_put->stone_num > now_put_stone_num)
+        first_put1 = *eldest_son;
+        while(first_put1->stone_num > now_put_stone_num)
         {
-            first_put = first_put->parent;
+            first_put1 = first_put1->parent;
         }
 
         //パスすべきなら次へ
-        problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
+        problem.stones.at(stone_num).set_side(first_put1->side).set_angle(first_put1->angle);
         if(eval.should_pass(problem.field,
-                            {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
+                            {problem.stones.at(stone_num),{first_put1->point.y, first_put1->point.x}},
                             get_rem_stone_zk(stone_num+1))== true)
         {
             eldest_son->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
@@ -151,7 +158,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         }
 
         //長男を置く
-        problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
+        problem.field.put_stone_basic(problem.stones.at(stone_num), first_put1->point.y, first_put1->point.x);
         break;
     }
 
@@ -165,24 +172,28 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
 
 
         // 親を遡りはじめに置いた石のnodeを得る
-        auto first_put= *second_son;
-        while(first_put->stone_num > now_put_stone_num)
+        first_put2= *second_son;
+        while(first_put2->stone_num > now_put_stone_num)
         {
-            first_put = first_put->parent;
+            first_put2 = first_put2->parent;
         }
 
+        //同じ手は要らない
+        if(first_put1 == first_put2 || first_put2== NULL) continue;
+
         //パスすべきなら次へ
-        problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
+        problem.stones.at(stone_num).set_side(first_put2->side).set_angle(first_put2->angle);
         if(eval.should_pass(problem.field,
-                            {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
+                            {problem.stones.at(stone_num),{first_put2->point.y, first_put2->point.x}},
                             get_rem_stone_zk(stone_num+1))== true)
         {
             second_son->get()->score = /*eval.min_value*/std::numeric_limits<double>::min();
             continue;
         }
 
-        second_sons.push_back(node_with_field_num{first_put,field_num});
-
+        second_sons.push_back(node_with_field_num{first_put2,field_num});
+        std::cout << "koko" << std::endl;
+        break;
     }
     result_vec[field_num].clear();
 }
