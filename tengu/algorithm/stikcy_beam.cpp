@@ -33,33 +33,6 @@ sticky_beam::~sticky_beam()
 {
 }
 
-/*
-void sticky_beam::run(){
-    QElapsedTimer timer;
-    timer.start();
-
-    std::vector<field_with_score_type> pattern;
-    pattern.emplace_back(problem.field,0);
-    size_t rem_stone_num = problem.stones.size();
-
-    for(auto stone_itr = problem.stones.begin(); stone_itr != problem.stones.end(); stone_itr++)
-    {
-        eval_pattern(*stone_itr,*stone_itr);
-        print_text(std::to_string(rem_stone_num--));
-    }
-
-    field_with_score_type& best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  const& lhs, auto const& rhs)
-    {
-        return lhs.field.get_score() < rhs.field.get_score();
-    });
-
-    int time = timer.elapsed();
-    print_text(std::to_string(time) + "msかかった");
-    answer_send(best_ans.field);
-}
-*/
-
-
 void sticky_beam::run()
 {
     qDebug("sticky_beam start");
@@ -67,7 +40,6 @@ void sticky_beam::run()
     //石の数ループ
     for(; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
-        std::cout << now_put_stone_num << std::endl;
         //保持するフィールドの数ループ
         for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
         {
@@ -97,16 +69,18 @@ void sticky_beam::run()
             holding_problems.back().score = best_second_son->first_put->score;
         }
         //置き換える場合
-        /*
         else if(worst_element->score < best_second_son->first_put->score)
         {
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic();
+            holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_angle(best_second_son->first_put->angle).set_side(best_second_son->first_put->side);
+            if(worst_element->problem.field.is_puttable_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
+                    best_second_son->first_put->point.y, best_second_son->first_put->point.x) == false) std::cout << "dame" << std::endl;
             worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
                     best_second_son->first_put->point.y, best_second_son->first_put->point.x);
             worst_element->score = best_second_son->first_put->score;
         }
-        */
+
         second_sons.clear();
         std::cout << "now_put_stone_num = " << now_put_stone_num << std::endl;
         std::cout << "holding problems = " << holding_problems.size() << std::endl;
@@ -222,7 +196,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         }
 
         second_sons.push_back(node_with_field_num{first_put2,field_num});
-        std::cout << "push_back to second_sons" << std::endl;
+        //std::cout << "push_back to second_sons" << std::endl;
         break;
     }
     result_vec[field_num].clear();
