@@ -827,18 +827,13 @@ void field_type::make_bit()
     //bit_plaint_field_only_obstacleは実際には石をおいていない初期のフィールド
     for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
-        bit_plain_field_only_obstacle[i] = 0xffffffffffffffff;
-        bit_only_flame_and_obstacle_field[i] = 0xffffffffffffffff;
+        bit_plain_field_only_flame_and_obstacle[i] = 0xffffffffffffffff;
         bit_plain_field_only_stones[i] = 0;
-    }
-    for(int i=16;i<48;i++){
-        bit_only_flame_and_obstacle_field[i] = 0xffff00000000ffff;
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
             bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
-            bit_plain_field_only_obstacle[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
-            bit_only_flame_and_obstacle_field[y+16] -= (uint64_t)(raw_data.at(y).at(x)) << ((64-17)-x);
+            bit_plain_field_only_flame_and_obstacle[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
         }
     }
 
@@ -890,7 +885,7 @@ void field_type::init_route_map(){
             tmp[y] |= bit_slide_field[y] << 1;
             tmp[y] |= bit_slide_field[y] >> 1;
             tmp[y] |= bit_slide_field[y];
-            tmp[y] = tmp[y] & (~bit_plain_field_only_obstacle[y]);
+            tmp[y] = tmp[y] & (~bit_plain_field_only_flame_and_obstacle[y]);
             if(tmp[y] != bit_slide_field[y])match_flag = false;
         }
         if(match_flag)break;
@@ -983,7 +978,7 @@ int (*field_type::make_manhattan_field(uint64_t const bit_manhattan_start_field_
 
     auto end_check = [&](){
         for(int i=0;i<64;i++){
-            if((bit_field[i] | bit_only_flame_and_obstacle_field[i]) != 0xffffffffffffffff) return false;
+            if((bit_field[i] | bit_plain_field_only_flame_and_obstacle[i]) != 0xffffffffffffffff) return false;
         }
         return true;
     };
@@ -1000,7 +995,7 @@ int (*field_type::make_manhattan_field(uint64_t const bit_manhattan_start_field_
             bit_field[i] |= bit_field_buffer[i] >> 1;//right
         }
         for(int i=0;i<64;i++){
-            bit_field[i] &= ~bit_only_flame_and_obstacle_field[i];
+            bit_field[i] &= ~bit_plain_field_only_flame_and_obstacle[i];
         }
     };
 
