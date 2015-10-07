@@ -822,15 +822,19 @@ void field_type::make_bit()
     //make bit plain field
     for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
-        bit_only_flame_and_obstacle_field = 0;
+        bit_only_flame_and_obstacle_field[i] = 0xffffffffffffffff;
         bit_plain_field_only_stones[i] = 0;
+    }
+    for(int i=16;i<48;i++){
+        bit_only_flame_and_obstacle_field[i] = 0xffff00000000ffff;
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
             bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
-            bit_only_flame_and_obstacle_field += (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
+            bit_only_flame_and_obstacle_field[y+16] -= (uint64_t)(raw_data.at(y).at(x)) << ((64-17)-x);
         }
     }
+
     //make bit sides field
     for(int i=0;i<64;i++){
         bit_sides_field[i] = 0;
