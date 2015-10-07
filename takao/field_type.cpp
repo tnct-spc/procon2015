@@ -875,22 +875,16 @@ void field_type::init_route_map(){
         //c++が書きたい
         bit_slide_field[i] = bit_plain_field_only_stones[i];
     }
-    for(int y = 0; y < 64; y ++){
-        std::cout << static_cast<std::bitset<64>>(bit_slide_field[y]) << std::endl;
-    }
     while(true){
         uint64_t tmp[64] = {0};
         bool match_flag = true;
         for(int y = 0; y < 64; y++){
-            //tmp[y] = tmp[y] & (~bit_plain_field_only_obstacle[y]);
             if(y > 0)tmp[y] |= bit_slide_field[y-1];
             if(y < 63)tmp[y] |= bit_slide_field[y+1];
             tmp[y] |= bit_slide_field[y] << 1;
             tmp[y] |= bit_slide_field[y] >> 1;
             tmp[y] |= bit_slide_field[y];
-            //std::cout << static_cast<std::bitset<64>>(tmp[y]) << std::endl;
             tmp[y] = tmp[y] & (~bit_plain_field_only_obstacle[y]);
-            //std::cout << static_cast<std::bitset<64>>(tmp[y]) << std::endl;
             if(tmp[y] != bit_slide_field[y])match_flag = false;
         }
         if(match_flag)break;
@@ -906,12 +900,14 @@ void field_type::init_route_map(){
             }
         }
     }
+    /*
     for(auto y : distance_map){
         for(auto  x : y){
             std::cout << std::setw(3) << x;
         }
         std::cout << std::endl;
     }
+    */
     for(int y = 0; y < 64; y ++){
         for(int x = 0; x < 64; x ++){
             int pos_y = y;
@@ -955,12 +951,14 @@ void field_type::init_route_map(){
             }
         }
     }
+    /*
     for(auto y : weighted_route_map){
         for(auto  x : y){
             std::cout << std::setw(4) << x;
         }
         std::cout << std::endl;
     }
+    */
 }
 
 double field_type::evaluate_ken_o_expwy() const
