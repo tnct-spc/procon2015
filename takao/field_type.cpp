@@ -13,6 +13,7 @@
 #include <immintrin.h>
 #include <QDebug>
 #include <cstdlib>
+#include <random>
 void field_type::cancellation_of_restriction()
 {
     has_limit = false;
@@ -121,6 +122,9 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
         }
     }
     processes.emplace_back(stone, point_type{y, x});
+    if(processes.size() == 1){
+        init_route_map();
+    }
     return *this;
 }
 
@@ -820,13 +824,16 @@ void field_type::set_provided_stones(size_t ps)
 void field_type::make_bit()
 {
     //make bit plain field
+    //bit_plaint_field_only_obstacleは実際には石をおいていない初期のフィールド
     for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
+        bit_plain_field_only_obstacle[i] = 0xffffffffffffffff;
         bit_plain_field_only_stones[i] = 0;
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
             bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
+            bit_plain_field_only_obstacle[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
         }
     }
     //make bit sides field
@@ -858,5 +865,106 @@ double field_type::evaluate_normalized_complexity() const
     }
     return static_cast<double>(side * side) / static_cast<double>(get_block_num());
 }
+void field_type::init_route_map(){
+    uint64_t bit_slide_field[64];
+    std::random_device rnd;
+    std::mt19937 mt(rnd());
+    std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> distance_map = {0};
+    weighted_route_map = distance_map;//明らかにおかしいけど,初期化のため仕方がない
+    for(int i = 0;i < 64;i++){
+        //c++が書きたい
+        bit_slide_field[i] = bit_plain_field_only_stones[i];
+    }
+    for(int y = 0; y < 64; y ++){
+        std::cout << static_cast<std::bitset<64>>(bit_slide_field[y]) << std::endl;
+    }
+    while(true){
+        uint64_t tmp[64] = {0};
+        bool match_flag = true;
+        for(int y = 0; y < 64; y++){
+            //tmp[y] = tmp[y] & (~bit_plain_field_only_obstacle[y]);
+            if(y > 0)tmp[y] |= bit_slide_field[y-1];
+            if(y < 63)tmp[y] |= bit_slide_field[y+1];
+            tmp[y] |= bit_slide_field[y] << 1;
+            tmp[y] |= bit_slide_field[y] >> 1;
+            tmp[y] |= bit_slide_field[y];
+            //std::cout << static_cast<std::bitset<64>>(tmp[y]) << std::endl;
+            tmp[y] = tmp[y] & (~bit_plain_field_only_obstacle[y]);
+            //std::cout << static_cast<std::bitset<64>>(tmp[y]) << std::endl;
+            if(tmp[y] != bit_slide_field[y])match_flag = false;
+        }
+        if(match_flag)break;
+        for(int y = 0; y < 64; y++){
+            bit_slide_field[y] = tmp[y];
+        }
+        for(int y = 16; y <= 47; y++){
+            int x = 0;
+            for(u_int64_t mask = 0b0000000000000000100000000000000000000000000000000000000000000000;
+                mask != 0b0000000000000000000000000000000000000000000000001000000000000000;
+                mask >>= 1,x++){
+                distance_map[y -16][x]  += (bit_slide_field[y] & mask ? 1 : 0);
+            }
+        }
+    }
+    for(auto y : distance_map){
+        for(auto  x : y){
+            std::cout << std::setw(3) << x;
+        }
+        std::cout << std::endl;
+    }
+    for(int y = 0; y < 64; y ++){
+        for(int x = 0; x < 64; x ++){
+            int pos_y = y;
+            int pos_x = x;
+            while(true){
+                int my_distance = distance_map[pos_y][pos_x];
+                int up_way = -1, down_way = -1, left_way = -1, right_way = -1;
+                if(my_distance == 0)break;
+                weighted_route_map[pos_y][pos_x] += 1;
+                int ways = 0;
+                if(pos_y > 0  && distance_map[pos_y -1][pos_x] == my_distance+1){
+                    down_way = ways;
+                    ways++;
+                }
+                if(pos_y < 63 && distance_map[pos_y +1][pos_x] == my_distance+1){
+                    up_way = ways;
+                    ways++;
+                }
+                if(pos_x > 0  && distance_map[pos_y][pos_x -1] == my_distance+1){
+                    left_way = ways;
+                    ways++;
+                }
+                if(pos_x < 63 && distance_map[pos_y][pos_x +1] == my_distance+1){
+                    right_way = ways;
+                    ways++;
+                }
+                if(ways == 0)break;
+                std::uniform_int_distribution<int> uni_rand(0,ways-1);
+                int rand_way = uni_rand(mt);
+                if(down_way == rand_way){
+                    pos_y--;
+                }else if(up_way == rand_way){
+                    pos_y++;
+                }else if(left_way == rand_way){
+                    pos_x--;
+                }else if(right_way == rand_way){
+                    pos_x++;
+                }else{
+                    qDebug() << "いやおかしいよ";
+                }
+            }
+        }
+    }
+    for(auto y : weighted_route_map){
+        for(auto  x : y){
+            std::cout << std::setw(4) << x;
+        }
+        std::cout << std::endl;
+    }
+}
 
+double field_type::evaluate_ken_o_expwy() const
+{
+
+}
 bool field_type::get_has_limit() const{return has_limit;}
