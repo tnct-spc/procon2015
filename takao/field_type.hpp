@@ -114,7 +114,7 @@ public:
     size_t get_block_num() const;//何かが配置されている(空白以外)マスの数を返す
     size_t get_stone_num() const;
     double evaluate_normalized_complexity() const;
-
+    double evaluate_ken_o_expwy() const;
     //現在の状態における得点を返す
     size_t get_score() const;
 
@@ -153,6 +153,7 @@ private:
     bool has_limit;
 
     raw_field_type raw_data;
+    std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> weighted_route_map;
     std::vector<process_type> processes;
     //渡された石の総数.get_answerで必要
     size_t provided_stones;
@@ -165,7 +166,7 @@ private:
     };
 
     int processes_min_stone_nth();
-
+    void init_route_map();
     bool is_placed_stone[256];
     //石が置かれているか否かを返す
     bool is_placed(stone_type const& stone) const;
@@ -173,6 +174,7 @@ private:
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
         uint64_t bit_plain_field_only_stones[64];
+        uint64_t bit_plain_field_only_obstacle[64];
         uint64_t bit_sides_field[64];//石のサイドフィールド
         uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下

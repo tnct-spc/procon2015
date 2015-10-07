@@ -146,3 +146,6 @@ bool net::is_error(){
 int net::what_error(){
     return net_error_num;
 }
+QString net::random_naming(){
+
+}
