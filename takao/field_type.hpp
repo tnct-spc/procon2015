@@ -113,6 +113,9 @@ public:
     size_t empty_zk() const;//get_score()を同じ.なんのためにあるのかわからない
     size_t get_block_num() const;//何かが配置されている(空白以外)マスの数を返す
     size_t get_stone_num() const;
+    uint64_t *get_bit_plain_field_only_stones(){
+        return bit_plain_field_only_stones;
+    }
     double evaluate_normalized_complexity() const;
     double evaluate_ken_o_expwy() const;
     //現在の状態における得点を返す
@@ -126,6 +129,10 @@ public:
 
     // bit化していない配列のアクセッサ
     raw_field_type const& get_raw_data() const;
+
+    //マンハッタン距離が描かれたint[64][64]のフィールドを返す.引数は距離を求める最初の地点のみ1に設定したbit_field[64]
+    int (*make_manhattan_field(uint64_t const bit_manhattan_start_field_[]))[64];
+
     // don't use this
     raw_field_type& set_raw_data();
 
@@ -174,7 +181,7 @@ private:
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
         uint64_t bit_plain_field_only_stones[64];
-        uint64_t bit_plain_field_only_obstacle[64];
+        uint64_t bit_only_flame_and_obstacle_field[64];
         uint64_t bit_sides_field[64];//石のサイドフィールド
         uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下

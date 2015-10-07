@@ -827,15 +827,27 @@ void field_type::make_bit()
     //bit_plaint_field_only_obstacleは実際には石をおいていない初期のフィールド
     for(int i=0;i<64;i++){
         bit_plain_field[i] = 0xffffffffffffffff;
+<<<<<<< HEAD
         bit_plain_field_only_obstacle[i] = 0xffffffffffffffff;
+=======
+        bit_only_flame_and_obstacle_field[i] = 0xffffffffffffffff;
+>>>>>>> feature/manhattan
         bit_plain_field_only_stones[i] = 0;
+    }
+    for(int i=16;i<48;i++){
+        bit_only_flame_and_obstacle_field[i] = 0xffff00000000ffff;
     }
     for(int y=0;y<32;y++){
         for(int x=0;x<32;x++){
             bit_plain_field[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
+<<<<<<< HEAD
             bit_plain_field_only_obstacle[y+16] -= (uint64_t)(raw_data.at(y).at(x) + 1) << ((64-17)-x);
+=======
+            bit_only_flame_and_obstacle_field[y+16] -= (uint64_t)(raw_data.at(y).at(x)) << ((64-17)-x);
+>>>>>>> feature/manhattan
         }
     }
+
     //make bit sides field
     for(int i=0;i<64;i++){
         bit_sides_field[i] = 0;
@@ -966,3 +978,62 @@ double field_type::evaluate_ken_o_expwy() const
 
 }
 bool field_type::get_has_limit() const{return has_limit;}
+
+int (*field_type::make_manhattan_field(uint64_t const bit_manhattan_start_field_[]))[64]
+{
+    uint64_t bit_field[64];
+    uint64_t bit_field_buffer[64];
+    int (*manhattan_field)[64];
+    manhattan_field = new int[64][64];
+    uint64_t mask = 1;
+
+    auto end_check = [&](){
+        for(int i=0;i<64;i++){
+            if((bit_field[i] | bit_only_flame_and_obstacle_field[i]) != 0xffffffffffffffff) return false;
+        }
+        return true;
+    };
+
+    auto bit_field_spread = [&](){
+        //copy buffer
+        for(int i=0;i<64;i++){
+            bit_field_buffer[i] = bit_field[i];
+        }
+        for(int i=0;i<64;i++){
+            if(i!=0) bit_field[i] |= bit_field_buffer[i-1];//upper
+            if(i!=63) bit_field[i] |= bit_field_buffer[i+1];//under
+            bit_field[i] |= bit_field_buffer[i] << 1;//left
+            bit_field[i] |= bit_field_buffer[i] >> 1;//right
+        }
+        for(int i=0;i<64;i++){
+            bit_field[i] &= ~bit_only_flame_and_obstacle_field[i];
+        }
+    };
+
+    auto add_manhattan = [&](){
+        for(int i=0;i<64;i++){
+            for(int j=0;j<64;j++){
+                manhattan_field[i][63 - j] += bit_field[i] >> j & mask;
+            }
+        }
+    };
+
+    //copy
+    for(int i=0;i<64;i++){
+        bit_field[i] = bit_manhattan_start_field_[i];
+    }
+    //copy field
+    for(int i=0;i<64;i++){
+        for(int j=0;j<64;j++){
+            manhattan_field[i][63 - j] = bit_field[i] >> j & mask;
+        }
+    }
+
+    //spread field
+    while(1){
+        bit_field_spread();
+        add_manhattan();
+        if(end_check()) break;
+    }
+    return manhattan_field;
+}
