@@ -181,6 +181,7 @@ private:
         //#BitSystem
         uint64_t bit_plain_field[64];//普通のフィールド
         uint64_t bit_plain_field_only_stones[64];
+        uint64_t bit_plain_field_only_obstacle[64];
         uint64_t bit_only_flame_and_obstacle_field[64];
         uint64_t bit_sides_field[64];//石のサイドフィールド
         uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
