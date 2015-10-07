@@ -129,6 +129,10 @@ public:
 
     // bit化していない配列のアクセッサ
     raw_field_type const& get_raw_data() const;
+
+    //マンハッタン距離が描かれたint[64][64]のフィールドを返す.引数は距離を求める最初の地点のみ1に設定したbit_field[64]
+    int (*make_manhattan_field(uint64_t const bit_manhattan_start_field_[]))[64];
+
     // don't use this
     raw_field_type& set_raw_data();
 
