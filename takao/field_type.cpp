@@ -15,6 +15,7 @@
 #include <QDebug>
 #include <cstdlib>
 
+/* temporary unavailable
 void field_type::cancellation_of_restriction()
 {
     has_limit = false;
@@ -52,6 +53,7 @@ void field_type::cancellation_of_restriction()
         }
     }
 }
+*/
 
 bool field_type::is_puttable_basic(const stone_type &stone, int y, int x) const
 {
@@ -125,24 +127,31 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
             raw_data.at(i+y).at(j+x) = stone_nth;
         }
     }
-    processes.emplace_back(stone, point_type{y, x});
+    processes.emplace_back(stone_nth,
+                           static_cast<int>(stone.get_side()),
+                           stone.get_angle() / 90,
+                           point_type{y, x});
     return *this;
 }
 
-field_type& field_type::remove_stone_basic()
+// bit_process_type化により引数にremoveする石をとるように変更
+field_type& field_type::remove_stone_basic(stone_type const& stone)
 {
 #ifdef _DEBUGMODE
     if(processes.size() == 0)throw std::runtime_error("Stone is not even placed one!");
 #endif
     int processes_end = processes.size()-1;
-    int last_stone_nth = processes[processes_end].stone.get_nth();
-
+    int last_stone_nth = processes[processes_end].nth;
+#ifdef QT_DEBUG
+    if(stone.get_nth() != last_stone_nth)
+        throw std::runtime_error("remove_stone_basic: nth does not match");
+#endif
     is_placed_stone[last_stone_nth-1]=false;
 
     //remove from bit field
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
-        bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
+        bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)stone.get_side(),(int)((stone.get_angle())/90),i))));
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
@@ -189,6 +198,7 @@ size_t field_type::get_score() const
 }
 
 //石を置く
+/* unavailable
 field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 {
 #ifdef _DEBUGMODE
@@ -196,7 +206,7 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
 #endif
     int stone_nth = stone.get_nth();
     is_placed_stone[stone_nth-1]=true;
-    /*ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと*/
+    //ビットフィールドに置く #get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
 
     //フィールドに石を、サイドフィールドに石の辺を置く
     for(int i=0;i<8;i++){
@@ -249,8 +259,10 @@ field_type& field_type::put_stone(stone_type const& stone, int y, int x)
     processes.emplace_back(stone, point_type{y, x});
     return *this;
 }
+*/
 
 //接していなくても石を置けるか
+/* unavailable
 bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 {
     //まだ置かれていないか確かめる
@@ -276,8 +288,10 @@ bool field_type::is_puttable_force(const stone_type &stone, int y, int x)
 
     return true;
 }
+*/
 
 //石を置けるか
+/* unavailable
 bool field_type::is_puttable(stone_type const& stone, int y, int x) const
 {
     //まだ置かれていないか確かめる
@@ -312,7 +326,9 @@ bool field_type::is_puttable(stone_type const& stone, int y, int x) const
 
     return true;
 }
+*/
 
+/* これバグってないすか
 int field_type::processes_min_stone_nth()
 {
     int8_t min_nth=INT8_MAX;
@@ -321,13 +337,15 @@ int field_type::processes_min_stone_nth()
     }
     return min_nth;
 }
+*/
 
 //石を取り除けるか
+/* unavailable
 bool field_type::is_removable(const stone_type &stone)
 {
     std::vector<pair_type> pair_list;
     std::vector<pair_type> remove_list;
-    if(processes[processes.size()-1].stone.get_nth()==stone.get_nth()) return true;
+    if(processes[processes.size()-1].nth==stone.get_nth()) return true;
     if(is_placed(stone) == false) return false;
     if(processes.size() == 1)return true;
     if(processes_min_stone_nth()==stone.get_nth()) return true;
@@ -374,8 +392,10 @@ bool field_type::is_removable(const stone_type &stone)
     }
     return true;
 }
+*/
 
 //一番番号の大きくて、一番最後に置いたを取り除く
+/* unavailable
 field_type& field_type::remove_large_most_number_and_just_before_stone()
 {
 #ifdef _DEBUGMODE
@@ -408,8 +428,10 @@ field_type& field_type::remove_large_most_number_and_just_before_stone()
     }
     return *this;
 }
+*/
 
 //一番番号の大きい石を取り除く
+/* unavailable
 field_type& field_type::remove_large_most_number_stone()
 {
 #ifdef _DEBUGMODE
@@ -449,13 +471,17 @@ field_type& field_type::remove_large_most_number_stone()
     }
     return *this;
 }
+*/
 
+/* unavailable
 bool field_type::is_removable_force(const stone_type &stone)
 {
     return is_placed(stone);
 }
+*/
 
 //石を取り除く
+/* unavailable
 field_type& field_type::remove_stone(stone_type const& stone)
 {
 #ifdef _DEBUGMODE
@@ -468,14 +494,14 @@ field_type& field_type::remove_stone(stone_type const& stone)
     //Search stone
     int stone_processes_at=0;
     for(size_t i=0;i<processes.size();i++){
-        if(processes[i].stone.get_nth() == stone_nth){
+        if(processes[i].nth == stone_nth){
             stone_processes_at = i;
             break;
         }
     }
     //remove from bit field
     //フィールドから石を取り除く
-    for(int i=0;i<8;i++){
+    for(int i=0;i<8;i++) {
         bit_plain_field[16+(processes[stone_processes_at].position.y)+i] = ((bit_plain_field[16+(processes[stone_processes_at].position.y)+i]) & (~((processes[stone_processes_at].stone).get_bit_plain_stones((processes[stone_processes_at].position.x)+7,(int)processes[stone_processes_at].stone.get_side(),(int)((processes[stone_processes_at].stone.get_angle())/90),i))));
     }
     //remove stone from processes
@@ -521,8 +547,10 @@ field_type& field_type::remove_stone(stone_type const& stone)
 
     return *this;
 }
+*/
 
 //自分より若い石に接していない石を探してすべて返す
+/* unavailable
 std::vector<stone_type> field_type::search_not_in_contact_stones()
 {
     std::vector<stone_type> result;
@@ -551,8 +579,10 @@ std::vector<stone_type> field_type::search_not_in_contact_stones()
     }
     return result;
 }
+*/
 
 //すべての石が自分より若い石に接しているか確認する
+/* unavailable
 bool field_type::is_stones_contact()
 {
     int is_contact_flag;
@@ -579,8 +609,10 @@ bool field_type::is_stones_contact()
     }
     return true;
 }
+*/
 
 //自分より若い石に接することができない(制約違反)石を探してすべて返す
+/* unavailable
 std::vector<stone_type> field_type::search_cannot_be_in_contact_stones()
 {
     std::vector<stone_type> result;
@@ -603,8 +635,10 @@ std::vector<stone_type> field_type::search_cannot_be_in_contact_stones()
     }
     return result;
 }
+*/
 
 //すべての石が自分より若い石に接することができるか確認する
+/* unavailable
 bool field_type::is_stones_can_contact()
 {
     int stone_nth;
@@ -626,8 +660,10 @@ bool field_type::is_stones_can_contact()
     }
     return true;
 }
+*/
 
 //置かれた石の一覧を表す配列を返す
+/* unavailable
 std::vector<stone_type> field_type::list_of_stones() const
 {
     std::vector<stone_type> result;
@@ -635,7 +671,9 @@ std::vector<stone_type> field_type::list_of_stones() const
             [](auto const & process) { return process.stone; });
     return result;
 }
+*/
 
+/* unavailable
 placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const & x)
 {
     auto nth = raw_data.at(y).at(x);
@@ -657,7 +695,9 @@ placed_stone_type field_type::get_stone(std::size_t const & y, std::size_t const
     }
     return placed_stone_type(*stone, pf, ps);
 }
+*/
 
+/* unavailable
 void field_type::init_edge(){
     for(int i=0;i<256;i++)is_placed_stone[i]=false;
 
@@ -699,24 +739,26 @@ void field_type::init_edge(){
         return FIELD_SIZE;
     }();
 }
+*/
 
 field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
 {
     has_limit = true;
     provided_stones = stone_nth;
+    raw_field_type raw_data;
     auto rows = _split(raw_field_text, "\r\n");
     for (std::size_t i = 0; i < raw_data.size(); ++i) {
         std::transform(rows[i].begin(), rows[i].end(), raw_data[i].begin(),
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
-    make_bit();
-    init_edge();
+    make_bit(raw_data);
+    //init_edge();
 }
+
 field_type::field_type(const int obstacles, const int cols, const int rows){
     has_limit = true;
     set_random(obstacles,cols,rows);
-    make_bit();
-    init_edge();
+    //init_edge();
 }
 
 field_type::raw_field_type const & field_type::get_raw_data() const
@@ -739,7 +781,7 @@ void field_type::print_field()
 std::string field_type::get_answer()
 {
     std::string result;
-    int prev_nth = 0;
+    unsigned int prev_nth = 0;
     int process_count = 0;
     //石の番号順にソート
     std::sort(processes.begin(), processes.end(),
@@ -750,7 +792,7 @@ std::string field_type::get_answer()
         auto current_nth = process.nth;
 
         // スキップ分の改行を挿入する
-        for (int i = prev_nth + 1; i < current_nth; ++i)
+        for (unsigned int i = prev_nth + 1; i < current_nth; ++i)
             result.append("\r\n");
 
         if (process_count != 0)
@@ -760,9 +802,9 @@ std::string field_type::get_answer()
                 + " "
                 + std::to_string(process.position.y)
                 + " "
-                + (process.stone.get_side() == stone_type::Sides::Head ? "H" : "T")
+                + "HT"[process.flip]
                 + " "
-                + std::to_string(process.stone.get_angle());
+                + std::to_string(process.rotate * 90);
         result.append(line);
         prev_nth = current_nth;
         process_count++;
@@ -779,6 +821,7 @@ std::string field_type::get_answer()
 
 void field_type::set_random(int const obstacle, int const col, int const row)
 {
+    raw_field_type raw_data;
     // fill outer zone
     for(int i = 0; i < FIELD_SIZE; i++)
         for(int j = 0; j < FIELD_SIZE; j++)
@@ -801,6 +844,7 @@ void field_type::set_random(int const obstacle, int const col, int const row)
                 return;
         }
     }
+    make_bit(raw_data);
 }
 
 //        sum += std::count(each_row.begin(), each_row.end(),0);
@@ -821,9 +865,10 @@ void field_type::set_provided_stones(size_t ps)
 {
     provided_stones = ps;
 }
+
 //#BitSystem
 //bitデータの作成
-void field_type::make_bit()
+void field_type::make_bit(raw_field_type const& raw_data)
 {
     //make bit plain field
     for(int i=0;i<64;i++){
@@ -852,6 +897,7 @@ void field_type::make_bit()
     }
 #endif
 }
+
 double field_type::evaluate_normalized_complexity() const
 {
     uint64_t side = 0;
@@ -864,4 +910,7 @@ double field_type::evaluate_normalized_complexity() const
     return static_cast<double>(side * side) / static_cast<double>(get_block_num());
 }
 
-bool field_type::get_has_limit() const{return has_limit;}
+bool field_type::get_has_limit() const
+{
+    return has_limit;
+}

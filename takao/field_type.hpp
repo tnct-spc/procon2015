@@ -42,7 +42,7 @@ public:
     //石を置く
     field_type& put_stone_basic(stone_type const& stone, int y, int x);
     //石を取り除く
-    field_type& remove_stone_basic();
+    field_type& remove_stone_basic(stone_type const& stone);
 
     /*制限解除後に使う関数*/
 
@@ -51,39 +51,39 @@ public:
     /**************/
 
     //石を置けるか
-    bool is_puttable(stone_type const& stone, int y, int x) const;
+    //bool is_puttable(stone_type const& stone, int y, int x) const;
     //接していなくても石を置けるか
-    bool is_puttable_force(stone_type const& stone, int y, int x);
+    //bool is_puttable_force(stone_type const& stone, int y, int x);
     //石を置く
-    field_type& put_stone(stone_type const& stone, int y, int x);
+    //field_type& put_stone(stone_type const& stone, int y, int x);
 
     /******************/
     /***石を取り除く***/
     /******************/
 
     //一番番号の大きくて、一番最後に置いたを取り除く
-    field_type& remove_large_most_number_and_just_before_stone();
+    //field_type& remove_large_most_number_and_just_before_stone();
     //一番番号の大きい石を取り除く
-    field_type& remove_large_most_number_stone();
+    //field_type& remove_large_most_number_stone();
     //石を取り除けるか
-    bool is_removable(stone_type const& stone);
+    //bool is_removable(stone_type const& stone);
     //接しているかどうか関係なく、石を取り除けるか
-    bool is_removable_force(stone_type const& stone);
+    //bool is_removable_force(stone_type const& stone);
     //石を取り除く
-    field_type& remove_stone(stone_type const& stone);
+    //field_type& remove_stone(stone_type const& stone);
 
     /**************/
     /***石を探す***/
     /**************/
 
     //自分より若い石に接していない石を探してすべて返す
-    std::vector<stone_type> search_not_in_contact_stones();
+    //std::vector<stone_type> search_not_in_contact_stones();
     //すべての石が自分より若い石に接しているか確認する
-    bool is_stones_contact();
+    //bool is_stones_contact();
     //自分より若い石に接することができない(制約違反)石を探してすべて返す
-    std::vector<stone_type> search_cannot_be_in_contact_stones();
+    //std::vector<stone_type> search_cannot_be_in_contact_stones();
     //すべての石が自分より若い石に接することができるか確認する
-    bool is_stones_can_contact();
+    //bool is_stones_can_contact();
 
 
     /*その他*/
@@ -150,7 +150,7 @@ private:
         uint64_t bit_sides_field_just_before[256][64];
         uint64_t **bit_sides_field_at_stone_nth;//石の番号ごとのサイドフィールド
         //bool is_overlap_obstacle[39][39][2][4];//y(-7~31)-x(-7~31)-flip-angleに置いて障害物とぶつかるか<-却下
-        void make_bit();//bitデータの作成
+        void make_bit(raw_field_type const& raw_data);//bitデータの作成
     void init_edge();
 };
 inline size_t field_type::empty_zk() const{
