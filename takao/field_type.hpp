@@ -13,6 +13,7 @@ int constexpr FIELD_SIZE = 32;
 
 // 敷地
 //field_type&が返り値の関数は*thisの参照が返り値です
+// 制限解除関連は一時的に削除
 class field_type
 {
 public:
@@ -24,7 +25,6 @@ public:
 
     ~field_type() = default;
 
-
     int upper_edge = 0; //上方から数えた障害物しかない行の数
     int right_edge = 0; //右方から数えた障害物しかない列の数
     int buttom_edge = 0;//下方から数えた障害物しかない行の数
@@ -32,59 +32,12 @@ public:
 
     /*石の設置・撤去関数*/
 
-    //制限解除(明示的に呼び出してください)
-    void cancellation_of_restriction();
-
-    /*制限解除前に使う関数*/
-
     //石を置けるか
     bool is_puttable_basic(stone_type const& stone, int y, int x) const;
     //石を置く
     field_type& put_stone_basic(stone_type const& stone, int y, int x);
     //石を取り除く
     field_type& remove_stone_basic(stone_type const& stone);
-
-    /*制限解除後に使う関数*/
-
-    /**************/
-    /***石を置く***/
-    /**************/
-
-    //石を置けるか
-    //bool is_puttable(stone_type const& stone, int y, int x) const;
-    //接していなくても石を置けるか
-    //bool is_puttable_force(stone_type const& stone, int y, int x);
-    //石を置く
-    //field_type& put_stone(stone_type const& stone, int y, int x);
-
-    /******************/
-    /***石を取り除く***/
-    /******************/
-
-    //一番番号の大きくて、一番最後に置いたを取り除く
-    //field_type& remove_large_most_number_and_just_before_stone();
-    //一番番号の大きい石を取り除く
-    //field_type& remove_large_most_number_stone();
-    //石を取り除けるか
-    //bool is_removable(stone_type const& stone);
-    //接しているかどうか関係なく、石を取り除けるか
-    //bool is_removable_force(stone_type const& stone);
-    //石を取り除く
-    //field_type& remove_stone(stone_type const& stone);
-
-    /**************/
-    /***石を探す***/
-    /**************/
-
-    //自分より若い石に接していない石を探してすべて返す
-    //std::vector<stone_type> search_not_in_contact_stones();
-    //すべての石が自分より若い石に接しているか確認する
-    //bool is_stones_contact();
-    //自分より若い石に接することができない(制約違反)石を探してすべて返す
-    //std::vector<stone_type> search_cannot_be_in_contact_stones();
-    //すべての石が自分より若い石に接することができるか確認する
-    //bool is_stones_can_contact();
-
 
     /*その他*/
 
