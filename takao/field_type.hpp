@@ -137,7 +137,7 @@ public:
     void print_field();
 
     bool get_has_limit() const;
-
+    std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> const& route_map();
     std::vector<process_type> const& get_processes()
     {
         return processes;
@@ -190,5 +190,8 @@ inline size_t field_type::get_block_num() const
 }
 inline size_t field_type::get_stone_num() const{
     return processes.size();
+}
+inline std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> const& field_type::route_map() {
+    return weighted_route_map;
 }
 #endif // FIELD_TYPE
