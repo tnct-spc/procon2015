@@ -76,17 +76,17 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
     }
 
     //ロウデータに置く
-    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
-    {
-        if(stone.at(i,j) == 0)//石がないならどうでもいい
-        {
-            continue;
-        }
-        else
-        {
-            raw_data.at(i+y).at(j+x) = stone_nth;
-        }
-    }
+//    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
+//    {
+//        if(stone.at(i,j) == 0)//石がないならどうでもいい
+//        {
+//            continue;
+//        }
+//        else
+//        {
+//            raw_data.at(i+y).at(j+x) = stone_nth;
+//        }
+//    }
     processes.emplace_back(stone_nth,
                            static_cast<int>(stone.get_side()),
                            stone.get_angle() / 90,
@@ -118,22 +118,22 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
         bit_sides_field[i] = bit_sides_field_just_before[processes_end][i];
     }
     //remove from raw data
-    int stone_position_x = processes[processes_end].position.x;
-    int stone_position_y = processes[processes_end].position.y;
-    int stone_position_back_x = processes[processes_end].position.x + 7;
-    int stone_position_back_y = processes[processes_end].position.y + 7;
-    if(stone_position_x < 0) stone_position_x = 0;
-    if(stone_position_y < 0) stone_position_y = 0;
-    if(stone_position_back_x > 31) stone_position_back_x = 31;
-    if(stone_position_back_y > 31) stone_position_back_y = 31;
-
-    for(int i = stone_position_y; i <= stone_position_back_y; ++i){
-        for(int j = stone_position_x; j <= stone_position_back_x; ++j){
-            if(raw_data.at(i).at(j) == last_stone_nth){
-                raw_data.at(i).at(j) = 0;
-            }
-        }
-    }
+//    int stone_position_x = processes[processes_end].position.x;
+//    int stone_position_y = processes[processes_end].position.y;
+//    int stone_position_back_x = processes[processes_end].position.x + 7;
+//    int stone_position_back_y = processes[processes_end].position.y + 7;
+//    if(stone_position_x < 0) stone_position_x = 0;
+//    if(stone_position_y < 0) stone_position_y = 0;
+//    if(stone_position_back_x > 31) stone_position_back_x = 31;
+//    if(stone_position_back_y > 31) stone_position_back_y = 31;
+//
+//    for(int i = stone_position_y; i <= stone_position_back_y; ++i){
+//        for(int j = stone_position_x; j <= stone_position_back_x; ++j){
+//            if(raw_data.at(i).at(j) == last_stone_nth){
+//                raw_data.at(i).at(j) = 0;
+//            }
+//        }
+//    }
 
     //remove stone from processes
     processes.erase(processes.end());
@@ -159,7 +159,7 @@ size_t field_type::get_score() const
 
 field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth)
 {
-    has_limit = true;
+    //has_limit = true;
     provided_stones = stone_nth;
     raw_field_type raw_data;
     auto rows = _split(raw_field_text, "\r\n");
@@ -172,26 +172,22 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
 }
 
 field_type::field_type(const int obstacles, const int cols, const int rows){
-    has_limit = true;
+    //has_limit = true;
     set_random(obstacles,cols,rows);
     //init_edge();
 }
 
-field_type::raw_field_type const & field_type::get_raw_data() const
-{
-    return raw_data;
-}
-
 void field_type::print_field()
 {
-    for(auto const&each_raw : raw_data)
-    {
-        for(auto const each_block : each_raw)
-        {
-            std::cout << std::setw(3) << each_block;
-        }
-        std::cout << std::endl;
-    }
+    std::cerr << "gyaaaaaa" << std::endl;
+//    for(auto const&each_raw : raw_data)
+//    {
+//        for(auto const each_block : each_raw)
+//        {
+//            std::cout << std::setw(3) << each_block;
+//        }
+//        std::cout << std::endl;
+//    }
 }
 
 std::string field_type::get_answer()
@@ -263,17 +259,12 @@ void field_type::set_random(int const obstacle, int const col, int const row)
     make_bit(raw_data);
 }
 
-//        sum += std::count(each_row.begin(), each_row.end(),0);
 /* 1 new line at the end of the output */
 std::string field_type::str()
 {
     std::ostringstream ss;
-    for(auto row : raw_data) {
-        for(auto block : row) {
-            ss << (block != 0);
-        }
-        ss << "\r\n";
-    }
+    for(int i = 0; i < 32; i++)
+        ss << (std::bitset<32>)(bit_plain_field[i + 16] >> 16 & 0xffffffff) << "\r\n";
     return std::move(ss.str());
 }
 
@@ -324,9 +315,4 @@ double field_type::evaluate_normalized_complexity() const
         side += _mm_popcnt_u64((bit_plain_field[i-1])^   (bit_plain_field[i]));
     }
     return static_cast<double>(side * side) / static_cast<double>(get_block_num());
-}
-
-bool field_type::get_has_limit() const
-{
-    return has_limit;
 }

@@ -52,27 +52,6 @@ public:
     // おいた時
     // 引数: 置く前のフィールド、行おうとしている操作、そのさらに次の石
     // fieldを内部で変更するけど元に戻すからヘーキヘーキ
-    double inline move_goodness(field_type &field, process_type const& process,
-                                stone_type &next_stone) const
-    {
-        double evaluation_value = 0.0;
-        evaluation_value += w_contact_move * normalized_contact(field, process);
-        field.put_stone_basic(process.stone, process.position.y, process.position.x);
-        evaluation_value += w_nextbranches * nextbranches(field, next_stone);
-        evaluation_value += w_complexity * field.evaluate_normalized_complexity();
-        field.remove_stone_basic(process.stone);
-        return evaluation_value;
-    }
-    // 上に同じ、最後の石専用 (next_stoneをとらない)
-    double inline move_goodness(field_type &field, const process_type &process) const
-    {
-        double evaluation_value = 0.0;
-        evaluation_value += w_contact_move * normalized_contact(field, process);
-        field.put_stone_basic(process.stone, process.position.y, process.position.x);
-        evaluation_value += w_complexity * field.evaluate_normalized_complexity();
-        field.remove_stone_basic(process.stone);
-        return evaluation_value;
-    }
     // bit version
     // 最後の石も渡してOK
     double inline move_goodness(field_type &field,
@@ -93,14 +72,6 @@ public:
     // パスするとき
     // 引数: 操作前のフィールド、行おうとしている操作、残りの石のzk数(暫定)
     // (残りの石のzk数: 行おうとしている操作の後の残りの石のzkの合計)
-    bool inline should_pass(field_type const& field,
-                            process_type const& process,
-                            std::size_t rem_stone_zk) const
-    {
-        if(rem_stone_zk < field.empty_zk())
-            return false;
-        return normalized_contact(field, process) < t_contact_pass;
-    }
     // bit version
     bool inline should_pass(field_type const& field,
                             std::vector<stone_type> const& stones,
@@ -113,11 +84,6 @@ public:
     }
 
     // 先読みの深さ
-    int inline search_depth(field_type const& field, process_type const& process)
-    {
-        double x = (1.0 - normalized_contact(field, process));
-        return max_search_depth * x * x;
-    }
     // bit version
     int inline search_depth(field_type const& field,
                             std::vector<stone_type> const& stones,
@@ -137,7 +103,6 @@ private:
     // 上限
     int const max_search_depth = 15; // 先読みの深さ上限
     // 評価関数
-    double normalized_contact(field_type const& field, process_type const& process) const; // 接辺の数(正規化)
     double normalized_contact(field_type const& field, std::vector<stone_type> const& stones, bit_process_type process) const; // bit version
     int nextbranches(field_type const& field, stone_type &stone) const; // 次の石がおける数、stoneを内部で変更するけど元に戻すからヘーキヘーキ
 };
