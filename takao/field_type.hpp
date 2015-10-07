@@ -113,6 +113,9 @@ public:
     size_t empty_zk() const;//get_score()を同じ.なんのためにあるのかわからない
     size_t get_block_num() const;//何かが配置されている(空白以外)マスの数を返す
     size_t get_stone_num() const;
+    uint64_t *get_bit_plain_field_only_stones(){
+        return bit_plain_field_only_stones;
+    }
     double evaluate_normalized_complexity() const;
 
     //現在の状態における得点を返す
