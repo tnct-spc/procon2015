@@ -98,8 +98,8 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
     //remove from bit field
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
-        bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)stone.get_side(),(int)((stone.get_angle())/90),i))));
-        //bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] = ((bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
+        bit_plain_field[16+(processes[processes_end].position.y)+i] &= ~stone.get_bit_plain_stones((processes[processes_end].position.x)+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
+        bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] &= ~stone.get_bit_plain_stones((processes[processes_end].position.x)+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
@@ -111,26 +111,6 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
         bit_sides_field[i] |= bit_plain_field_only_stones[i]<<1;//left
         bit_sides_field[i] |= bit_plain_field_only_stones[i]>>1;//right
     }
-    //remove from raw data
-//    int stone_position_x = processes[processes_end].position.x;
-//    int stone_position_y = processes[processes_end].position.y;
-//    int stone_position_back_x = processes[processes_end].position.x + 7;
-//    int stone_position_back_y = processes[processes_end].position.y + 7;
-//    if(stone_position_x < 0) stone_position_x = 0;
-//    if(stone_position_y < 0) stone_position_y = 0;
-//    if(stone_position_back_x > 31) stone_position_back_x = 31;
-//    if(stone_position_back_y > 31) stone_position_back_y = 31;
-//
-//    for(int i = stone_position_y; i <= stone_position_back_y; ++i){
-//        for(int j = stone_position_x; j <= stone_position_back_x; ++j){
-//            if(raw_data.at(i).at(j) == last_stone_nth){
-//                raw_data.at(i).at(j) = 0;
-//            }
-//        }
-//    }
-
-    //remove stone from processes
-    //processes.erase(processes.end());
     processes.pop_back();
     return *this;
 }
@@ -163,6 +143,7 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
     make_bit(raw_data);
+    qDebug() << this->str().c_str();
     //init_edge();
 }
 

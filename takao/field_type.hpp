@@ -88,7 +88,7 @@ private:
     size_t provided_stones;
 
     void init_route_map();
-    bool is_placed_stone[256];
+    bool is_placed_stone[256] = {0};
     //石が置かれているか否かを返す
     bool is_placed(stone_type const& stone) const;
 

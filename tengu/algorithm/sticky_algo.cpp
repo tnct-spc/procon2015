@@ -45,13 +45,18 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
                     auto worst_stone_param = std::min_element(stone_placement_vector.begin(),stone_placement_vector.end(),[](auto const &t1, auto const &t2){return t1.score < t2.score;});
                     if(should_pass){
                         if(_eval_field.score > worst_stone_param->score){
-                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
+                            //(*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
+                            (*worst_stone_param) = stone_params_type(dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field);
                         }
                     }else{
                         if(score > worst_stone_param->score){
-                            (*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field};
+                            //(*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field};
+                            (*worst_stone_param) = stone_params_type(dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field);
                         }
                     }
+                }
+                if(_eval_field.field.is_puttable_basic(stone,dy,dx) == 0){
+                    qDebug() << "壊れてる";
                 }
             }
         }
@@ -61,6 +66,9 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
             result_stone.emplace_back(*(stone_params.field),stone_params.score);
         }else{
             field_type field = *(stone_params.field);
+            if(field.is_puttable_basic(stone.set_angle(stone_params.process.rotate * 90).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x) == 0){
+                qDebug() << "おかしい";
+            }
             result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.rotate * 90).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
         }
     }
