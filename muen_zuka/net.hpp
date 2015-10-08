@@ -41,7 +41,7 @@ private slots:
 private:
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     //std::shared_ptr<QNetworkAccessManager> manager;
-
+    QString random_naming();
     QUrl _server_url,_master_url;
     QString _player_id;
     int _problem_num;

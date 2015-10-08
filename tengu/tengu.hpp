@@ -10,5 +10,6 @@
 #include "algorithm/read_ahead.hpp"
 #include "algorithm/new_beam.hpp"
 #include "algorithm/stikcy_beam.hpp"
+#include "algorithm/yrange_based_yayoi.h"
 
 #endif // TENGU_HPP
