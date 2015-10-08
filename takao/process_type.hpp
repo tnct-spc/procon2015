@@ -16,6 +16,7 @@ struct bit_process_type
         nth(nth_), flip(flip_), angle(angle_), position(position_)
     {
     }
+    bit_process_type(){}
 
     int inline get_rotate() const // f**k
     {

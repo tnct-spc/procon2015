@@ -27,13 +27,16 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle <= 270;angle += 90,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             if(_eval_field.field.is_puttable_basic(stone,dy,dx)){
                 double score;
-                bool should_pass;
-                    should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),static_cast<stone_type::Sides>(flip),angle,{dy,dx}),get_rem_stone_zk(stone));
+                bool should_pass = false;
+                    //should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
                     score = _evaluator.move_goodness(_eval_field.field,origin_problem.stones,
                                                      bit_process_type(stone.get_nth(),
-                                                     static_cast<stone_type::Sides>(flip),
+                                                     flip,
                                                      angle,
                                                      {dy,dx}));
+                    if(_eval_field.field.is_puttable_basic(stone,dy,dx) == 0){
+                        qDebug() << "マジで壊れてる";
+                    }
                 //ビームサーチの幅制限
                 if(stone_placement_vector.size() < (std::size_t)search_width){
                     if(should_pass){
@@ -66,10 +69,10 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
             result_stone.emplace_back(*(stone_params.field),stone_params.score);
         }else{
             field_type field = *(stone_params.field);
-            if(field.is_puttable_basic(stone.set_angle(stone_params.process.rotate * 90).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x) == 0){
+            if(field.is_puttable_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x) == 0){
                 qDebug() << "おかしい";
             }
-            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.rotate * 90).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
+            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
         }
     }
     if(result_stone.size() == 0)return std::move(pattern);
