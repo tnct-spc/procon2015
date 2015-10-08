@@ -137,7 +137,7 @@ void Slave::text_box_clear(){
     ui->textBrowser->setPlainText("");
 }
 void Slave::answer_save_to_file(){
-    auto filename = QFileDialog::getOpenFileName(this);
+    auto filename = QFileDialog::getSaveFileName(this);
     if(filename.isEmpty())return;
     QFile file(filename);
     if(!file.open(QIODevice::WriteOnly))return;
