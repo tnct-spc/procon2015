@@ -7,7 +7,7 @@
 // bit version
 double evaluator::normalized_contact(const field_type &field, std::vector<stone_type> &stones, bit_process_type process) const
 {
-    std::cerr << "nth: " << process.nth << std::endl;
+    //std::cerr << "nth: " << process.nth << std::endl;
     stone_type &stone = stones[process.nth - 1];
 
     bit_process_type bak_process = stone.current_process(process.position);

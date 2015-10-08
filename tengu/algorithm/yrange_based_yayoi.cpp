@@ -101,7 +101,7 @@ void yrange_based_yayoi::one_try(problem_type& problem, std::size_t stone_num)
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));
         if(next.score == -1) continue;//どこにも置けなかった
-        if(pass(next) == true) continue;
+        //if(pass(next) == true) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
@@ -117,7 +117,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
         if(_field.is_puttable_basic(stone,i,j) == true)
         {
-            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),angle,side,point_type{i,j}));
+            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),side,angle,point_type{i,j}));
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
             //3個以下の石で、露出度が8割を切っriていたらskip(when skip_minimum_stone = true)
@@ -164,7 +164,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search_when_second(field_typ
         {
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
-            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),angle,side,point_type{i,j}));
+            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),side,angle,point_type{i,j}));
             double const field_complexity = _field.evaluate_normalized_complexity();
             if(best.score < score || (best.score == score && best.complexity> field_complexity))
             {
@@ -212,13 +212,12 @@ void yrange_based_yayoi::improve()
 
             stone_nth++;
         }
-        problem.stones[stone_nth].set_angle(best_processes[count].angle).set_side(static_cast<stone_type::Sides>(best_processes[count].flip));
-        problem.field.put_stone_basic(problem.stones[best_processes[count].nth-1],best_processes[count].position.y,best_processes[count].position.x);
+        problem.stones[stone_nth-1].set_angle(best_processes[count].angle).set_side(static_cast<stone_type::Sides>(best_processes[count].flip));
+        problem.field.put_stone_basic(problem.stones[stone_nth-1],best_processes[count].position.y,best_processes[count].position.x);
         stone_nth++;
     }
     for(size_t stone_nth=best_processes[best_processes.size()-1].nth+1; stone_nth <= problem.stones.size(); ++stone_nth){
         put_stone(stone_nth-1);
-        stone_nth++;
     }
     //Send
     answer_send(problem.field);
