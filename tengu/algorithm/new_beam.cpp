@@ -187,7 +187,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             {
                 result_vec.emplace_back(each_node);
             }
-            _field.remove_stone_basic();
+            _field.remove_stone_basic(stone);
         }
     }
     //std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;

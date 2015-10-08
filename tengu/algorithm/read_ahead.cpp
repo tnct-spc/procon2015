@@ -67,7 +67,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const a
         {
             auto max = std::min_element(search_vec .begin(),search_vec .end(),[](const search_type& lhs, const search_type& rhs)
             {
-                return lhs.score == rhs.score ? lhs.island < rhs.island : lhs.score > rhs.score;
+                return lhs.score == rhs.score ? lhs.complexity < rhs.complexity : lhs.score > rhs.score;
             });
             if(pass(*max,problem.stones.at(stone_num)) == true)
             {
@@ -143,7 +143,7 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
                 //保持している中での最悪手
                 auto min = std::min_element(search_vec.begin(),search_vec.end(),[](auto const&lhs, auto const& rhs)
                     {
-                        return lhs.score == rhs.score ? lhs.island > rhs.island : lhs.score < rhs.score;
+                        return lhs.score == rhs.score ? lhs.complexity > rhs.complexity : lhs.score < rhs.score;
                     });
                 if(s.stones_info_vec.size() == 0 && (min->score <= score)) //1層目　保持している中の最悪手より良い
                 {
