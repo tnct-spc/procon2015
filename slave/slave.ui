@@ -340,6 +340,9 @@
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -366,6 +369,9 @@
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -654,7 +660,7 @@
   <slot>ui_button_playerid_pushed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

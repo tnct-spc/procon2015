@@ -27,7 +27,7 @@ public:
         std::vector<stones_info_type> stones_info_vec;
         int score = -1;
         double complexity = -1;
-        search_type(std::vector<stones_info_type> stones_info_vec,double score,int island):stones_info_vec(stones_info_vec),score(score),island(island){}
+        search_type(std::vector<stones_info_type> stones_info_vec,double score,double complexity):stones_info_vec(stones_info_vec),score(score),complexity(complexity){}
         search_type(){}
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
