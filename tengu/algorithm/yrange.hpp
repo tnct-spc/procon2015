@@ -27,13 +27,15 @@ private:
     problem_type origin_problem;
     evaluator eval;
     void solve();
-    void one_try(problem_type& problem, std::size_t stone_num);
+    void one_try(field_type &field, std::size_t stone_num);
     search_type search(field_type& _field, stone_type& stone);
     bool pass(search_type const& search);
 
     //Time
     QElapsedTimer limit_timer;
     const int time_limit;
+    int emit_count=0;
+    int best_score = FIELD_SIZE * FIELD_SIZE;
 };
 
 
