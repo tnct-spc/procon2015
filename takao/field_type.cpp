@@ -91,6 +91,7 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
                            static_cast<int>(stone.get_side()),
                            stone.get_angle() / 90,
                            point_type{y, x});
+    qDebug() << processes.size();
     return *this;
 }
 
@@ -136,7 +137,8 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
 //    }
 
     //remove stone from processes
-    processes.erase(processes.end());
+    //processes.erase(processes.end());
+    processes.pop_back();
     return *this;
 }
 
