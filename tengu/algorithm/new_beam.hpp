@@ -27,29 +27,28 @@ private:
         stone_type::Sides side;
         std::size_t search_depth;
         double score;
-    std::size_t search_depth;
 
     node(std::shared_ptr<node> _parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
-            parent(_parent),
-            stone_num(_stone_num),
-            point(_point),
-            angle(_angle),
-            side(_side),
-        score(_score),
-        search_depth(_search_depth)
+        parent(_parent),
+        stone_num(_stone_num),
+        point(_point),
+        angle(_angle),
+        side(_side),
+        search_depth(_search_depth),
+        score(_score)
         {}
 
     node(node *_parent, std::size_t _stone_num, point_type _point, std::size_t _angle, stone_type::Sides _side, double _score, std::size_t _search_depth):
-            parent(_parent),
-            stone_num(_stone_num),
-            point(_point),
-            angle(_angle),
-            side(_side),
-        score(_score),
-        search_depth(_search_depth)
+        parent(_parent),
+        stone_num(_stone_num),
+        point(_point),
+        angle(_angle),
+        side(_side),
+        search_depth(_search_depth),
+        score(_score)
         {}
 
-        ~node()
+    ~node()
         {}
     };
 
