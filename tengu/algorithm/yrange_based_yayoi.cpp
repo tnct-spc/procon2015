@@ -172,7 +172,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
             //置けたら接してる辺を数えて良ければ置き換え
             int const score = evaluate(_field,stone,i,j);
             //3個以下の石で、露出度が8割を切っていたらskip(when skip_minimum_stone = true)
-            if(stone.get_area()<=3 && degree_of_exposure(score,stone)<0.8){
+            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score,stone)<0.45){
                 //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
             }else{
                 int const island = get_island(_field.get_raw_data());
@@ -349,6 +349,10 @@ void yrange_based_yayoi::improve()
             stone_nth++;
         }
         problem.field.put_stone_basic(best_processes[count].stone,best_processes[count].position.y,best_processes[count].position.x);
+        stone_nth++;
+    }
+    for(size_t stone_nth=best_processes[best_processes.size()-1].stone.get_nth()+1; stone_nth <= problem.stones.size(); ++stone_nth){
+        put_stone(stone_nth-1);
         stone_nth++;
     }
     //Send
