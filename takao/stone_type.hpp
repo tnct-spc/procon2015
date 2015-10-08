@@ -5,6 +5,7 @@
 #include "point_type.hpp"
 #include "utils.hpp"
 #include "point_type.hpp"
+#include "process_type.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include <array>
@@ -57,6 +58,8 @@ public:
         bit_stones_type const& get_raw_bit_plain_stones() const;
     void print_stone() const;
     void init_stone();
+    bit_process_type current_process(point_type position) const;
+    void apply_process(bit_process_type process);
 private:
     int nth;
     std::size_t side_length = 0;

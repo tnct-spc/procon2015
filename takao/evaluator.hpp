@@ -36,7 +36,8 @@ public:
      * 0.0 <= w_{complexity,contact_move}_rel <= 1.0 かつ
      * 0.0 <= w_complexity_rel + w_contact_move_rel <= 1.0
      */
-    evaluator(double w_complexity_rel_, double w_contact_move_rel_,
+    evaluator(double w_complexity_rel_,
+              double w_contact_move_rel_,
               double t_contact_pass_) :
         w_complexity(-w_complexity_rel_),
         w_contact_move(w_contact_move_rel_),
@@ -74,7 +75,7 @@ public:
     // (残りの石のzk数: 行おうとしている操作の後の残りの石のzkの合計)
     // bit version
     bool inline should_pass(field_type const& field,
-                            std::vector<stone_type> const& stones,
+                            std::vector<stone_type> &stones,
                             bit_process_type const process,
                             std::size_t rem_stone_zk) const
     {
@@ -86,14 +87,14 @@ public:
     // 先読みの深さ
     // bit version
     int inline search_depth(field_type const& field,
-                            std::vector<stone_type> const& stones,
+                            std::vector<stone_type> &stones,
                             bit_process_type const process)
     {
         double x = (1.0 - normalized_contact(field, stones, process));
         return max_search_depth * x * x;
     }
     // 評価関数
-    double normalized_contact(field_type const& field, std::vector<stone_type> const& stones, bit_process_type process) const; // bit version
+    double normalized_contact(field_type const& field, std::vector<stone_type> &stones, bit_process_type process) const; // bit version
 
 
 private:
