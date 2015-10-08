@@ -28,6 +28,7 @@ private:
     void one_try(problem_type& problem, std::size_t stone_num);
     int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     search_type search(field_type& _field, stone_type& stone);
+    search_type search_when_second(field_type& _field, stone_type& stone);
     int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search, stone_type const& stone);
     double degree_of_exposure(int score, stone_type const& stone);

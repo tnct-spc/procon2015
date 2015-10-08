@@ -171,7 +171,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
             int const score = evaluate(_field,stone,i,j);
-            //3個以下の石で、露出度が8割を切っていたらskip
+            //3個以下の石で、露出度が8割を切っていたらskip(when skip_minimum_stone = true)
             if(stone.get_area()<=3 && degree_of_exposure(score,stone)<0.8){
                 //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
             }else{
@@ -180,6 +180,45 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
                 {
                     best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
                 }
+            }
+            _field.remove_stone_basic();
+        }
+    }
+    return best;
+}
+
+//おける場所の中から評価値の高いものを選んで返す
+yrange_based_yayoi::search_type yrange_based_yayoi::search_when_second(field_type& _field, stone_type& stone)
+{
+    //best_fieldと＆をとって、重なってしまわないか検査する
+    auto is_puttable = [&](stone_type& stone, int dy, int dx){
+        //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+        stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+        int avx_collision = 0;
+        __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
+        __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+0]);
+        avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+        avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
+        avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+4]);
+        avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+        return !avx_collision;
+    };
+
+
+    search_type best = {{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
+    //おける可能性がある場所すべてにおいてみる
+    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+    {
+        stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        if(_field.is_puttable_basic(stone,i,j) && is_puttable(stone,i,j))
+        {
+            _field.put_stone_basic(stone,i,j);
+            //置けたら接してる辺を数えて良ければ置き換え
+            int const score = evaluate(_field,stone,i,j);
+            int const island = get_island(_field.get_raw_data());
+            if(best.score < score || (best.score == score && best.island > island))
+            {
+                best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
             }
             _field.remove_stone_basic();
         }
@@ -287,50 +326,26 @@ double yrange_based_yayoi::degree_of_exposure(int score, stone_type const& stone
 
 void yrange_based_yayoi::improve()
 {
-    //仕上げ Start Solve Second
     problem_type problem = origin_problem;
+
+    auto put_stone = [&](int stone_itr){
+        //すでにプロセスにある場所を除く置ける場所を探して、置く
+
+        search_type best_position = std::move(search_when_second(problem.field,problem.stones[stone_itr]));
+
+        if(best_position.score != -1){//置ける場所があったか
+            //if(pass(next,each_stone) == true) continue;
+            problem.stones[stone_itr].set_angle(best_position.angle).set_side(best_position.side);
+            problem.field.put_stone_basic(problem.stones[stone_itr],best_position.point.y,best_position.point.x);
+        }
+    };
+
+    //仕上げ Start Solve Second
     for(size_t count=0, stone_nth=1; count < best_processes.size(); ++count){
         while(static_cast<size_t>(best_processes[count].stone.get_nth()) != stone_nth){
-            //すでにプロセスにある場所を除く置ける場所を探して、置く
 
-            //best_fieldと＆をとって、重なってしまわないか検査する
-            auto is_puttable = [&](stone_type& stone, int dy, int dx){
-                //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
-                stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
-                int avx_collision = 0;
-                __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
-                __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+0]);
-                avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
-                avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
-                avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+4]);
-                avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
-                return !avx_collision;
-            };
+            put_stone(stone_nth-1);
 
-            //石を置ける場所を探して置く
-            auto put_stone = [&](stone_type& stone){
-                //設置可能範囲は左上座標(-7,-7)から左上座標(31,31)まで
-                for(int dy=-7;dy<32;dy++){
-                    for(int dx=-7;dx<32;dx++){
-                        //反転
-                        for(int flip = 0; flip < 2; flip ++){
-                            //回転
-                            for(int angle = 0; angle < 4; angle ++){
-                                //フィールドに置けるかチェック
-                                if(is_puttable(stone,dy,dx) && problem.field.is_puttable_basic(stone,dy,dx)){
-                                    //設置
-                                    problem.field.put_stone_basic(stone,dy,dx);
-                                    return;
-                                }
-                                stone.rotate(90);
-                            }
-                            stone.flip();
-                        }
-                    }
-                }
-            };
-
-            put_stone(problem.stones[stone_nth-1]);
             stone_nth++;
         }
         problem.field.put_stone_basic(best_processes[count].stone,best_processes[count].position.y,best_processes[count].position.x);
