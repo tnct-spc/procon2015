@@ -91,7 +91,6 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
                            static_cast<int>(stone.get_side()),
                            stone.get_angle() / 90,
                            point_type{y, x});
-    qDebug() << processes.size();
     return *this;
 }
 
