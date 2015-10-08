@@ -12,8 +12,7 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem, evaluator eval):eval(eval)
-yrange::yrange(problem_type _problem, int time_limit, evaluator eval):time_limit(time_limit),eval(eval)
+yrange::yrange(problem_type _problem, int _time_limit, evaluator _eval):time_limit(_time_limit),eval(_eval)
 {
     algorithm_name = "yrange";
     origin_problem = _problem;
@@ -121,8 +120,8 @@ void yrange::one_try(problem_type& problem, std::size_t stone_num)
     {
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));
-            if(next.point.y == -FIELD_SIZE) continue;//どこにも置けなかった
-        if(pass(next,each_stone) == true) continue;
+        if(next.point.y == -FIELD_SIZE) continue;//どこにも置けなかった
+        if(pass(next) == true) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
@@ -138,9 +137,11 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
-            int const score = eval.normalized_contact(_field,pre_problem.stones,bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
+            double const score = eval.normalized_contact(_field,
+                                                         origin_problem.stones,
+                                                         bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
             _field.put_stone_basic(stone,y,x);
-            double field_complexity = _field.evaluate_normalized_complexity();
+            double const field_complexity = _field.evaluate_normalized_complexity();
             if(best.score < score || (best.score == score && best.complexity > field_complexity))
             {
                 best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, field_complexity};
@@ -151,75 +152,8 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
     return best;
 }
 
-            num--;
-            recurision(i,j);
-        }
- /*
-    int label = -2;
-    int count1, count2,count3 = 0;
-
-    //次の空白を見つけ、そこを--labelにして帰る
-    auto next_find = [&label, &field]()
-    {
-        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
-        {
-            if(field[i][j] == 0)
-            {
-                field[i][j] = --label;
-                return;
-            }
-        }
-        return;
-    };
-
-    //ただのラベリング　再帰だと遅いらし
-    while(label < count3)
-    {
-        count3 = label;
-        next_find();
-        count1 = 0;
-        count2 = -1;
-        while(count1 > count2)
-        {
-            count2 = count1;
-            for(int i = 0; i < FIELD_SIZE - 1; ++i) for(int j = 0; j < FIELD_SIZE - 1; ++j)
-            {
-                if(field[i][j] == label)
-                {
-                    if(field[i][j+1] == 0)
-                    {
-                        field[i][j+1] = field[i][j];
-                        count1++;
-                    }
-                    if(field[i+1][j] == 0)
-                    {
-                        field[i+1][j] = field[i][j];
-                        count1++;
-                    }
-                }
-            }
-            for(int i = FIELD_SIZE - 1; i > 0; --i) for(int j = FIELD_SIZE - 1; j > 0; --j)
-            {
-                if(field[i][j] == label)
-                {
-                    if(field[i][j-1] == 0)
-                    {
-                        field[i][j-1] = field[i][j];
-                        count1++;
-                    }
-                    if(field[i-1][j] == 0)
-                    {
-                        field[i-1][j] = field[i][j];
-                        count1++;
-                    }
-                }
-            }
-        }
-     }
-     return -1 * label -2;
-*/
-bool yrange::pass(search_type const& search, stone_type const& stone)
+bool yrange::pass(search_type const& search)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
+    if(search.score  < 0.35) return true;
     else return false;
 }

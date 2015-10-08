@@ -10,7 +10,7 @@ class yrange : public algorithm_type
 {
     Q_OBJECT
 public:
-    yrange(problem_type _problem, int time_limit, evaluator eval);
+    yrange(problem_type _problem, int time_limit, evaluator _eval);
     ~yrange();
     void run();
 
@@ -20,7 +20,7 @@ private:
         point_type point;
         std::size_t angle;
         stone_type::Sides side;
-        int score;
+        double score;
         double complexity;
     };
 
@@ -29,7 +29,7 @@ private:
     void solve();
     void one_try(problem_type& problem, std::size_t stone_num);
     search_type search(field_type& _field, stone_type& stone);
-    bool pass(search_type const& search, stone_type const& stone);
+    bool pass(search_type const& search);
 
     //Time
     QElapsedTimer limit_timer;
