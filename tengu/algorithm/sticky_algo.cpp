@@ -18,7 +18,7 @@ sticky_algo::sticky_algo(problem_type _problem, evaluator _eval) : origin_proble
 sticky_algo::~sticky_algo(){
 
 }
-std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone, stone_type& next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width){
+std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,std::vector<field_with_score_type> pattern, int search_width){
     result_stone.clear();
     std::vector<stone_params_type> stone_placement_vector;
     for(field_with_score_type& _eval_field : pattern){
@@ -26,16 +26,12 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone,
             if(_eval_field.field.is_puttable_basic(stone,dy,dx)){
                 double score;
                 bool should_pass;
-                    if(non_next_stone){
-                        score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}));
-                        //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
-                        should_pass = false;
-                    }else{
-                        score = _evaluator.move_goodness(_eval_field.field,process_type(stone,{dy,dx}),next_stone);
-                        //score = light_eval(_eval_field.field,process_type(stone,{dy,dx}));
-                        should_pass = _evaluator.should_pass(_eval_field.field,process_type(stone,{dy,dx}),get_rem_stone_zk(stone));
-                        //should_pass = false;
-                    }
+                    should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),static_cast<stone_type::Sides>(flip),angle,{dy,dx}),get_rem_stone_zk(stone));
+                    score = _evaluator.move_goodness(_eval_field.field,origin_problem.stones,
+                                                     bit_process_type(stone.get_nth(),
+                                                     static_cast<stone_type::Sides>(flip),
+                                                     angle,
+                                                     {dy,dx}));
                 //ビームサーチの幅制限
                 if(stone_placement_vector.size() < search_width){
                     if(should_pass){
@@ -63,7 +59,7 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern( stone_type& stone,
             result_stone.emplace_back(*(stone_params.field),stone_params.score);
         }else{
             field_type field = *(stone_params.field);
-            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.angle).set_side(stone_params.side),stone_params.dy,stone_params.dx),stone_params.score});
+            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.rotate * 90).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
         }
     }
     if(result_stone.size() == 0)return std::move(pattern);
@@ -80,9 +76,9 @@ void sticky_algo::run(){
         //最後の石の時
         print_text(std::to_string(cnt--));
         if(stone_itr + 1 == problem.stones.end()){
-            pattern = eval_pattern(*stone_itr,*stone_itr,true,std::move(pattern),5);
+            pattern = eval_pattern(*stone_itr,std::move(pattern),5);
         }else{
-            pattern = eval_pattern(*stone_itr,*(stone_itr+1),false,std::move(pattern),5);
+            pattern = eval_pattern(*stone_itr,std::move(pattern),5);
         }
     }
     field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {
@@ -91,10 +87,4 @@ void sticky_algo::run(){
     int time = timer.elapsed();
     print_text(std::to_string(time) + "msかかった");
     answer_send(best_ans.field);
-}
-double sticky_algo::light_eval(field_type &field, process_type process){
-    field.put_stone_basic(process.stone,process.position.y,process.position.x);
-    double score = field.evaluate_normalized_complexity();
-    field.remove_stone_basic();
-    return score;
 }
