@@ -12,7 +12,7 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem, int _time_limit, evaluator _eval):time_limit(_time_limit),eval(_eval)
+yrange::yrange(problem_type _problem, int _time_limit, evaluator _eval):eval(_eval),time_limit(_time_limit)
 {
     algorithm_name = "yrange";
     origin_problem = _problem;
