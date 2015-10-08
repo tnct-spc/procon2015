@@ -111,7 +111,7 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
             count++;
-            int const score = eval.normalized_contact(_field,
+            double const score = eval.normalized_contact(_field,
                                                       pre_problem.stones,
                                                       bit_process_type(stone_num+1,side,angle,point_type{y,x})
                                                       );
