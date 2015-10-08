@@ -36,18 +36,7 @@ new_beam::~new_beam()
 void new_beam::run()
 {
     qDebug("new_beam start");
-/*
-    //はじめに置く石の場所、角度、反転分のループ
-    for(int y = 1-STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1-STONE_SIZE; x  < FIELD_SIZE; ++x) for(int angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
-    {
-        origin_problem.stones.at(0).set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-        //置ければ始める
-        if(origin_problem.field.is_puttable(origin_problem.stones.front(),y,x) == true)
-        {
-            one_try(origin_problem,y,x,angle,side);
-        }
-    }
-*/
+
     only_one_try(origin_problem);
 
 }
@@ -55,14 +44,11 @@ void new_beam::run()
 //はじめに置く石から探索を開始する
 void new_beam::only_one_try(problem_type problem)
 {
-    std::cout << "start only one try." << std::endl;
     for(std::size_t stone_num = 0; stone_num < problem.stones.size(); ++stone_num)
     {
         std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
-        //std::cout << "stone_num = " << stone_num << std::endl;
 
         search(problem.field, stone_num, root);
-        //std::cout << "再帰抜けた result_vec.size() = " << result_vec.size() << std::endl;
 
         for(std::size_t i = 0; i < result_vec.size(); ++i)
         {
@@ -70,27 +56,11 @@ void new_beam::only_one_try(problem_type problem)
             {
                 return lhs->score < rhs->score;
             });
-            //std::cout << "max score = " << max->get()->score << " decied max" << std::endl;
-/*
-            if(max->get()->stone_num < stone_num)
-            {
-                std::cout << "dame" << std::endl;
-                continue;
-            }
-*/
+
             // 親を遡りはじめに置いた石のnodeを得る
             auto first_put= *max;
-            /*
-            if(first_put == NULL)
-            {
-                std::cout << "first _put = NULL" << std::endl;
-                continue;
-            }
-            */
-            //std::cout << first_put->stone_num << std::endl;
             while(first_put->stone_num > now_put_stone_num)
             {
-                //std::cout << first_put->stone_num << std::endl;
                 first_put = first_put->parent;
             }
 
@@ -100,18 +70,11 @@ void new_beam::only_one_try(problem_type problem)
                                 get_rem_stone_zk(stone_num+1))== true)
             {
                 max->get()->score = std::numeric_limits<double>::min();
-                //std::cout << "pass" << std::endl;
 #ifdef QT_DEBUG
                 if(i == result_vec.size() - 1) std::cout << stone_num << "th stone passed" << std::endl;
 #endif
                 continue;
             }
-            /*
-            if(problem.field.is_puttable_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x) == false)
-            {
-                std::cout << "can't put" << std::endl;
-            }
-            */
             problem.field.put_stone_basic(problem.stones.at(stone_num), first_put->point.y, first_put->point.x);
 #ifdef QT_DEBUG
             std::cout << stone_num << "th stone putted" << std::endl;
@@ -163,7 +126,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
 #ifdef QT_DEBUG
                 if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
 #endif
-                //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
             else
             {
@@ -182,8 +144,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             }
         }
     }
-
-    //for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
 
     if(nodes.size() == 0) return 0;
     //探索の最下層だったら結果をresult_vec入れる
@@ -209,16 +169,5 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             _field.remove_stone_basic();
         }
     }
-    //std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;
     return nodes.size();
-}
-
-int new_beam::get_rem_stone_zk(int stone_num)
-{
-    int sum = 0;
-    for(std::size_t i = stone_num; i < origin_problem.stones.size(); ++i)
-    {
-        sum += origin_problem.stones.at(i).get_area();
-    }
-    return sum;
 }
