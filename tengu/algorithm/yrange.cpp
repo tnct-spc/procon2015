@@ -12,12 +12,6 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem)
-{
-    algorithm_name = "yrange";
-    pre_problem = _problem;
-}
-
 yrange::yrange(problem_type _problem, evaluator eval):eval(eval)
 {
     algorithm_name = "yrange";

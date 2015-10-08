@@ -9,7 +9,6 @@ class yrange : public algorithm_type
 {
     Q_OBJECT
 public:
-    yrange(problem_type _problem);
     yrange(problem_type _problem, evaluator eval);
     ~yrange();
     void run();

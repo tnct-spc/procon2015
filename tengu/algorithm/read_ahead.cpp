@@ -11,14 +11,6 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 
-read_ahead::read_ahead(problem_type _problem)
-{
-    pre_problem = _problem;
-    algorithm_name = "read_ahead";
-    search_depth = 3;
-    ALL_STONES_NUM = pre_problem.stones.size();
-}
-
 read_ahead::read_ahead(problem_type _problem, evaluator _eval) : eval(_eval)
 {
     pre_problem = _problem;

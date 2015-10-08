@@ -9,7 +9,6 @@ class read_ahead : public algorithm_type
 {
     Q_OBJECT
 public:
-    read_ahead(problem_type _problem);
     read_ahead(problem_type _problem, evaluator _eval);
     ~read_ahead();
     void run();
