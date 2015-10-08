@@ -25,7 +25,7 @@ public:
     struct search_type
     {
         std::vector<stones_info_type> stones_info_vec;
-        int score = -1;
+        double score = -1;
         double complexity = -1;
         search_type(std::vector<stones_info_type> stones_info_vec,double score,double complexity):stones_info_vec(stones_info_vec),score(score),complexity(complexity){}
         search_type(){}
@@ -48,7 +48,7 @@ private:
     evaluator eval;
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
     int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
-    bool pass(search_type const& search,stone_type const& stone);
+    bool pass(search_type const& search);
 };
 
 #endif // READAHEAD

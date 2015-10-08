@@ -69,7 +69,7 @@ void read_ahead::one_try(problem_type problem, int y, int x, std::size_t const a
             {
                 return lhs.score == rhs.score ? lhs.complexity < rhs.complexity : lhs.score > rhs.score;
             });
-            if(pass(*max,problem.stones.at(stone_num)) == true)
+            if(pass(*max) == true)
             {
                 max->score *= -1;
                 continue;
@@ -196,9 +196,9 @@ int read_ahead::search(std::vector<search_type>& parental_search_vec, search_typ
     return count;
 }
 
-bool read_ahead::pass(search_type const& search, stone_type const& stone)
+bool read_ahead::pass(search_type const& search)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.5) return true;
+    if(search.score < 0.5) return true;
     else return false;
 }
 
