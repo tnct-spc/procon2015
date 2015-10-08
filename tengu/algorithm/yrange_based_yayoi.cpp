@@ -11,7 +11,7 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange_based_yayoi::yrange_based_yayoi(problem_type _problem, int time_limit):time_limit(time_limit)
+yrange_based_yayoi::yrange_based_yayoi(problem_type _problem, int time_limit, evaluator _eval):time_limit(time_limit),eval(_eval)
 {
     algorithm_name = "yrange_based_yayoi";
     origin_problem = _problem;
@@ -109,7 +109,7 @@ void yrange_based_yayoi::solve()
                         best_score = score;
                         //Save processes
                         best_processes.clear();
-                        std::copy(problem.field.get_processes().begin(),problem.field.get_processes().end(),std::back_inserter(best_processes));
+                        std::copy(problem.field.processes.begin(),problem.field.processes.end(),std::back_inserter(best_processes));
                         //Save field
                         uint64_t const (&field_bits)[64] = problem.field.get_bit_plain_field();
                         for(int i=0;i<64;i++) best_field[i]=field_bits[i];
@@ -129,33 +129,10 @@ void yrange_based_yayoi::one_try(problem_type& problem, std::size_t stone_num)
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));
         if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
-        if(pass(next,each_stone) == true) continue;
+        if(pass(next) == true) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
-}
-
-//評価関数
-int yrange_based_yayoi::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
-{
-    int const n = stone.get_nth();
-    int count = 0;
-    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
-    {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
-
-        if(field.get_raw_data().at(k).at(l) == n)
-        {
-            count += (kl1 + k1l);
-            if(k == 0 || k == FIELD_SIZE - 1) count++;
-            if(l == 0 || l == FIELD_SIZE - 1) count++;
-        }
-        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
-        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
-    }
-    return count;
 }
 
 //おける場所の中から評価値の高いものを選んで返す
@@ -168,20 +145,20 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
         if(_field.is_puttable_basic(stone,i,j) == true)
         {
+            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),angle,side,point_type{i,j}));
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
-            int const score = evaluate(_field,stone,i,j);
-            //3個以下の石で、露出度が8割を切っていたらskip(when skip_minimum_stone = true)
-            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score,stone)<0.45){
+            //3個以下の石で、露出度が8割を切っriていたらskip(when skip_minimum_stone = true)
+            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score)<0.45){
                 //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
             }else{
-                int const island = get_island(_field.get_raw_data());
-                if(best.score < score || (best.score == score && best.island > island))
+                double const field_complexity = _field.evaluate_normalized_complexity();
+                if(best.score < score || (best.complexity == score && best.complexity > field_complexity))
                 {
-                    best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
+                    best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, field_complexity};
                 }
             }
-            _field.remove_stone_basic();
+            _field.remove_stone_basic(stone);
         }
     }
     return best;
@@ -214,113 +191,27 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search_when_second(field_typ
         {
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
-            int const score = evaluate(_field,stone,i,j);
-            int const island = get_island(_field.get_raw_data());
-            if(best.score < score || (best.score == score && best.island > island))
+            double const score = eval.normalized_contact(_field,origin_problem.stones,bit_process_type(stone.get_nth(),angle,side,point_type{i,j}));
+            double const field_complexity = _field.evaluate_normalized_complexity();
+            if(best.score < score || (best.score == score && best.complexity> field_complexity))
             {
-                best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
+                best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, field_complexity};
             }
-            _field.remove_stone_basic();
+            _field.remove_stone_basic(stone);
         }
     }
     return best;
 }
 
-int yrange_based_yayoi::get_island(field_type::raw_field_type field)
+bool yrange_based_yayoi::pass(search_type const& search)
 {
-    int num = -2;
-    std::function<void(int,int)> recurision = [&num,&recurision,&field](int y, int x) -> void
-    {
-        field[y][x] = num;
-        if(0 < y && field[y-1][x] == 0) recurision(y-1,x);
-        if(y < FIELD_SIZE - 1 && field[y+1][x] == 0) recurision(y+1,x);
-        if(0 < x && field[y][x-1] == 0) recurision(y,x-1);
-        if(x < FIELD_SIZE - 1 && field[y][x+1] == 0) recurision(y,x+1);
-        return;
-    };
-    for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
-    {
-        if(field[i][j] == 0){
-            num--;
-            recurision(i,j);
-        }
-    }
-    return -1 * num - 2;
- /*
-    int label = -2;
-    int count1, count2,count3 = 0;
-
-    //次の空白を見つけ、そこを--labelにして帰る
-    auto next_find = [&label, &field]()
-    {
-        for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
-        {
-            if(field[i][j] == 0)
-            {
-                field[i][j] = --label;
-                return;
-            }
-        }
-        return;
-    };
-
-    //ただのラベリング　再帰だと遅いらし
-    while(label < count3)
-    {
-        count3 = label;
-        next_find();
-        count1 = 0;
-        count2 = -1;
-        while(count1 > count2)
-        {
-            count2 = count1;
-            for(int i = 0; i < FIELD_SIZE - 1; ++i) for(int j = 0; j < FIELD_SIZE - 1; ++j)
-            {
-                if(field[i][j] == label)
-                {
-                    if(field[i][j+1] == 0)
-                    {
-                        field[i][j+1] = field[i][j];
-                        count1++;
-                    }
-                    if(field[i+1][j] == 0)
-                    {
-                        field[i+1][j] = field[i][j];
-                        count1++;
-                    }
-                }
-            }
-            for(int i = FIELD_SIZE - 1; i > 0; --i) for(int j = FIELD_SIZE - 1; j > 0; --j)
-            {
-                if(field[i][j] == label)
-                {
-                    if(field[i][j-1] == 0)
-                    {
-                        field[i][j-1] = field[i][j];
-                        count1++;
-                    }
-                    if(field[i-1][j] == 0)
-                    {
-                        field[i-1][j] = field[i][j];
-                        count1++;
-                    }
-                }
-            }
-        }
-     }
-     return -1 * label -2;
-*/
-}
-
-bool yrange_based_yayoi::pass(search_type const& search, stone_type const& stone)
-{
-    if(degree_of_exposure(search.score,stone) < 0.35) return true;
+    if(degree_of_exposure(search.score) < 0.35) return true;
     else return false;
 }
 
-double yrange_based_yayoi::degree_of_exposure(int score, stone_type const& stone)
+double yrange_based_yayoi::degree_of_exposure(int score)
 {
-    return (static_cast<double>(score) / static_cast<double>(stone.get_side_length()));
+    return score;
 }
 
 
@@ -342,16 +233,16 @@ void yrange_based_yayoi::improve()
 
     //仕上げ Start Solve Second
     for(size_t count=0, stone_nth=1; count < best_processes.size(); ++count){
-        while(static_cast<size_t>(best_processes[count].stone.get_nth()) != stone_nth){
+        while(static_cast<size_t>(best_processes[count].nth) != stone_nth){
 
             put_stone(stone_nth-1);
 
             stone_nth++;
         }
-        problem.field.put_stone_basic(best_processes[count].stone,best_processes[count].position.y,best_processes[count].position.x);
+        problem.field.put_stone_basic(origin_problem.stones.at(best_processes[count].nth-1),best_processes[count].position.y,best_processes[count].position.x);
         stone_nth++;
     }
-    for(size_t stone_nth=best_processes[best_processes.size()-1].stone.get_nth()+1; stone_nth <= problem.stones.size(); ++stone_nth){
+    for(size_t stone_nth=best_processes[best_processes.size()-1].nth+1; stone_nth <= problem.stones.size(); ++stone_nth){
         put_stone(stone_nth-1);
         stone_nth++;
     }

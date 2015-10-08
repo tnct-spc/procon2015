@@ -56,7 +56,7 @@ public:
     // 引数の座標にある石を返す
     placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
 
-
+    std::vector<bit_process_type> processes;
 
     // don't use this
     raw_field_type& set_raw_data();
@@ -83,7 +83,6 @@ public:
     }
 
 private:
-    std::vector<bit_process_type> processes;
     std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> weighted_route_map;
     //渡された石の総数.get_answerで必要
     size_t provided_stones;
