@@ -968,4 +968,3 @@ double field_type::evaluate_ken_o_expwy() const
 }
 bool field_type::get_has_limit() const{return has_limit;}
 
-}
