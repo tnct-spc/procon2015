@@ -18,7 +18,6 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/sticky_algo.cpp \
     algorithm/read_ahead.cpp \
     algorithm/square.cpp \
-    algorithm/yrange2.cpp \
     algorithm/new_beam.cpp
 
 
@@ -30,7 +29,6 @@ HEADERS += tengu.hpp\
     algorithm/sticky_algo.hpp \
     algorithm/read_ahead.hpp \
     algorithm/square.hpp \
-    algorithm/yrange2.hpp \
     algorithm/new_beam.hpp
 
 LIBS += -lQt5Concurrent
