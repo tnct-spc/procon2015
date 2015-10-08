@@ -65,7 +65,7 @@ void yrange::run()
         problem_type problem = pre_problem;
         //if(one_try(pre_problem, l, m, rotate) != pre_problem.field.get_score()) return;
         one_try(problem, y, x, rotate);
-        if(problem.field.list_of_stones().size() == 0) continue;
+        //if(problem.field.list_of_stones().size() == 0) continue;
         answer_send(problem.field);
         std::string const flip = problem.stones.front().get_side() == stone_type::Sides::Head ? "Head" : "Tail";
         qDebug("emit starting by %2d,%2d %3lu %s score = %3zu",y,x,rotate / 2 * 90,flip.c_str(), problem.field.get_score());

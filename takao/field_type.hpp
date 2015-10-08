@@ -56,8 +56,7 @@ public:
     // 引数の座標にある石を返す
     placed_stone_type get_stone(std::size_t const & y, std::size_t const & x);
 
-    // bit化していない配列のアクセッサ
-    raw_field_type const& get_raw_data() const;
+
     // don't use this
     raw_field_type& set_raw_data();
 
