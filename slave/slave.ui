@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>496</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -495,6 +495,19 @@
     <string>00</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox_8">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>490</y>
+     <width>171</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_based_yayoi</string>
+   </property>
+  </widget>
   <action name="problem_load_action">
    <property name="text">
     <string>問題読み込み</string>
@@ -520,7 +533,7 @@
      <y>10</y>
     </hint>
     <hint type="destinationlabel">
-     <x>377</x>
+     <x>357</x>
      <y>120</y>
     </hint>
    </hints>
@@ -536,7 +549,7 @@
      <y>288</y>
     </hint>
     <hint type="destinationlabel">
-     <x>440</x>
+     <x>357</x>
      <y>284</y>
     </hint>
    </hints>
@@ -552,7 +565,7 @@
      <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>438</x>
+     <x>357</x>
      <y>310</y>
     </hint>
    </hints>
@@ -568,7 +581,7 @@
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>440</x>
+     <x>357</x>
      <y>348</y>
     </hint>
    </hints>
@@ -584,7 +597,7 @@
      <y>367</y>
     </hint>
     <hint type="destinationlabel">
-     <x>436</x>
+     <x>357</x>
      <y>379</y>
     </hint>
    </hints>
@@ -600,7 +613,7 @@
      <y>392</y>
     </hint>
     <hint type="destinationlabel">
-     <x>441</x>
+     <x>357</x>
      <y>395</y>
     </hint>
    </hints>
@@ -696,7 +709,7 @@
      <y>44</y>
     </hint>
     <hint type="destinationlabel">
-     <x>417</x>
+     <x>357</x>
      <y>71</y>
     </hint>
    </hints>

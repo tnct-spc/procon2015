@@ -1,4 +1,4 @@
-#include "yrange.hpp"
+#include "yrange_based_yayoi.h"
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -11,30 +11,33 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem, int time_limit):time_limit(time_limit)
+yrange_based_yayoi::yrange_based_yayoi(problem_type _problem, int time_limit):time_limit(time_limit)
 {
-    algorithm_name = "yrange";
+    algorithm_name = "yrange_based_yayoi";
     origin_problem = _problem;
 }
 
-yrange::~yrange()
+yrange_based_yayoi::~yrange_based_yayoi()
 {
 }
 
-void yrange::run()
+void yrange_based_yayoi::run()
 {
     //制限時間まで解く→完成次第送信
     print_text("解答開始");
     solve();
+    //最良だった解答のテコ入れ→完成次第送信
+    print_text("テコ入れ開始");
+    improve();
     //exit
     print_text("終了");
 }
 
-void yrange::solve()
+void yrange_based_yayoi::solve()
 {
     problem_type base_problem = origin_problem;
     limit_timer.start();
-    qDebug("yrange start");
+    qDebug("yrange_based_yayoi start");
 /*
     QVector<std::tuple<problem_type,int,int,std::size_t>> data;
     data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
@@ -91,7 +94,7 @@ void yrange::solve()
 
                     //----------------------------------------------------------------------------------------------------------
                     int t = static_cast<int>(limit_timer.elapsed());
-                    if(t > time_limit){
+                    if(t > time_limit - 30000){//30秒前
                         qDebug("time limit!");
                         return;
                     }
@@ -104,6 +107,12 @@ void yrange::solve()
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
                         best_score = score;
+                        //Save processes
+                        best_processes.clear();
+                        std::copy(problem.field.get_processes().begin(),problem.field.get_processes().end(),std::back_inserter(best_processes));
+                        //Save field
+                        uint64_t const (&field_bits)[64] = problem.field.get_bit_plain_field();
+                        for(int i=0;i<64;i++) best_field[i]=field_bits[i];
                     }
                     //-----------------------------------------------------------------------------------------------------------
                 }
@@ -112,7 +121,7 @@ void yrange::solve()
     }
 }
 
-void yrange::one_try(problem_type& problem, std::size_t stone_num)
+void yrange_based_yayoi::one_try(problem_type& problem, std::size_t stone_num)
 {
     //２個目以降
     for(stone_num++; stone_num < problem.stones.size(); ++stone_num)
@@ -127,7 +136,7 @@ void yrange::one_try(problem_type& problem, std::size_t stone_num)
 }
 
 //評価関数
-int yrange::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
+int yrange_based_yayoi::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
 {
     int const n = stone.get_nth();
     int count = 0;
@@ -150,7 +159,7 @@ int yrange::evaluate(field_type const& field, stone_type stone,int const i, int 
 }
 
 //おける場所の中から評価値の高いものを選んで返す
-yrange::search_type yrange::search(field_type& _field, stone_type& stone)
+yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, stone_type& stone)
 {
     search_type best = {{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
     //おける可能性がある場所すべてにおいてみる
@@ -158,6 +167,50 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
     {
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
         if(_field.is_puttable_basic(stone,i,j) == true)
+        {
+            _field.put_stone_basic(stone,i,j);
+            //置けたら接してる辺を数えて良ければ置き換え
+            int const score = evaluate(_field,stone,i,j);
+            //3個以下の石で、露出度が8割を切っていたらskip(when skip_minimum_stone = true)
+            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score,stone)<0.45){
+                //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
+            }else{
+                int const island = get_island(_field.get_raw_data());
+                if(best.score < score || (best.score == score && best.island > island))
+                {
+                    best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
+                }
+            }
+            _field.remove_stone_basic();
+        }
+    }
+    return best;
+}
+
+//おける場所の中から評価値の高いものを選んで返す
+yrange_based_yayoi::search_type yrange_based_yayoi::search_when_second(field_type& _field, stone_type& stone)
+{
+    //best_fieldと＆をとって、重なってしまわないか検査する
+    auto is_puttable = [&](stone_type& stone, int dy, int dx){
+        //get_bit_plain_stonesはxが+1されているのでbit_plain_stonesを使う場合は+1し忘れないこと
+        stone_type::bit_stones_type const& bit_plain_stones = stone.get_raw_bit_plain_stones();
+        int avx_collision = 0;
+        __m256i avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
+        __m256i avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+0]);
+        avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+        avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[dx+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
+        avx_bit_field = _mm256_loadu_si256((__m256i*)&best_field[16+dy+4]);
+        avx_collision |= !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
+        return !avx_collision;
+    };
+
+
+    search_type best = {{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
+    //おける可能性がある場所すべてにおいてみる
+    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+    {
+        stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        if(_field.is_puttable_basic(stone,i,j) && is_puttable(stone,i,j))
         {
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
@@ -173,7 +226,7 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
     return best;
 }
 
-int yrange::get_island(field_type::raw_field_type field)
+int yrange_based_yayoi::get_island(field_type::raw_field_type field)
 {
     int num = -2;
     std::function<void(int,int)> recurision = [&num,&recurision,&field](int y, int x) -> void
@@ -259,8 +312,56 @@ int yrange::get_island(field_type::raw_field_type field)
 */
 }
 
-bool yrange::pass(search_type const& search, stone_type const& stone)
+bool yrange_based_yayoi::pass(search_type const& search, stone_type const& stone)
 {
-    if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
+    if(degree_of_exposure(search.score,stone) < 0.35) return true;
     else return false;
+}
+
+double yrange_based_yayoi::degree_of_exposure(int score, stone_type const& stone)
+{
+    return (static_cast<double>(score) / static_cast<double>(stone.get_side_length()));
+}
+
+
+void yrange_based_yayoi::improve()
+{
+    problem_type problem = origin_problem;
+
+    auto put_stone = [&](int stone_itr){
+        //すでにプロセスにある場所を除く置ける場所を探して、置く
+
+        search_type best_position = std::move(search_when_second(problem.field,problem.stones[stone_itr]));
+
+        if(best_position.score != -1){//置ける場所があったか
+            //if(pass(next,each_stone) == true) continue;
+            problem.stones[stone_itr].set_angle(best_position.angle).set_side(best_position.side);
+            problem.field.put_stone_basic(problem.stones[stone_itr],best_position.point.y,best_position.point.x);
+        }
+    };
+
+    //仕上げ Start Solve Second
+    for(size_t count=0, stone_nth=1; count < best_processes.size(); ++count){
+        while(static_cast<size_t>(best_processes[count].stone.get_nth()) != stone_nth){
+
+            put_stone(stone_nth-1);
+
+            stone_nth++;
+        }
+        problem.field.put_stone_basic(best_processes[count].stone,best_processes[count].position.y,best_processes[count].position.x);
+        stone_nth++;
+    }
+    for(size_t stone_nth=best_processes[best_processes.size()-1].stone.get_nth()+1; stone_nth <= problem.stones.size(); ++stone_nth){
+        put_stone(stone_nth-1);
+        stone_nth++;
+    }
+    //Send
+    answer_send(problem.field);
+
+    //----------------------------------------------------------------------------------------------------------
+    int t = static_cast<int>(limit_timer.elapsed());
+    int const score = problem.field.get_score();
+    qDebug("***last*** emit starting by score = %3d time = %d",score,t);
+    //-----------------------------------------------------------------------------------------------------------
+    return;
 }

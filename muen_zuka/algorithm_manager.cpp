@@ -29,6 +29,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
     if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
     if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(8))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit));
 
     for(auto algo : algo_vec){
         algo->setParent(this);
@@ -59,6 +60,7 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(5))emit send_text("yrange2動作");
     if(enable_algorithm_list.at(6))emit send_text("read_ahead動作");
     if(enable_algorithm_list.at(7))emit send_text("new_beam動作");
+    if(enable_algorithm_list.at(8))emit send_text("yrange_based_yayoi動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();
