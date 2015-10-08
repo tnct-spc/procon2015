@@ -3,12 +3,14 @@
 #define YRANGE_HPP
 #include <takao.hpp>
 #include <array>
+#include "evaluator.hpp"
 
 class yrange : public algorithm_type
 {
     Q_OBJECT
 public:
     yrange(problem_type _problem);
+    yrange(problem_type _problem, evaluator eval);
     ~yrange();
     void run();
 
@@ -19,14 +21,13 @@ private:
         std::size_t angle;
         stone_type::Sides side;
         int score;
-        int island;
+        double complexity;
     };
 
     problem_type pre_problem;
+    evaluator eval;
     void one_try(problem_type& problem, int x, int y, std::size_t const rotate);
-    int evaluate(field_type const& field, stone_type stone,int const i, int const j)const;
     search_type search(field_type& _field, stone_type& stone);
-    int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search, stone_type const& stone);
 };
 
