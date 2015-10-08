@@ -12,7 +12,7 @@ sticky_algo::sticky_algo(problem_type _problem) : origin_problem(_problem),probl
 {
     algorithm_name = "sticky";
 }
-sticky_algo::sticky_algo(problem_type _problem, evaluator _eval) : origin_problem(_problem),problem(_problem),_evaluator(_eval)
+sticky_algo::sticky_algo(problem_type _problem, evaluator _eval) : _evaluator(_eval), origin_problem(_problem), problem(_problem)
 {
     algorithm_name = "sticky";
 }
@@ -35,7 +35,7 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
                                                      angle,
                                                      {dy,dx}));
                 //ビームサーチの幅制限
-                if(stone_placement_vector.size() < search_width){
+                if(stone_placement_vector.size() < (std::size_t)search_width){
                     if(should_pass){
                         stone_placement_vector.emplace_back(dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field);
                     }else{
