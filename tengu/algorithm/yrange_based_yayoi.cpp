@@ -38,37 +38,6 @@ void yrange_based_yayoi::solve()
     problem_type base_problem = origin_problem;
     limit_timer.start();
     qDebug("yrange_based_yayoi start");
-/*
-    QVector<std::tuple<problem_type,int,int,std::size_t>> data;
-    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
-    for(int l = 1-STONE_SIZE; l < FIELD_SIZE; ++l) for(int m = 1-STONE_SIZE; m  < FIELD_SIZE; ++m)
-    {
-        for(std::size_t rotate = 0; rotate < 8; ++rotate)
-        {
-            data.push_back(std::make_tuple(origin_problem,l,m,rotate));
-        }
-
-        QFuture<void> threads = QtConcurrent::map(
-            data,
-            [this](auto& tup)
-            {
-                this->one_try(std::get<0>(tup), std::get<1>(tup), std::get<2>(tup), std::get<3>(tup));
-            });
-        threads.waitForFinished();
-
-        for(auto& each_data : data)
-        {
-            auto& problem = std::get<0>(each_data);
-            if(problem.field.get_score() < best_score)
-            {
-                answer_send(problem.field);
-                print_text((boost::format("score = %d")%problem.field.get_score()).str());
-                best_score = problem.field.get_score();
-            }
-        }
-    }
-*/
-
 
     std::array<int,39> start_y{{24,-7,29,13,-1,9,30,19,15,-4,18,17,20,-2,23,10,4,-6,7,-5,31,3,8,21,5,16,-3,0,11,22,14,27,2,26,28,1,12,6,25}};
     std::array<int,39> start_x{{5,19,13,26,16,20,8,10,3,23,2,27,0,29,6,-5,-7,11,-4,7,22,-3,1,-6,-2,24,-1,30,31,9,14,25,17,28,21,15,18,12,4}};
@@ -88,13 +57,16 @@ void yrange_based_yayoi::solve()
                     //Start Solve
                     problem_type problem = base_problem;
                     problem.field.put_stone_basic(base_problem.stones[stone_num],y,x);
+
+                    //SOLVE
                     one_try(problem, stone_num);
-                    //Send
+
+                    //SEND
                     answer_send(problem.field);
 
                     //----------------------------------------------------------------------------------------------------------
                     int t = static_cast<int>(limit_timer.elapsed());
-                    if(t > time_limit - 30000){//30秒前
+                    if(t > time_limit - 5000){//5秒前
                         qDebug("time limit!");
                         return;
                     }
@@ -103,7 +75,7 @@ void yrange_based_yayoi::solve()
                     int const score = problem.field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
                     qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,t,emit_count);
-                    if(best_score > score)
+                    if(score < best_score)
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
                         best_score = score;
@@ -128,7 +100,7 @@ void yrange_based_yayoi::one_try(problem_type& problem, std::size_t stone_num)
     {
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));
-        if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
+        if(next.score == -1) continue;//どこにも置けなかった
         if(pass(next) == true) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
@@ -149,7 +121,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
             _field.put_stone_basic(stone,i,j);
             //置けたら接してる辺を数えて良ければ置き換え
             //3個以下の石で、露出度が8割を切っriていたらskip(when skip_minimum_stone = true)
-            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score)<0.45){
+            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score)<0.85){
                 //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
             }else{
                 double const field_complexity = _field.evaluate_normalized_complexity();
@@ -187,6 +159,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search_when_second(field_typ
     for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        //field::is_puttable + yayoi::is_puttable
         if(_field.is_puttable_basic(stone,i,j) && is_puttable(stone,i,j))
         {
             _field.put_stone_basic(stone,i,j);
@@ -239,7 +212,8 @@ void yrange_based_yayoi::improve()
 
             stone_nth++;
         }
-        problem.field.put_stone_basic(origin_problem.stones.at(best_processes[count].nth-1),best_processes[count].position.y,best_processes[count].position.x);
+        problem.stones[stone_nth].set_angle(best_processes[count].angle).set_side(static_cast<stone_type::Sides>(best_processes[count].flip));
+        problem.field.put_stone_basic(problem.stones[best_processes[count].nth-1],best_processes[count].position.y,best_processes[count].position.x);
         stone_nth++;
     }
     for(size_t stone_nth=best_processes[best_processes.size()-1].nth+1; stone_nth <= problem.stones.size(); ++stone_nth){
