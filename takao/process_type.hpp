@@ -6,9 +6,9 @@
 
 struct bit_process_type
 {
-    unsigned int nth : 9;
-    unsigned int flip : 1;
-    unsigned int rotate : 2;
+    unsigned int nth;
+    unsigned int flip;
+    unsigned int rotate;
     point_type position;
 
     bit_process_type() = default;

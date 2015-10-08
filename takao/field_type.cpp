@@ -39,9 +39,6 @@ bool field_type::is_puttable_basic(const stone_type &stone, int y, int x) const
     if(processes.size() == 0) return true;
 
     //石が他の自分より若い石と接しているか調べる
-    //#avx_collision = 0; (この行まで来るということは必ずavx_collision=0)
-    //#上ですでにbit_plain_stonesの[4]~[7]が読んであるので再利用
-    //avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][4]);
     avx_bit_field = _mm256_loadu_si256((__m256i*)&bit_sides_field[16+y+4]);
     avx_collision = !_mm256_testz_si256(avx_bit_field,avx_bit_stone);
     avx_bit_stone = _mm256_loadu_si256((__m256i*)&bit_plain_stones[x+7+1][static_cast<int>(stone.get_side())][stone.get_angle()/90][0]);
@@ -72,22 +69,11 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7-1,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//left
         bit_sides_field[16+y+i] |= (stone).get_bit_plain_stones(x+7+1,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);//right
     }
-
-    //ロウデータに置く
-//    for(int i = 0; i < STONE_SIZE; ++i) for(int j = 0; j < STONE_SIZE; ++j)
-//    {
-//        if(stone.at(i,j) == 0)//石がないならどうでもいい
-//        {
-//            continue;
-//        }
-//        else
-//        {
-//            raw_data.at(i+y).at(j+x) = stone_nth;
-//        }
-//    }
+    /*
     if(processes.size() == 1){
         init_route_map();
     }
+    */
     processes.emplace_back(stone_nth,
                            static_cast<int>(stone.get_side()),
                            stone.get_angle() / 90,

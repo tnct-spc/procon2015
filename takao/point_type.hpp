@@ -8,8 +8,8 @@ public:
     point_type() = default;
     ~point_type() = default;
 
-    signed int y : 6;
-    signed int x : 6;
+    signed int y;
+    signed int x;
 
     friend inline bool operator== (point_type const& lhs, point_type const& rhs)
     {
