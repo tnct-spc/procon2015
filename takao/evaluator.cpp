@@ -11,18 +11,24 @@ double evaluator::normalized_contact(const field_type &field, std::vector<stone_
     uint64_t const (&field_bits)[64] = field.get_bit_plain_field();
     stone_type::bit_stones_type const& stone_bits =  stone.get_raw_bit_plain_stones();
     int const flip = process.flip;
-    // static_assert(flip == 0 || flip == 1, "flip");
     int const rotate = process.get_rotate();
-    // static_assert(0 <= rotate && rotate < 4, "rotate");
     int const posx = process.position.x;
     int const posy = process.position.y;
 
 #ifdef QT_DEBUG
     if(flip != (int)stone.get_side())
         throw std::runtime_error("normalized_contact: flip does not match");
+    if(flip != 0 && flip != 1)
+        throw std::runtime_error("normalized_contact: invalid flip");
+    if(rotate < 0 || 3 < rotate)
+        throw std::runtime_error("normalized_contact: invalid rotate");
+    if(posx < -7 || 31 < posx)
+        throw std::runtime_error("normalized_contact: invalid posx");
+    if(posy < -7 || 31 < posy)
+        throw std::runtime_error("normalized_contact: invalid posy");
     if(rotate != stone.get_angle() / 90)
         throw std::runtime_error("normalized_contact: rotate does not match");
-    if(!field.is_puttable(process.stone, posy, posx))
+    if(!field.is_puttable(stone, posy, posx))
         throw std::runtime_error("normalized_contact: この石は敷けません 。石を敷く前のfieldを渡してね");
 #endif
     uint64_t sum = 0;
