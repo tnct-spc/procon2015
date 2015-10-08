@@ -122,9 +122,10 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
         }
     }
     processes.emplace_back(stone, point_type{y, x});
-    if(processes.size() == 1){
-        init_route_map();
-    }
+    //これを入れると動かないかつだれも使ってないのでとりあえず消した。（緊急）
+    //if(processes.size() == 1){
+    //    init_route_map();
+    //}
     return *this;
 }
 
