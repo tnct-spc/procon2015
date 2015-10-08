@@ -62,3 +62,23 @@ int evaluator::nextbranches(const field_type &field, stone_type &stone) const
     }
     return sum;
 }
+int evaluator::footprint(const field_type &field, const std::vector<stone_type> &stones, bit_process_type process) const
+{
+    int sum = 0;
+    stone_type const& stone = stones[process.nth - 1];
+    stone_type::bit_stones_type const& stone_bits =  stone.get_raw_bit_plain_stones();
+    int const flip = process.flip;
+    int const rotate = process.rotate;
+    int const posx = process.position.x;
+    int const posy = process.position.y;
+    //sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1][flip][rotate][i]);
+    for(int i = 0; i < 8; i ++){//縦についてのループ
+        u_int64_t mask = 0b1000000000000000000000000000000000000000000000000000000000000000;
+        for(int j = 0; j < 64; j ++,mask >>= 1){
+            if(mask & stone_bits[posx + 7 + 1][flip][rotate][i] == 1){
+                //sum += route_map[i][j];
+            }
+        }
+    }
+    return sum;
+}
