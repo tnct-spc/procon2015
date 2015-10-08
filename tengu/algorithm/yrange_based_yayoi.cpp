@@ -172,7 +172,7 @@ yrange_based_yayoi::search_type yrange_based_yayoi::search(field_type& _field, s
             //置けたら接してる辺を数えて良ければ置き換え
             int const score = evaluate(_field,stone,i,j);
             //3個以下の石で、露出度が8割を切っていたらskip(when skip_minimum_stone = true)
-            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score,stone)<0.45){
+            if(stone.get_area()<=3 && stone.get_nth() >= 64 && degree_of_exposure(score,stone)<0.85){
                 //qDebug("skip. stone_nth=%d stone_area=%zu",stone.get_nth(),stone.get_area());
             }else{
                 int const island = get_island(_field.get_raw_data());
