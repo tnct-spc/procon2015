@@ -76,7 +76,7 @@ field_type& field_type::put_stone_basic(const stone_type &stone, int y, int x)
     */
     processes.emplace_back(stone_nth,
                            static_cast<int>(stone.get_side()),
-                           stone.get_angle() / 90,
+                           stone.get_angle(),
                            point_type{y, x});
     return *this;
 }
@@ -99,7 +99,7 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
         bit_plain_field[16+(processes[processes_end].position.y)+i] &= ~stone.get_bit_plain_stones((processes[processes_end].position.x)+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
-        bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] &= ~stone.get_bit_plain_stones((processes[processes_end].position.x)+7,static_cast<int>(stone.get_side()),stone.get_angle()/90,i);
+        bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] = ((bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i]) & (~((stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)stone.get_side(),(int)((stone.get_angle())/90),i))));
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
@@ -192,7 +192,7 @@ std::string field_type::get_answer()
                 + " "
                 + "HT"[process.flip]
                 + " "
-                + std::to_string(process.rotate * 90);
+                + std::to_string(process.angle);
         result.append(line);
         prev_nth = current_nth;
         process_count++;
