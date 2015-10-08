@@ -113,7 +113,7 @@ field_type& field_type::remove_stone_basic(stone_type const& stone)
     //フィールドから石を取り除く
     for(int i=0;i<8;i++){
         bit_plain_field[16+(processes[processes_end].position.y)+i] = ((bit_plain_field[16+(processes[processes_end].position.y)+i]) & (~((stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)stone.get_side(),(int)((stone.get_angle())/90),i))));
-        //bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] = ((bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i]) & (~((processes[processes_end].stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)processes[processes_end].stone.get_side(),(int)((processes[processes_end].stone.get_angle())/90),i))));
+        bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i] = ((bit_plain_field_only_stones[16+(processes[processes_end].position.y)+i]) & (~((stone).get_bit_plain_stones((processes[processes_end].position.x)+7,(int)stone.get_side(),(int)((stone.get_angle())/90),i))));
     }
     //サイドフィールドを前の状態に復元する
     for(int i=0;i<64;i++){
