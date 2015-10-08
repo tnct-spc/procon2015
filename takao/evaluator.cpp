@@ -12,7 +12,7 @@ double evaluator::normalized_contact(const field_type &field, std::vector<stone_
     stone_type::bit_stones_type const& stone_bits =  stone.get_raw_bit_plain_stones();
     int const flip = process.flip;
     // static_assert(flip == 0 || flip == 1, "flip");
-    int const rotate = process.rotate;
+    int const rotate = process.get_rotate();
     // static_assert(0 <= rotate && rotate < 4, "rotate");
     int const posx = process.position.x;
     int const posy = process.position.y;
@@ -68,7 +68,7 @@ int evaluator::footprint(const field_type &field, const std::vector<stone_type> 
     stone_type const& stone = stones[process.nth - 1];
     stone_type::bit_stones_type const& stone_bits =  stone.get_raw_bit_plain_stones();
     int const flip = process.flip;
-    int const rotate = process.rotate;
+    int const rotate = process.get_rotate();
     int const posx = process.position.x;
     int const posy = process.position.y;
     //sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1][flip][rotate][i]);
