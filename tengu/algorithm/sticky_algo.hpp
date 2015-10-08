@@ -9,26 +9,19 @@ public:
 };
 class stone_params_type{
 public:
-    stone_params_type(int dy,int dx,int angle,stone_type::Sides side,double score,bool pass,field_type* field):dy(dy),dx(dx),angle(angle),side(side),score(score),pass(pass),field(field){}
-    /*
-    stone_params_type& operator=(stone_params_type& lval){
-        dy = lval.dy;
-        dx = lval.dx;
-        angle = lval.angle;
-        side = lval.side;
-        score = lval.score;
-        pass = lval.pass;
-        field = lval.field;
-        return *this;
+    stone_params_type(int _dy,int _dx,int _angle,stone_type::Sides _side,double _score,bool _pass,field_type* _field){
+        process.position.y = _dy;
+        process.position.x = _dx;
+        process.rotate = _angle / 90;
+        process.flip = static_cast<int>(_side);
+        score = _score;
+        pass = _pass;
+        field = _field;
     }
-    */
-    int dy;
-    int dx;
-    int angle;
-    stone_type::Sides side;
     double score;
     bool pass;
     field_type* field;
+    bit_process_type process;
 };
 
 class sticky_algo : public algorithm_type
@@ -45,10 +38,9 @@ private:
     static constexpr std::size_t SEARCH_WIDTH = 5;
 
     evaluator _evaluator = evaluator(-10,1,1,0.5);
-    double light_eval(field_type& field,process_type process);
-    const problem_type origin_problem;
+    problem_type origin_problem;
     problem_type problem;
-    std::vector<field_with_score_type> eval_pattern(stone_type& stone,stone_type& next_stone, bool non_next_stone, std::vector<field_with_score_type> pattern, int search_width);
+    std::vector<field_with_score_type> eval_pattern(stone_type& stone, std::vector<field_with_score_type> pattern, int search_width);
     std::vector<field_with_score_type> result_stone;
 
 };

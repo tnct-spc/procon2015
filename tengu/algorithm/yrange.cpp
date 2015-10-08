@@ -1,4 +1,5 @@
 #include "yrange.hpp"
+#include "evaluator.hpp"
 #include <algorithm>
 #include <array>
 #include <functional>
@@ -11,7 +12,8 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange::yrange(problem_type _problem, int time_limit):time_limit(time_limit)
+yrange::yrange(problem_type _problem, evaluator eval):eval(eval)
+yrange::yrange(problem_type _problem, int time_limit, evaluator eval):time_limit(time_limit),eval(eval)
 {
     algorithm_name = "yrange";
     origin_problem = _problem;
@@ -119,80 +121,39 @@ void yrange::one_try(problem_type& problem, std::size_t stone_num)
     {
         stone_type& each_stone = problem.stones.at(stone_num);
         search_type next = std::move(search(problem.field,each_stone));
-        if(next.point.y == FIELD_SIZE) continue;//どこにも置けなかった
+            if(next.point.y == -FIELD_SIZE) continue;//どこにも置けなかった
         if(pass(next,each_stone) == true) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         problem.field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
 }
 
-//評価関数
-int yrange::evaluate(field_type const& field, stone_type stone,int const i, int const j)const
-{
-    int const n = stone.get_nth();
-    int count = 0;
-    for(int k = (i < 2) ? 0 : i - 1 ;k < i + STONE_SIZE && k + 1 < FIELD_SIZE; ++k) for(int l = (j < 2) ? 0 : j - 1; l < j + STONE_SIZE && l + 1 < FIELD_SIZE; ++l)
-    {
-        int const kl  = (field.get_raw_data().at(k).at(l) != 0 && field.get_raw_data().at(k).at(l) != n) ? 1 : 0;
-        int const kl1 = (field.get_raw_data().at(k).at(l+1) != 0 && field.get_raw_data().at(k).at(l+1) != n) ? 1 : 0;
-        int const k1l = (field.get_raw_data().at(k+1).at(l) != 0 && field.get_raw_data().at(k+1).at(l) != n) ? 1 : 0;
-
-        if(field.get_raw_data().at(k).at(l) == n)
-        {
-            count += (kl1 + k1l);
-            if(k == 0 || k == FIELD_SIZE - 1) count++;
-            if(l == 0 || l == FIELD_SIZE - 1) count++;
-        }
-        if(field.get_raw_data().at(k).at(l+1) == n) count += kl;
-        if(field.get_raw_data().at(k+1).at(l) == n) count += kl;
-    }
-    return count;
-}
-
 //おける場所の中から評価値の高いものを選んで返す
 yrange::search_type yrange::search(field_type& _field, stone_type& stone)
 {
-    search_type best = {{FIELD_SIZE,FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
+    search_type best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
     //おける可能性がある場所すべてにおいてみる
-    for(int i = 1 - STONE_SIZE; i < FIELD_SIZE; ++i) for(int j = 1 - STONE_SIZE; j < FIELD_SIZE; ++j) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+    for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
         stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
-        if(_field.is_puttable_basic(stone,i,j) == true)
+        if(_field.is_puttable_basic(stone,y,x) == true)
         {
-            _field.put_stone_basic(stone,i,j);
-            //置けたら接してる辺を数えて良ければ置き換え
-            int const score = evaluate(_field,stone,i,j);
-            int const island = get_island(_field.get_raw_data());
-            if(best.score < score || (best.score == score && best.island > island))
+            int const score = eval.normalized_contact(_field,pre_problem.stones,bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
+            _field.put_stone_basic(stone,y,x);
+            double field_complexity = _field.evaluate_normalized_complexity();
+            if(best.score < score || (best.score == score && best.complexity > field_complexity))
             {
-                best = {point_type{i,j}, angle, static_cast<stone_type::Sides>(side), score, island};
+                best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, field_complexity};
             }
-            _field.remove_stone_basic();
+            _field.remove_stone_basic(stone);
         }
     }
     return best;
 }
 
-int yrange::get_island(field_type::raw_field_type field)
-{
-    int num = -2;
-    std::function<void(int,int)> recurision = [&num,&recurision,&field](int y, int x) -> void
-    {
-        field[y][x] = num;
-        if(0 < y && field[y-1][x] == 0) recurision(y-1,x);
-        if(y < FIELD_SIZE - 1 && field[y+1][x] == 0) recurision(y+1,x);
-        if(0 < x && field[y][x-1] == 0) recurision(y,x-1);
-        if(x < FIELD_SIZE - 1 && field[y][x+1] == 0) recurision(y,x+1);
-        return;
-    };
-    for(int i = 0; i < FIELD_SIZE; ++i) for(int j = 0; j < FIELD_SIZE; ++j)
-    {
-        if(field[i][j] == 0){
             num--;
             recurision(i,j);
         }
-    }
-    return -1 * num - 2;
  /*
     int label = -2;
     int count1, count2,count3 = 0;
@@ -257,8 +218,6 @@ int yrange::get_island(field_type::raw_field_type field)
      }
      return -1 * label -2;
 */
-}
-
 bool yrange::pass(search_type const& search, stone_type const& stone)
 {
     if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
