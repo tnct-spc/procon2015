@@ -26,9 +26,6 @@ void yrange::run()
     //制限時間まで解く→完成次第送信
     print_text("解答開始");
     solve();
-    //最良だった解答のテコ入れ→完成次第送信
-    print_text("テコ入れ開始");
-    improve();
     //exit
     print_text("終了");
 }
@@ -107,8 +104,6 @@ void yrange::solve()
                     {
                         print_text((boost::format("score = %d")%problem.field.get_score()).str());
                         best_score = score;
-                        //Save processes
-                        std::copy(problem.field.get_processes().begin(),problem.field.get_processes().end(),std::back_inserter(best_processes));
                     }
                     //-----------------------------------------------------------------------------------------------------------
                 }
@@ -268,9 +263,4 @@ bool yrange::pass(search_type const& search, stone_type const& stone)
 {
     if((static_cast<double>(search.score) / static_cast<double>(stone.get_side_length())) < 0.35) return true;
     else return false;
-}
-
-void yrange::improve()
-{
-    return;
 }
