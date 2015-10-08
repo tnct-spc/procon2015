@@ -1,6 +1,7 @@
 #ifndef READAHEAD
 #define READAHEAD
-#include <takao.hpp>
+#include "takao.hpp"
+#include "evaluator.hpp"
 #include <array>
 #include <queue>
 
@@ -8,7 +9,7 @@ class read_ahead : public algorithm_type
 {
     Q_OBJECT
 public:
-    read_ahead(problem_type _problem);
+    read_ahead(problem_type _problem, evaluator _eval);
     ~read_ahead();
     void run();
 
@@ -17,17 +18,17 @@ public:
         point_type point;
         std::size_t angle;
         stone_type::Sides side;
-        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){};
-        stones_info_type(){};
+        stones_info_type(point_type point, std::size_t angle, stone_type::Sides side):point(point),angle(angle),side(side){}
+        stones_info_type(){}
     };
 
     struct search_type
     {
         std::vector<stones_info_type> stones_info_vec;
         int score = -1;
-        int island = -1;
-        search_type(std::vector<stones_info_type> stones_info_vec,double score,int island):stones_info_vec(stones_info_vec),score(score),island(island){};
-        search_type(){};
+        double complexity = -1;
+        search_type(std::vector<stones_info_type> stones_info_vec,double score,int island):stones_info_vec(stones_info_vec),score(score),island(island){}
+        search_type(){}
         friend inline bool operator== (search_type const& lhs, search_type const& rhs)
         {
             return lhs.stones_info_vec[0].point == rhs.stones_info_vec[0].point &&
@@ -44,10 +45,9 @@ private:
     std::size_t search_depth = 3;
     std::size_t ALL_STONES_NUM;
     problem_type pre_problem;
+    evaluator eval;
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
-    int evaluate(field_type const& field, stone_type stone,int const y, int const x)const;
     int search(std::vector<search_type>& sv, search_type s, field_type &_field, std::size_t const stone_num);
-    int get_island(field_type::raw_field_type field);
     bool pass(search_type const& search,stone_type const& stone);
 };
 

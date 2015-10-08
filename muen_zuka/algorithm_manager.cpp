@@ -20,15 +20,17 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     enable_algorithm_list = enable_algo;
     //アルゴリズムの最適解値を初期化
     algorithm_type::_best_score = std::numeric_limits<int>::max();
+    // 評価関数をインスタンス化
+    evaluator eval(-10, 1, 1, 0.5);
     //動かしたいアルゴリズムを配列に入れる
     if(enable_algo.at(0))algo_vec.push_back(new simple_algorithm(problem));
     if(enable_algo.at(1))algo_vec.push_back(new poor_algo(problem));
     if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem));
     if(enable_algo.at(3))algo_vec.push_back(new square(problem));
-    if(enable_algo.at(4))algo_vec.push_back(new yrange(problem));
+    if(enable_algo.at(4))algo_vec.push_back(new yrange(problem, eval));
     if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
-    if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
-    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem, eval));
+    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem, eval));
 
     for(auto algo : algo_vec){
         algo->setParent(this);
