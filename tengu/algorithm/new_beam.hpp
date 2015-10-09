@@ -71,7 +71,6 @@ private:
     void one_try(problem_type problem, int y, int x, std::size_t const angle, const int side);
     void only_one_try(problem_type problem);
     int search(field_type& _field, std::size_t const stone_num, std::shared_ptr<node> parent);
-    int get_rem_stone_zk(int stone_num);
 };
 
 #endif // NEW_BEAM_HPP

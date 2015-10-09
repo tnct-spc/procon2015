@@ -13,20 +13,18 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 
-sticky_beam::sticky_beam(problem_type _problem)
+sticky_beam::sticky_beam(problem_type _problem) : origin_problem(_problem)
 {
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
-    holding_problems.emplace_back(_problem,0);
 }
 
-sticky_beam::sticky_beam(problem_type _problem, evaluator eval):eval(eval)
+sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),origin_problem(_problem)
 {
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
-    holding_problems.emplace_back(_problem,0);
 }
 
 sticky_beam::~sticky_beam()
@@ -37,8 +35,35 @@ void sticky_beam::run()
 {
     qDebug("sticky_beam start");
 
+    //一つは探索する
+    holding_problems.emplace_back(origin_problem,0);
+    put_a_stone(holding_problems[0].problem,0,0);
+
+    //残りはrandom
+    std::random_device seed_gen;
+    std::mt19937_64 engine(seed_gen());
+    std::uniform_int_distribution<int> position(-STONE_SIZE + 1, FIELD_SIZE - 1);
+    std::uniform_int_distribution<int> rotate(0,3);
+    std::uniform_int_distribution<int> flip(0,1);
+    stone_type first_stone = origin_problem.stones.front();
+    while(holding_problems.size() < HOLD_FIELD_NUM)
+    {
+        int const x = position(engine);
+        int const y = position(engine);
+        int const angle = rotate(engine) * 90;
+        int const side = flip(engine);
+
+        first_stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        if(origin_problem.field.is_puttable_basic(first_stone,y,x) == true)
+        {
+            holding_problems.emplace_back(origin_problem,0);
+            holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
+            std::cout << "start by x = " << x << " y = " << y << " angle = " << angle << "side = " << side << std::endl;
+        }
+    }
+
     //石の数ループ
-    for(; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
+    for(++now_put_stone_num; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
         //保持するフィールドの数ループ
         for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
@@ -59,17 +84,8 @@ void sticky_beam::run()
             return lhs.first_put->score < rhs.first_put->score;
         });
         holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
-        //追加する場合
-        if(holding_problems.size() < HOLD_FIELD_NUM)
-        {
-            holding_problems.emplace_back(holding_problems[best_second_son->field_num]);
-            holding_problems.back().problem.field.remove_stone_basic();
-            holding_problems.back().problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
-                    best_second_son->first_put->point.y, best_second_son->first_put->point.x);
-            holding_problems.back().score = best_second_son->first_put->score;
-        }
         //置き換える場合
-        else if(worst_element->score < best_second_son->first_put->score)
+        if(worst_element->score < best_second_son->first_put->score)
         {
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic();
@@ -82,16 +98,16 @@ void sticky_beam::run()
         }
 
         second_sons.clear();
+#ifdef QT_DEBUG
         std::cout << "now_put_stone_num = " << now_put_stone_num << std::endl;
         std::cout << "holding problems = " << holding_problems.size() << std::endl;
+#endif
     }
 
     for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
     {
-        qDebug("emit only one try. score = %3zu",holding_problems[field_num].problem.field.get_score());
+        qDebug("emit sticky-beam. score = %3zu",holding_problems[field_num].problem.field.get_score());
         answer_send(holding_problems[field_num].problem.field);
-        //std::cout << holding_problems[field_num].problem.field.get_answer() << std::endl;
-        //std::cout << std::endl;
     }
 }
 
