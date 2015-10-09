@@ -35,6 +35,11 @@ void sticky_beam::run()
 {
     qDebug("sticky_beam start");
 
+    //一つは探索する
+    holding_problems.emplace_back(origin_problem,0);
+    put_a_stone(holding_problems[0].problem,0,0);
+
+    //残りはrandom
     std::random_device seed_gen;
     std::mt19937_64 engine(seed_gen());
     std::uniform_int_distribution<int> position(-STONE_SIZE + 1, FIELD_SIZE - 1);
@@ -53,6 +58,7 @@ void sticky_beam::run()
         {
             holding_problems.emplace_back(origin_problem,0);
             holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
+            std::cout << "start by x = " << x << " y = " << y << " angle = " << angle << "side = " << side << std::endl;
         }
     }
 
@@ -92,16 +98,16 @@ void sticky_beam::run()
         }
 
         second_sons.clear();
+#ifdef QT_DEBUG
         std::cout << "now_put_stone_num = " << now_put_stone_num << std::endl;
         std::cout << "holding problems = " << holding_problems.size() << std::endl;
+#endif
     }
 
     for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
     {
-        qDebug("emit only one try. score = %3zu",holding_problems[field_num].problem.field.get_score());
+        qDebug("emit sticky-beam. score = %3zu",holding_problems[field_num].problem.field.get_score());
         answer_send(holding_problems[field_num].problem.field);
-        //std::cout << holding_problems[field_num].problem.field.get_answer() << std::endl;
-        //std::cout << std::endl;
     }
 }
 
