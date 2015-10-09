@@ -12,7 +12,7 @@ public:
     stone_params_type(int _dy,int _dx,int _angle,stone_type::Sides _side,double _score,bool _pass,field_type* _field){
         process.position.y = _dy;
         process.position.x = _dx;
-        process.angle = _angle / 90;
+        process.angle = _angle ;
         process.flip = static_cast<unsigned int>(_side);
         score = _score;
         pass = _pass;

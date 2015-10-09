@@ -3,7 +3,7 @@
 #include <field_type.hpp>
 #include <process_type.hpp>
 #include <limits>
-
+#include <QDebug>
 /*
  * 評価関数クラス
  * コンストラクタでパラメータ(重み)を受け取る
@@ -61,12 +61,15 @@ public:
     {
         double ret = 0.0;
         ret += w_contact_move * normalized_contact(field, stones, process);
-        field.put_stone_basic(stones[process.nth - 1], process.position.y, process.position.x);
+        stone_type& stone = stones[process.nth - 1];
+        stone.apply_process(process);
+        field.put_stone_basic(stone, process.position.y, process.position.x);
         ret += w_complexity * field.evaluate_normalized_complexity();
         if(process.nth < stones.size()) // 最後の石以外
             ret += w_nextbranches * nextbranches(field, stones[process.nth]);
 
-        field.remove_stone_basic(stones[process.nth - 1]);
+        field.remove_stone_basic(stone);
+        if(field.is_puttable_basic(stone, process.position.y, process.position.x) == 0)qDebug() << "mou kaeri tai";
         return ret;
     }
 
