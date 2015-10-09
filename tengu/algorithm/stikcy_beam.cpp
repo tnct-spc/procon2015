@@ -13,20 +13,18 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 
-sticky_beam::sticky_beam(problem_type _problem)
+sticky_beam::sticky_beam(problem_type _problem) : origin_problem(_problem)
 {
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
-    holding_problems.emplace_back(_problem,0);
 }
 
-sticky_beam::sticky_beam(problem_type _problem, evaluator eval):eval(eval)
+sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),origin_problem(_problem)
 {
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
-    holding_problems.emplace_back(_problem,0);
 }
 
 sticky_beam::~sticky_beam()
@@ -36,6 +34,31 @@ sticky_beam::~sticky_beam()
 void sticky_beam::run()
 {
     qDebug("sticky_beam start");
+
+    /*
+    std::random_device seed_gen;
+    std::mt19937_64 engine(seed_gen());
+    std::uniform_int_distribution<int> position(-STONE_SIZE + 1, FIELD_SIZE - 1);
+    std::uniform_int_distribution<int> rotate(0,3);
+    std::uniform_int_distribution<int> flip(0,1);
+    stone_type& first_stone = origin_problem.stones.back();
+    while(holding_problems.size() < HOLD_FIELD_NUM)
+    {
+        int const x = position(engine);
+        int const y = position(engine);
+        int const angle = rotate(engine) * 90;
+        int const side = flip(engine);
+
+        first_stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
+        if(origin_problem.field.is_puttable_basic(first_stone,y,x) == true)
+        {
+            holding_problems.emplace_back(origin_problem,0);
+            holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
+        }
+    }
+     */
+
+    holding_problems.emplace_back(origin_problem,0);
 
     //石の数ループ
     for(; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
