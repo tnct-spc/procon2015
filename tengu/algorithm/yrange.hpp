@@ -21,7 +21,7 @@ private:
         std::size_t angle;
         stone_type::Sides side;
         double score;
-        double complexity;
+        int island_num;
     };
 
     problem_type origin_problem;
@@ -30,6 +30,7 @@ private:
     void one_try(field_type &field, std::size_t stone_num);
     search_type search(field_type& _field, stone_type& stone);
     bool pass(search_type const& search);
+    int count_island(field_type const& field);
 
     //Time
     QElapsedTimer limit_timer;

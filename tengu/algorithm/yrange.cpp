@@ -91,6 +91,7 @@ void yrange::one_try(field_type& field, std::size_t stone_num)
 yrange::search_type yrange::search(field_type& _field, stone_type& stone)
 {
     search_type best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
+    int base_island_num = count_island(_field);
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -101,10 +102,10 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
                                                          origin_problem.stones,
                                                          bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
             _field.put_stone_basic(stone,y,x);
-            double const field_complexity = _field.evaluate_normalized_complexity();
-            if(best.score < score || (best.score == score && best.complexity > field_complexity))
+            int const island_num = count_island(_field);
+            if((island_num - base_island_num) < 2 && (best.score < score || (best.score == score && best.island_num > island_num)))
             {
-                best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, field_complexity};
+                best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, island_num};
             }
             _field.remove_stone_basic(stone);
         }
@@ -116,4 +117,32 @@ bool yrange::pass(search_type const& search)
 {
     if(search.score  < 0.35) return true;
     else return false;
+}
+
+int yrange::count_island(field_type const& field)
+{
+    uint64_t const (&field_bits)[64] = field.get_bit_plain_field();
+    uint64_t bit_field[64];
+    for(int i=0;i<64;i++) bit_field[i]=field_bits[i];
+    uint64_t buf = 1;
+    uint64_t mask[64];
+    for(int i=63;i>=0;i--) mask[i] = buf << i;
+    int island_num = 0;
+    std::function<void(int,int)> recurision = [&mask,&recurision,&bit_field](int y, int x) -> void
+    {
+        bit_field[y] |= mask[x];
+        if(0+16 < y && ((bit_field[y-1] & mask[x]) == 0)) recurision(y-1,x);
+        if(y < FIELD_SIZE - 1+16 && ((bit_field[y+1] & mask[x]) == 0)) recurision(y+1,x);
+        if(0+16 < x && ((bit_field[y] & mask[x-1]) == 0)) recurision(y,x-1);
+        if(x < FIELD_SIZE - 1+16 && ((bit_field[y] & mask[x+1]) == 0)) recurision(y,x+1);
+        return;
+    };
+    for(int i = 0 + 16; i < FIELD_SIZE + 16; ++i) for(int j = 0 + 16; j < FIELD_SIZE + 16; ++j)
+    {
+        if((bit_field[i] & mask[j]) == 0){
+            island_num++;
+            recurision(i,j);
+        }
+    }
+    return island_num;
 }
