@@ -145,17 +145,6 @@ void sticky_beam::put_a_stone(int field_num, int stone_num)
 
     search(problem.field, field_num, stone_num, root);
 
-    /*
-    for(auto& each : result_vec[field_num])
-    {
-        first_put1 = each;
-        while(first_put1->stone_num > now_put_stone_num)
-        {
-            first_put1 = first_put1->parent;
-        }
-        std::cout << "each" << first_put1->point.y << " " << first_put1->point.x << " " << first_put1->angle << " " << std::endl;
-    }
-*/
     //自分の長男残す
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -190,17 +179,6 @@ void sticky_beam::put_a_stone(int field_num, int stone_num)
         break;
     }
 
-/*
-    for(auto& each : result_vec[field_num])
-    {
-        first_put2 = each;
-        while(first_put2->stone_num > now_put_stone_num)
-        {
-            first_put2 = first_put2->parent;
-        }
-        std::cout << "each" << first_put2->point.y << " " << first_put2->point.x << " " << first_put2->angle << " " << each->score << std::endl;
-    }
-*/
     //次男が居れば保存する
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -304,8 +282,6 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
             }
         }
     }
-
-    //for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
 
     if(nodes.size() == 0) return 0;
     //探索の最下層だったら結果をresult_vec入れる
