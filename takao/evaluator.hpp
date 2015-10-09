@@ -69,7 +69,6 @@ public:
             ret += w_nextbranches * nextbranches(field, stones[process.nth]);
 
         field.remove_stone_basic(stone);
-        if(field.is_puttable_basic(stone, process.position.y, process.position.x) == 0)qDebug() << "mou kaeri tai";
         return ret;
     }
 
@@ -111,7 +110,7 @@ private:
     int const max_search_depth = 15; // 先読みの深さ上限
     // 評価関数
     int nextbranches(field_type const& field, stone_type &stone) const; // 次の石がおける数、stoneを内部で変更するけど元に戻すからヘーキヘーキ
-    int footprint(field_type const& field, std::vector<stone_type> const& stones, bit_process_type process) const;
+    int footprint(field_type const& field, std::vector<stone_type> &stones, bit_process_type process) const;
 };
 
 #endif // EVALUATOR_HPP

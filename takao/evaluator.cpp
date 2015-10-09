@@ -2,7 +2,6 @@
 #include <field_type.hpp>
 #include <immintrin.h>
 #include <iostream>
-#define QT_DEBUG
 // fieldと石の接する辺の数÷石の辺の数
 // bit version
 double evaluator::normalized_contact(const field_type &field, std::vector<stone_type> &stones, bit_process_type process) const
@@ -19,8 +18,8 @@ double evaluator::normalized_contact(const field_type &field, std::vector<stone_
     int const rotate = process.get_rotate();
     int const posx = process.position.x;
     int const posy = process.position.y;
-
-#ifndef QT_DEBUG
+/*
+#ifdef QT_DEBUG
     if(flip != (int)stone.get_side())
         throw std::runtime_error("normalized_contact: flip does not match");
     if(flip != 0 && flip != 1)
@@ -38,6 +37,7 @@ double evaluator::normalized_contact(const field_type &field, std::vector<stone_
     if(!field.is_puttable_basic(stone, posy, posx))
         throw std::runtime_error("normalized_contact: この石は敷けません 。石を敷く前のfieldを渡してね");
 #endif
+*/
     uint64_t sum = 0;
     for(int i = 0; i < 8; i++) { // i行目を見る
         sum += _mm_popcnt_u64(field_bits[posy + 16 + i - 1] & stone_bits[posx + 7 + 1][flip][rotate][i]);
@@ -45,13 +45,15 @@ double evaluator::normalized_contact(const field_type &field, std::vector<stone_
         sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1 - 1][flip][rotate][i]);
         sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1 + 1][flip][rotate][i]);
     }
-#ifndef QT_DEBUG
+    /*
+#ifdef QT_DEBUG
 //    if(sum > stone.get_side_length() || stone.get_side_length() < 4) {
         stone.print_stone();
         std::cout << "sum = " << static_cast<double>(sum) << std::endl;
         std::cout << "side length = " << stone.get_side_length() << std::endl;
 //    }
 #endif
+*/
     //stone.apply_process(bak_process);
     return static_cast<double>(sum) / stone.get_side_length();
 }
@@ -76,22 +78,24 @@ int evaluator::nextbranches(const field_type &field, stone_type &stone) const
     }
     return sum;
 }
-int evaluator::footprint(const field_type &field, const std::vector<stone_type> &stones, bit_process_type process) const
+int evaluator::footprint(const field_type &field,  std::vector<stone_type> &stones, bit_process_type process) const
 {
     // 要修正だと思う(未確認)
     int sum = 0;
-    stone_type const& stone = stones[process.nth - 1];
+    stone_type &stone = stones[process.nth - 1];
+    stone.apply_process(process);
     stone_type::bit_stones_type const& stone_bits =  stone.get_raw_bit_plain_stones();
     int const flip = process.flip;
     int const rotate = process.get_rotate();
     int const posx = process.position.x;
     int const posy = process.position.y;
+    auto const route_map = field.route_map();
     //sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1][flip][rotate][i]);
     for(int i = 0; i < 8; i ++){//縦についてのループ
         u_int64_t mask = 0b1000000000000000000000000000000000000000000000000000000000000000;
         for(int j = 0; j < 64; j ++,mask >>= 1){
             if(mask & stone_bits[posx + 7 + 1][flip][rotate][i] == 1){
-                //sum += route_map[i][j];
+                sum += route_map[i][j];
             }
         }
     }

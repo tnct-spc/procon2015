@@ -34,9 +34,6 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
                                                      flip,
                                                      angle,
                                                      {dy,dx}));
-                    if(_eval_field.field.is_puttable_basic(stone,dy,dx) == 0){
-                        qDebug() << "マジで壊れてる";
-                    }
                 //ビームサーチの幅制限
                 if(stone_placement_vector.size() < (std::size_t)search_width){
                     if(should_pass){
@@ -58,9 +55,6 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
                         }
                     }
                 }
-                if(_eval_field.field.is_puttable_basic(stone,dy,dx) == 0){
-                    qDebug() << "壊れてる";
-                }
             }
         }
     }
@@ -69,9 +63,6 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
             result_stone.emplace_back(*(stone_params.field),stone_params.score);
         }else{
             field_type field = *(stone_params.field);
-            if(field.is_puttable_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x) == 0){
-                qDebug() << "おかしい";
-            }
             result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
         }
     }
