@@ -37,3 +37,8 @@ INCLUDEPATH += $$PWD/../tengu
 DEPENDPATH += $$PWD/../tengu
 
 include(../lib/qhttpserver/qhttpserver.pri)
+
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}

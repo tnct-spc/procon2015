@@ -36,7 +36,8 @@ HEADERS += tengu.hpp\
 LIBS += -lQt5Concurrent
 
 unix {
-    target.path = /usr/lib
+    target.path = /usr/local/lib
+    target.extra = ldconfig
     INSTALLS += target
 }
 

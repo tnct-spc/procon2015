@@ -30,3 +30,8 @@ unix:!macx: LIBS += -L$$OUT_PWD/../tengu/ -ltengu
 
 INCLUDEPATH += $$PWD/../tengu
 DEPENDPATH += $$PWD/../tengu
+
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}

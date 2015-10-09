@@ -13,7 +13,8 @@ DEFINES += TAKAO_LIBRARY
 LIBS += -lboost_system -lboost_thread
 
 unix {
-    target.path = /usr/lib
+    target.path = /usr/local/lib
+    target.extra = ldconfig
     INSTALLS += target
 }
 
