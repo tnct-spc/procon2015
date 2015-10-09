@@ -63,7 +63,9 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
             result_stone.emplace_back(*(stone_params.field),stone_params.score);
         }else{
             field_type field = *(stone_params.field);
-            result_stone.push_back({field.put_stone_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x),stone_params.score});
+            field.put_stone_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)),stone_params.process.position.y,stone_params.process.position.x);
+            if(field.processes.size() == 1)field.init_route_map();
+            result_stone.push_back({field,stone_params.score});
         }
     }
     if(result_stone.size() == 0)return std::move(pattern);
@@ -80,9 +82,9 @@ void sticky_algo::run(){
         //最後の石の時
         print_text(std::to_string(cnt--));
         if(stone_itr + 1 == problem.stones.end()){
-            pattern = eval_pattern(*stone_itr,std::move(pattern),5);
+            pattern = eval_pattern(*stone_itr,std::move(pattern),SEARCH_WIDTH);
         }else{
-            pattern = eval_pattern(*stone_itr,std::move(pattern),5);
+            pattern = eval_pattern(*stone_itr,std::move(pattern),SEARCH_WIDTH);
         }
     }
     field_with_score_type best_ans = *std::min_element(pattern.begin(),pattern.end(),[](auto  &t1, auto  &t2) {

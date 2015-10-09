@@ -143,12 +143,16 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
     }
     make_bit(raw_data);
     qDebug() << this->str().c_str();
+    std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> tmp = {0};
+    weighted_route_map = tmp;
     //init_edge();
 }
 
 field_type::field_type(const int obstacles, const int cols, const int rows){
     //has_limit = true;
     set_random(obstacles,cols,rows);
+    std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> tmp = {0};
+    weighted_route_map = tmp;
     //init_edge();
 }
 
@@ -301,7 +305,7 @@ void field_type::init_route_map(){
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> distance_map = {0};
-    weighted_route_map = distance_map;//明らかにおかしいけど,初期化のため仕方がない
+    //weighted_route_map = distance_map;//明らかにおかしいけど,初期化のため仕方がない
     for(int i = 0;i < 64;i++){
         //c++が書きたい
         bit_slide_field[i] = bit_plain_field_only_stones[i];
@@ -388,8 +392,11 @@ void field_type::init_route_map(){
             std::cout << std::setw(4) << x;
         }
         std::cout << std::endl;
+
     }
+    std::cout << std::endl;
     */
+
 }
 double field_type::evaluate_ken_o_expwy() const
 {

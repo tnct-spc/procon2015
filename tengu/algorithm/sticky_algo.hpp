@@ -36,9 +36,9 @@ public:
 
 private:
 
-    static constexpr std::size_t SEARCH_WIDTH = 5;
+    static constexpr std::size_t SEARCH_WIDTH = 500;
 
-    evaluator _evaluator = evaluator(-10,1,1,0.5);
+    evaluator _evaluator = evaluator(-0.5,0.1,0.3,0.5);
     problem_type origin_problem;
     problem_type problem;
     std::vector<field_with_score_type> eval_pattern(stone_type& stone, std::vector<field_with_score_type> pattern, int search_width);

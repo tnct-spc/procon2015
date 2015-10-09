@@ -78,9 +78,8 @@ int evaluator::nextbranches(const field_type &field, stone_type &stone) const
     }
     return sum;
 }
-int evaluator::footprint(const field_type &field,  std::vector<stone_type> &stones, bit_process_type process) const
+double evaluator::footprint(const field_type &field,  std::vector<stone_type> &stones, bit_process_type process) const
 {
-    // 要修正だと思う(未確認)
     int sum = 0;
     stone_type &stone = stones[process.nth - 1];
     stone.apply_process(process);
@@ -94,10 +93,11 @@ int evaluator::footprint(const field_type &field,  std::vector<stone_type> &ston
     for(int i = 0; i < 8; i ++){//縦についてのループ
         u_int64_t mask = 0b1000000000000000000000000000000000000000000000000000000000000000;
         for(int j = 0; j < 64; j ++,mask >>= 1){
-            if(mask & stone_bits[posx + 7 + 1][flip][rotate][i] == 1){
-                if(i+posy >= 0)sum += route_map[i + posy][j];
+            if(mask & stone_bits[posx + 7 + 1][flip][rotate][i]){
+                if(i+posy >= 0)
+                    sum += route_map[i + posy][j];
             }
         }
     }
-    return sum;
+    return static_cast<double>(sum) / static_cast<double>(stone.get_area());
 }
