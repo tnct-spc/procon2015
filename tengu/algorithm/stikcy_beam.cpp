@@ -12,7 +12,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
-
+/*
 sticky_beam::sticky_beam(problem_type _problem) : origin_problem(_problem)
 {
     algorithm_name = "sticky_beam";
@@ -119,7 +119,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
     std::shared_ptr<node> first_put1;
     std::shared_ptr<node> first_put2;
 
-    std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
+    std::shared_ptr<node> root (new node(NULL,stone_num,{0,0},0,stone_type::Sides::Head,/*eval.min_value*+/std::numeric_limits<double>::min(),MAX_SEARCH_DEPTH));
 
     search(problem.field, field_num, stone_num, root);
 
@@ -133,7 +133,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         }
         std::cout << "each" << first_put1->point.y << " " << first_put1->point.x << " " << first_put1->angle << " " << std::endl;
     }
-*/
+*+/
     //自分の長男残す
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -155,7 +155,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
                             {problem.stones.at(stone_num),{first_put1->point.y, first_put1->point.x}},
                             get_rem_stone_zk(stone_num+1))== true)
         {
-            //eldest_son->get()->score -= /*eval.min_value*/std::numeric_limits<double>::min() / 2;
+            //eldest_son->get()->score -= /*eval.min_value*+/std::numeric_limits<double>::min() / 2;
             eldest_son->get()->score -= 500;
             continue;
         }
@@ -176,7 +176,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         }
         std::cout << "each" << first_put2->point.y << " " << first_put2->point.x << " " << first_put2->angle << " " << each->score << std::endl;
     }
-*/
+*+/
     //次男が居れば保存する
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -305,3 +305,4 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
     //std::cout << "depth = " << parent->stone_num - now_put_stone_num + 1 << " branch = " << nodes.size() << std::endl;
     return nodes.size();
 }
+*/

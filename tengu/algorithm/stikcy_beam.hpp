@@ -6,7 +6,7 @@
 #include <queue>
 #include <memory>
 #include <vector>
-
+/*
 class sticky_beam : public algorithm_type
 {
     Q_OBJECT
@@ -84,12 +84,12 @@ private:
     int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky
-    double light_eval(field_type& field,process_type process);
+    //double light_eval(field_type& field,process_type process);
     problem_type problem;
     void eval_pattern(stone_type& stone, stone_type& next_stone);
     std::vector<problem_with_score_type> result_stone;
 
 
 };
-
+*/
 #endif // STICKY_BEAM_HPP

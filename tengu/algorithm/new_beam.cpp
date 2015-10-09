@@ -13,13 +13,6 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 
-new_beam::new_beam(problem_type _problem)
-{
-    origin_problem = _problem;
-    algorithm_name = "new_beam";
-    ALL_STONES_NUM = origin_problem.stones.size();
-
-}
 new_beam::new_beam(problem_type _problem, evaluator eval):eval(eval)
 {
     origin_problem = _problem;
@@ -66,7 +59,8 @@ void new_beam::only_one_try(problem_type problem)
 
             problem.stones.at(stone_num).set_side(first_put->side).set_angle(first_put->angle);
             if(eval.should_pass(problem.field,
-                                {problem.stones.at(stone_num),{first_put->point.y, first_put->point.x}},
+                                origin_problem.stones,
+                                bit_process_type(stone_num+1,static_cast<int>(first_put->side),first_put->angle,first_put->point),
                                 get_rem_stone_zk(stone_num+1))== true)
             {
                 max->get()->score = std::numeric_limits<double>::min();
@@ -95,8 +89,6 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
 
-    if(result_vec.size() == 0)
-
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -105,10 +97,9 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
         if(_field.is_puttable_basic(stone,y,x) == true)
         {
             // move_goodnessは2種類ある　最後の石かどうか判定が必要
-            const double score = stone_num == origin_problem.stones.size() - 1 ?
-                        eval.move_goodness(_field,{stone,{y,x}}) :
-                        eval.move_goodness(_field,{stone,{y,x}},origin_problem.stones.at(stone_num+1));
-
+            double const score = eval.move_goodness(_field,
+                                                    origin_problem.stones,
+                                                    bit_process_type(stone_num+1,side,angle,point_type{y,x}));
             //MAX_SEARCH_WIDTH個貯まるまでは追加する
             if(nodes.size() < MAX_SEARCH_WIDTH)
             {
@@ -120,11 +111,11 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
                                 angle,
                                 static_cast<stone_type::Sides>(side),
                                 score,
-                                stone_num == parent->stone_num ? eval.search_depth(_field, {stone,{y,x}}) : parent->search_depth
+                                stone_num == parent->stone_num ? eval.search_depth(_field,origin_problem.stones,bit_process_type(stone_num+1,angle,side,point_type{y,x})) : parent->search_depth
                                 )
                             );
 #ifdef QT_DEBUG
-                if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
+                if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field,origin_problem.stones,bit_process_type(stone_num+1,angle,side,point_type{y,x})) << std::endl;
 #endif
             }
             else
@@ -166,7 +157,7 @@ int new_beam::search(field_type& _field, std::size_t const stone_num, std::share
             {
                 result_vec.emplace_back(each_node);
             }
-            _field.remove_stone_basic();
+            _field.remove_stone_basic(stone);
         }
     }
     return nodes.size();
