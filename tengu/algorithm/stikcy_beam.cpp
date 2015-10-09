@@ -35,13 +35,12 @@ void sticky_beam::run()
 {
     qDebug("sticky_beam start");
 
-    /*
     std::random_device seed_gen;
     std::mt19937_64 engine(seed_gen());
     std::uniform_int_distribution<int> position(-STONE_SIZE + 1, FIELD_SIZE - 1);
     std::uniform_int_distribution<int> rotate(0,3);
     std::uniform_int_distribution<int> flip(0,1);
-    stone_type& first_stone = origin_problem.stones.back();
+    stone_type first_stone = origin_problem.stones.front();
     while(holding_problems.size() < HOLD_FIELD_NUM)
     {
         int const x = position(engine);
@@ -56,12 +55,9 @@ void sticky_beam::run()
             holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
         }
     }
-     */
-
-    holding_problems.emplace_back(origin_problem,0);
 
     //石の数ループ
-    for(; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
+    for(++now_put_stone_num; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
         //保持するフィールドの数ループ
         for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
@@ -82,17 +78,8 @@ void sticky_beam::run()
             return lhs.first_put->score < rhs.first_put->score;
         });
         holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
-        //追加する場合
-        if(holding_problems.size() < HOLD_FIELD_NUM)
-        {
-            holding_problems.emplace_back(holding_problems[best_second_son->field_num]);
-            holding_problems.back().problem.field.remove_stone_basic();
-            holding_problems.back().problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
-                    best_second_son->first_put->point.y, best_second_son->first_put->point.x);
-            holding_problems.back().score = best_second_son->first_put->score;
-        }
         //置き換える場合
-        else if(worst_element->score < best_second_son->first_put->score)
+        if(worst_element->score < best_second_son->first_put->score)
         {
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic();
