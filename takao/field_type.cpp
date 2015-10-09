@@ -142,7 +142,6 @@ field_type::field_type(std::string const & raw_field_text, std::size_t stone_nth
                        [](auto const & c) { return c == '1' ? -1 : 0; });
     }
     make_bit(raw_data);
-    qDebug() << this->str().c_str();
     std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> tmp = {0};
     weighted_route_map = tmp;
     //init_edge();
