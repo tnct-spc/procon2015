@@ -86,7 +86,6 @@ private:
     std::array<std::array<int, FIELD_SIZE>, FIELD_SIZE> weighted_route_map;
     //渡された石の総数.get_answerで必要
     size_t provided_stones;
-
     void init_route_map();
     bool is_placed_stone[256] = {0};
     //石が置かれているか否かを返す

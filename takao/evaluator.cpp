@@ -89,13 +89,13 @@ int evaluator::footprint(const field_type &field,  std::vector<stone_type> &ston
     int const rotate = process.get_rotate();
     int const posx = process.position.x;
     int const posy = process.position.y;
-    auto const route_map = field.route_map();
+    auto const& route_map = field.route_map();
     //sum += _mm_popcnt_u64(field_bits[posy + 16 + i] & stone_bits[posx + 7 + 1][flip][rotate][i]);
     for(int i = 0; i < 8; i ++){//縦についてのループ
         u_int64_t mask = 0b1000000000000000000000000000000000000000000000000000000000000000;
         for(int j = 0; j < 64; j ++,mask >>= 1){
             if(mask & stone_bits[posx + 7 + 1][flip][rotate][i] == 1){
-                sum += route_map[i][j];
+                if(i+posy >= 0)sum += route_map[i + posy][j];
             }
         }
     }

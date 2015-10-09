@@ -65,9 +65,10 @@ public:
         stone.apply_process(process);
         field.put_stone_basic(stone, process.position.y, process.position.x);
         ret += w_complexity * field.evaluate_normalized_complexity();
+        /*
         if(process.nth < stones.size()) // 最後の石以外
             ret += w_nextbranches * nextbranches(field, stones[process.nth]);
-
+        */
         field.remove_stone_basic(stone);
         return ret;
     }
