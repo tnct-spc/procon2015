@@ -6,7 +6,7 @@
 #include <queue>
 #include <memory>
 #include <vector>
-/*
+
 class sticky_beam : public algorithm_type
 {
     Q_OBJECT
@@ -91,5 +91,5 @@ private:
 
 
 };
-*/
+
 #endif // STICKY_BEAM_HPP
