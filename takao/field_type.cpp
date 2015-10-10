@@ -385,7 +385,7 @@ void field_type::init_route_map(){
             }
         }
     }
-    /*
+
     for(auto y : weighted_route_map){
         for(auto  x : y){
             std::cout << std::setw(4) << x;
@@ -394,7 +394,7 @@ void field_type::init_route_map(){
 
     }
     std::cout << std::endl;
-    */
+
 
 }
 double field_type::evaluate_ken_o_expwy() const

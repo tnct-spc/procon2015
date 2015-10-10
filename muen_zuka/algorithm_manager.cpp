@@ -25,13 +25,13 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     //動かしたいアルゴリズムを配列に入れる
     if(enable_algo.at(0))algo_vec.push_back(new simple_algorithm(problem));
     if(enable_algo.at(1))algo_vec.push_back(new poor_algo(problem));
-    if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem));
+    if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem,evaluator(-10,1,1,0.5)));
     //if(enable_algo.at(3))algo_vec.push_back(new square(problem));
     if(enable_algo.at(4))algo_vec.push_back(new yrange(problem, time_limit,eval));
     //if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
     if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem, eval));
     if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem, eval));
-    if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(0,0,1,0.5)));
     if(enable_algo.at(9))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit,eval));
 
 

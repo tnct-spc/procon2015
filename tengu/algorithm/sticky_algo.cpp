@@ -27,9 +27,9 @@ std::vector<field_with_score_type> sticky_algo::eval_pattern(stone_type& stone,s
         for(int flip = 0; flip <= 1 ;flip++,stone.flip())for(int angle = 0; angle <= 270;angle += 90,stone.rotate(90))for(int dy=-7;dy<=32;dy++)for(int dx=-7;dx<=32;dx++){
             if(_eval_field.field.is_puttable_basic(stone,dy,dx)){
                 double score;
-                bool should_pass = false;
-                    //should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
-                    score = _evaluator.move_goodness(_eval_field.field,origin_problem.stones,
+                bool should_pass;
+                should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
+                score = _evaluator.move_goodness(_eval_field.field,origin_problem.stones,
                                                      bit_process_type(stone.get_nth(),
                                                      flip,
                                                      angle,

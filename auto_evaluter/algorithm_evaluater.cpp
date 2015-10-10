@@ -106,8 +106,8 @@ field_type algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     /********************************/
     /********************************/
     //simple_algorithm algo(problem);
-    //sticky_algo algo(problem,_eval);
-    new_beam algo(problem,_eval);
+    sticky_algo algo(problem,_eval);
+    //new_beam algo(problem,_eval);
     /********************************/
     /********************************/
     /********************************/
@@ -157,7 +157,7 @@ void algorithm_evaluater::run(){
                     if(param_a + param_b > 1.0)break;
                     data.push_back(std::make_tuple(std::get<0>(named_problem),std::get<1>(named_problem),param_a,param_b,t_contact_pass));
                 }
-                if(data.size() > 32){
+                if(data.size() > 1024){
                 QFuture<void> threads = QtConcurrent::map(
                     data,
                     [this](auto tup){
