@@ -254,32 +254,3 @@ int yrange_next::count_island_fast(const field_type &field)
     //return
     return island_num;
 }
-
-int yrange_next::count_island(field_type const& field)
-{
-    //uint64_t const (&field_bits)[64] = field.get_bit_plain_field();
-    uint64_t bit_field[64];
-    //for(int i=0;i<64;i++) bit_field[i]=field_bits[i];
-    memcpy(bit_field, field.get_bit_plain_field(), sizeof(uint64_t)*64);
-    uint64_t buf = 1;
-    uint64_t mask[64];
-    for(int i=63;i>=0;i--) mask[i] = buf << i;
-    int island_num = 0;
-    std::function<void(int,int)> recurision = [&mask,&recurision,&bit_field](int y, int x) -> void
-    {
-        bit_field[y] |= mask[x];
-        if(0+16 < y && ((bit_field[y-1] & mask[x]) == 0)) recurision(y-1,x);
-        if(y < FIELD_SIZE - 1+16 && ((bit_field[y+1] & mask[x]) == 0)) recurision(y+1,x);
-        if(0+16 < x && ((bit_field[y] & mask[x-1]) == 0)) recurision(y,x-1);
-        if(x < FIELD_SIZE - 1+16 && ((bit_field[y] & mask[x+1]) == 0)) recurision(y,x+1);
-        return;
-    };
-    for(int i = 0 + 16; i < FIELD_SIZE + 16; ++i) for(int j = 0 + 16; j < FIELD_SIZE + 16; ++j)
-    {
-        if((bit_field[i] & mask[j]) == 0){
-            island_num++;
-            recurision(i,j);
-        }
-    }
-    return island_num;
-}
