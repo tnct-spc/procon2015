@@ -234,7 +234,6 @@ int yrange::count_island_fast(const field_type &field)
                     }else{
                         //違う穴だと思っていたものがくっついたので、label_countを一個減らす
                         label_count--;
-                        //qDebug("less label at y=%d x=%d %d %d",y,x,label_count,table_count);
                         if(up_label_num < left_label_num){
                             //値を入れる(たぶん早いので小さい方)
                             labeling_field[y][x] = up_label_num;
