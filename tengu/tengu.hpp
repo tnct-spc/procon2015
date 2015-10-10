@@ -11,5 +11,6 @@
 #include "algorithm/new_beam.hpp"
 #include "algorithm/stikcy_beam.hpp"
 #include "algorithm/yrange_based_yayoi.h"
+#include "algorithm/strange.hpp"
 
 #endif // TENGU_HPP
