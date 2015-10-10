@@ -41,6 +41,8 @@ void sticky_beam::run()
     holding_problems.emplace_back(origin_problem,0);
     put_a_stone(0,0);
 
+    holding_problems[0].problem.field.init_route_map();
+
     //残りはrandom
     std::random_device seed_gen;
     std::mt19937_64 engine(seed_gen());
