@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>514</height>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -527,6 +527,19 @@
     <string>yrange_based_yayoi</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="checkBox_10">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>510</y>
+     <width>161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_next</string>
+   </property>
+  </widget>
   <action name="problem_load_action">
    <property name="text">
     <string>問題読み込み</string>
@@ -751,7 +764,7 @@
   <slot>ui_button_playerid_pushed()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
