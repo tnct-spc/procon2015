@@ -6,13 +6,16 @@
 namespace stranger {
 class field_with_score_type{
 public:
-    field_with_score_type(field_type& field,double score):field(field),score(score){}
+    field_with_score_type(field_type const& field_, double score_) :
+        field(field_), score(score_)
+    {
+    }
     field_type field;
     double score;
 };
 class stone_params_type{
 public:
-    stone_params_type(int _dy,int _dx,int _angle,stone_type::Sides _side,double _score,bool _pass,field_type* _field){
+    stone_params_type(int _dy, int _dx, int _angle, stone_type::Sides _side, double _score, bool _pass, field_type* _field){
         process.position.y = _dy;
         process.position.x = _dx;
         process.angle = _angle ;
@@ -46,6 +49,8 @@ private:
     problem_type problem;
     std::vector<stranger::field_with_score_type> eval_pattern(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, int search_width);
     std::vector<stranger::field_with_score_type> result_stone;
+    std::vector<stranger::field_with_score_type> force_put(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, bit_process_type process);
+
 
 };
 #endif // STRANGE_HPP

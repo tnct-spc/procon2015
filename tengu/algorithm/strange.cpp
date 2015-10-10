@@ -24,17 +24,33 @@ strange::~strange()
 }
 
 std::vector<stranger::field_with_score_type>
+strange::force_put(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, bit_process_type process)
+{
+    result_stone.clear();
+    int bak_angle = stone.get_angle();
+    stone_type::Sides bak_side = stone.get_side();
+    stone.set_angle(process.angle);
+    stone.set_side(static_cast<stone_type::Sides>(process.flip));
+    field_type field = pattern.at(0).field;
+    field.put_stone_basic(stone, process.position.y, process.position.x);
+    stone.set_angle(bak_angle);
+    stone.set_side(bak_side);
+    pattern.emplace_back(field, 0.0);
+    return std::move(pattern);
+}
+
+std::vector<stranger::field_with_score_type>
 strange::eval_pattern(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, int search_width)
 {
     result_stone.clear();
     std::vector<stranger::stone_params_type> stone_placement_vector;
-    stone_placement_vector.reserve(SEARCH_WIDTH);
+    stone_placement_vector.reserve(search_width);
     for(stranger::field_with_score_type& _eval_field : pattern) {
         for(int flip = 0; flip <= 1 ; flip++, stone.flip()) for(int angle = 0; angle <= 270; angle += 90, stone.rotate(90)) for(int dy = -7; dy <= 32; dy++) for(int dx = -7; dx <= 32; dx++) {
             if(_eval_field.field.is_puttable_basic(stone, dy, dx)) {
                 double score;
                 bool should_pass = false;
-                    //should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
+                //should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
                 score = _evaluator.move_goodness(_eval_field.field,
                                                  origin_problem.stones,
                                                  bit_process_type(stone.get_nth(), flip, angle, {dy, dx}));
@@ -51,7 +67,7 @@ strange::eval_pattern(stone_type& stone, std::vector<stranger::field_with_score_
                                              stone_placement_vector.end(),
                                              [](auto const &t1, auto const &t2) { return t1.score < t2.score; });
                     if(should_pass) {
-                        if(_eval_field.score > worst_stone_param->score){
+                        if(_eval_field.score > worst_stone_param->score) {
                             //(*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
                             (*worst_stone_param) = stranger::stone_params_type(dy, dx, angle, static_cast<stone_type::Sides>(flip), _eval_field.score, true, &_eval_field.field);
                         }
@@ -86,16 +102,38 @@ void strange::run()
     QElapsedTimer timer;
     timer.start();
     std::vector<stranger::field_with_score_type> pattern;
-    pattern.emplace_back(problem.field,0);
-    size_t cnt = problem.stones.size();
-    for(auto stone_itr = problem.stones.begin(); stone_itr != problem.stones.end(); stone_itr++){
-        //最後の石の時
+    pattern.emplace_back(problem.field, 0);
+
+    std::vector<bit_process_type> init_moves = [this]() -> std::vector<bit_process_type>
+    {
+        std::vector<bit_process_type> ret;
+        field_type& field = problem.field;
+        stone_type& stone = problem.stones[0];
+        stone_type::Sides bak_side = stone.get_side();
+        int bak_angle = stone.get_angle();
+        for(int x = -7; x < 32; x++)
+            for(int y = -7; y < 32; y++)
+                for(int flip = 0; flip < 2; flip++) {
+                    stone.set_side(static_cast<stone_type::Sides>(flip));
+                    for(int rotate = 0; rotate < 4; rotate++) {
+                        stone.set_angle(rotate * 90);
+                        if(field.is_puttable_basic(stone, y, x))
+                            ret.emplace_back(1, flip, rotate * 90, point_type{y, x});
+                    }
+                }
+        stone.set_side(bak_side);
+        stone.set_angle(bak_angle);
+        return std::move(ret);
+    }();
+    std::random_shuffle(init_moves.begin(), init_moves.end());
+    // saisho no ishi
+    pattern = force_put(problem.stones.at(0), std::move(pattern), init_moves[0]);
+
+    // 2banme ikou no ishi
+    size_t cnt = problem.stones.size() - 1;
+    for(auto it = problem.stones.begin() + 1; it != problem.stones.end(); it++) {
         print_text(std::to_string(cnt--));
-        if(stone_itr + 1 == problem.stones.end()) {
-            pattern = eval_pattern(*stone_itr, std::move(pattern), SEARCH_WIDTH);
-        } else {
-            pattern = eval_pattern(*stone_itr, std::move(pattern), SEARCH_WIDTH);
-        }
+        pattern = eval_pattern(*it, std::move(pattern), SEARCH_WIDTH);
     }
     stranger::field_with_score_type best_ans =
             *std::min_element(pattern.begin(), pattern.end(),
