@@ -92,7 +92,6 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
 {
     search_type best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
     int base_island_num = count_island_fast(_field);
-    qDebug("%d: island=%d new island=%d",stone.get_nth(),count_island(_field),base_island_num);
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -137,7 +136,7 @@ int yrange::count_island_fast(const field_type &field)
     if(!is_init){
         is_init = true;
         uint64_t buf = 1;
-        for(int i=63;i>=0;i--) mask[i] = buf << i;
+        for(int i=0;i<64;i++) mask[63-i] = buf << i;
     }
     //init
     memcpy(bit_field, field.get_bit_plain_field(), sizeof(uint64_t)*64);
@@ -146,14 +145,15 @@ int yrange::count_island_fast(const field_type &field)
     //search
     int up_label_num,left_label_num;
     int label_count = 0;
+    int table_count = 0;
     //when y==x==0
     //空白かどうか
     if((bit_field[16] & mask[16]) == 0){
         //新しくラベルを追加する
-        qDebug("add label at y0x0");
         label_count++;
-        labeling_field[0][0] = label_count;
-        rooting_table[label_count] = label_count;//分かりやすいので１から使う
+        table_count++;
+        labeling_field[0][0] = table_count;
+        rooting_table[table_count] = table_count;//分かりやすいので１から使う
     }
     //when y==0 x!=0
     for(int x=1;x<32;++x){
@@ -163,10 +163,10 @@ int yrange::count_island_fast(const field_type &field)
             left_label_num = labeling_field[0][x-1];
             if(left_label_num == 0){
                 //空白ではなかったので、新しくラベルを追加する
-                qDebug("add label at y0 x=%d",x);
                 label_count++;
-                labeling_field[0][x] = label_count;
-                rooting_table[label_count] = label_count;//分かりやすいので１から使う
+                table_count++;
+                labeling_field[0][x] = table_count;
+                rooting_table[table_count] = table_count;//分かりやすいので１から使う
             }else{
                 //左に空白があったので、左と同じラベルを貼る
                 labeling_field[0][x] = left_label_num;
@@ -181,10 +181,10 @@ int yrange::count_island_fast(const field_type &field)
             up_label_num = labeling_field[y-1][0];
             if(up_label_num == 0){
                 //空白だったので、新しくラベルを追加する
-                qDebug("add label at x0 y=%d",y);
                 label_count++;
-                labeling_field[y][0] = label_count;
-                rooting_table[label_count] = label_count;//分かりやすいので１から使う
+                table_count++;
+                labeling_field[y][0] = table_count;
+                rooting_table[table_count] = table_count;//分かりやすいので１から使う
             }else{
                 //上に空白があったので、上と同じラベルを貼る
                 labeling_field[y][0] = up_label_num;
@@ -199,14 +199,15 @@ int yrange::count_island_fast(const field_type &field)
                 left_label_num = labeling_field[y][x-1];
                 if(up_label_num == 0 && left_label_num == 0){
                     //どちらも空白ではなかったので、新しくラベルを追加する
-                    qDebug("add label at x=%d y=%d",x,y);
                     label_count++;
-                    labeling_field[y][x] = label_count;
-                    rooting_table[label_count] = label_count;//分かりやすいので１から使う
+                    table_count++;
+                    //qDebug("add label at y=%d x=%d %d %d",y,x,label_count,table_count);
+                    labeling_field[y][x] = table_count;
+                    rooting_table[table_count] = table_count;//分かりやすいので１から使う
                 }else if(up_label_num > 0 && left_label_num == 0){
                     //上に空白があったので、上と同じラベルを貼る
                     labeling_field[y][x] = up_label_num;
-                }else if(up_label_num > 0 && left_label_num == 0){
+                }else if(up_label_num == 0 && left_label_num > 0){
                     //左に空白があったので、左と同じラベルを貼る
                     labeling_field[y][x] = left_label_num;
                 }else if(up_label_num == left_label_num){
@@ -232,7 +233,8 @@ int yrange::count_island_fast(const field_type &field)
                         labeling_field[y][x] = up_label_num;//どっちでもよし
                     }else{
                         //違う穴だと思っていたものがくっついたので、label_countを一個減らす
-//label_count--;
+                        label_count--;
+                        //qDebug("less label at y=%d x=%d %d %d",y,x,label_count,table_count);
                         if(up_label_num < left_label_num){
                             //値を入れる(たぶん早いので小さい方)
                             labeling_field[y][x] = up_label_num;
