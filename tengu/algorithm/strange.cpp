@@ -2,6 +2,7 @@
 #include <limits>
 #include <sstream>
 #include <algorithm>
+#include <random>
 #include "QDebug"
 #include "QString"
 #include "QElapsedTimer"
@@ -125,7 +126,7 @@ void strange::run()
         stone.set_angle(bak_angle);
         return std::move(ret);
     }();
-    std::random_shuffle(init_moves.begin(), init_moves.end());
+    std::shuffle(init_moves.begin(), init_moves.end(), std::mt19937());
     // saisho no ishi
     pattern = force_put(problem.stones.at(0), std::move(pattern), init_moves[0]);
 
