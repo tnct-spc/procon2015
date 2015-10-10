@@ -31,6 +31,7 @@ private:
     search_type search(field_type& _field, stone_type& stone);
     bool pass(search_type const& search);
     int count_island(field_type const& field);
+    int count_island_fast(field_type const& field);
 
     //Time
     QElapsedTimer limit_timer;

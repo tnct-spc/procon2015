@@ -91,7 +91,8 @@ void yrange::one_try(field_type& field, std::size_t stone_num)
 yrange::search_type yrange::search(field_type& _field, stone_type& stone)
 {
     search_type best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
-    int base_island_num = count_island(_field);
+    int base_island_num = count_island_fast(_field);
+    qDebug("%d: island=%d new island=%d",stone.get_nth(),count_island(_field),base_island_num);
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -102,7 +103,7 @@ yrange::search_type yrange::search(field_type& _field, stone_type& stone)
                                                          origin_problem.stones,
                                                          bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
             _field.put_stone_basic(stone,y,x);
-            int const island_num = count_island(_field);
+            int const island_num = count_island_fast(_field);
             if(best.score < score || (best.score == score && best.island_num > island_num))
             {
                 if((island_num - base_island_num) >= 2){
@@ -125,11 +126,140 @@ bool yrange::pass(search_type const& search)
     else return false;
 }
 
+int yrange::count_island_fast(const field_type &field)
+{
+    //static init
+    static short labeling_field[32][32];
+    static int rooting_table[256];
+    static uint64_t mask[64];
+    static bool is_init = false;
+    static uint64_t bit_field[64];
+    if(!is_init){
+        is_init = true;
+        uint64_t buf = 1;
+        for(int i=63;i>=0;i--) mask[i] = buf << i;
+    }
+    //init
+    memcpy(bit_field, field.get_bit_plain_field(), sizeof(uint64_t)*64);
+    for(int i=0;i<32;++i)for(int j=0;j<32;j++) labeling_field[i][j] = 0;
+    int island_num = 0;
+    //search
+    int up_label_num,left_label_num;
+    int label_count = 0;
+    //when y==x==0
+    //空白かどうか
+    if((bit_field[16] & mask[16]) == 0){
+        //新しくラベルを追加する
+        qDebug("add label at y0x0");
+        label_count++;
+        labeling_field[0][0] = label_count;
+        rooting_table[label_count] = label_count;//分かりやすいので１から使う
+    }
+    //when y==0 x!=0
+    for(int x=1;x<32;++x){
+        //空白かどうか
+        if((bit_field[16] & mask[x+16]) == 0){
+            //左を見る
+            left_label_num = labeling_field[0][x-1];
+            if(left_label_num == 0){
+                //空白ではなかったので、新しくラベルを追加する
+                qDebug("add label at y0 x=%d",x);
+                label_count++;
+                labeling_field[0][x] = label_count;
+                rooting_table[label_count] = label_count;//分かりやすいので１から使う
+            }else{
+                //左に空白があったので、左と同じラベルを貼る
+                labeling_field[0][x] = left_label_num;
+            }
+        }
+    }
+    for(int y=1;y<32;++y){
+        //when y!=0 x==0
+        //空白かどうか
+        if((bit_field[y+16] & mask[16]) == 0){
+            //上を見る
+            up_label_num = labeling_field[y-1][0];
+            if(up_label_num == 0){
+                //空白だったので、新しくラベルを追加する
+                qDebug("add label at x0 y=%d",y);
+                label_count++;
+                labeling_field[y][0] = label_count;
+                rooting_table[label_count] = label_count;//分かりやすいので１から使う
+            }else{
+                //上に空白があったので、上と同じラベルを貼る
+                labeling_field[y][0] = up_label_num;
+            }
+        }
+        for(int x=1;x<32;++x){
+            //空白かどうか
+            if((bit_field[y+16] & mask[x+16]) == 0){
+                /*空白だったので、上と左を見てなんらかの値で埋める*/
+                //左と上を見る
+                up_label_num = labeling_field[y-1][x];
+                left_label_num = labeling_field[y][x-1];
+                if(up_label_num == 0 && left_label_num == 0){
+                    //どちらも空白ではなかったので、新しくラベルを追加する
+                    qDebug("add label at x=%d y=%d",x,y);
+                    label_count++;
+                    labeling_field[y][x] = label_count;
+                    rooting_table[label_count] = label_count;//分かりやすいので１から使う
+                }else if(up_label_num > 0 && left_label_num == 0){
+                    //上に空白があったので、上と同じラベルを貼る
+                    labeling_field[y][x] = up_label_num;
+                }else if(up_label_num > 0 && left_label_num == 0){
+                    //左に空白があったので、左と同じラベルを貼る
+                    labeling_field[y][x] = left_label_num;
+                }else if(up_label_num == left_label_num){
+                    //どちらも同じ穴の空白だったので、同じラベルを貼る
+                    labeling_field[y][x] = up_label_num;//どっちでもよし
+                }else{
+                    //上にも左にも空白があって、パット見同じ穴だと分かって無さそうだったのでいろいろ調べてなんかしら貼る
+                    //uplabelとleftlabelの値をテーブルを使って限界まで下げる
+                    while(1){
+                        if(up_label_num != rooting_table[up_label_num]){
+                            up_label_num = rooting_table[up_label_num];
+                            continue;
+                        }else break;
+                    }
+                    while(1){
+                        if(left_label_num != rooting_table[left_label_num]){
+                            left_label_num = rooting_table[left_label_num];
+                            continue;
+                        }else break;
+                    }
+                    if(up_label_num == left_label_num){
+                        //結局同じ穴だって分かってた
+                        labeling_field[y][x] = up_label_num;//どっちでもよし
+                    }else{
+                        //違う穴だと思っていたものがくっついたので、label_countを一個減らす
+//label_count--;
+                        if(up_label_num < left_label_num){
+                            //値を入れる(たぶん早いので小さい方)
+                            labeling_field[y][x] = up_label_num;
+                            //テーブルに今の発見を紐付ける(大きい値を参照しようとすると小さい値にいく)
+                            rooting_table[left_label_num] = up_label_num;
+                        }else{
+                            //値を入れる(たぶん早いので小さい方)
+                            labeling_field[y][x] = left_label_num;
+                            //テーブルに今の発見を紐付ける(大きい値を参照しようとすると小さい値にいく)
+                            rooting_table[up_label_num] = left_label_num;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    island_num = label_count;
+    //return
+    return island_num;
+}
+
 int yrange::count_island(field_type const& field)
 {
-    uint64_t const (&field_bits)[64] = field.get_bit_plain_field();
+    //uint64_t const (&field_bits)[64] = field.get_bit_plain_field();
     uint64_t bit_field[64];
-    for(int i=0;i<64;i++) bit_field[i]=field_bits[i];
+    //for(int i=0;i<64;i++) bit_field[i]=field_bits[i];
+    memcpy(bit_field, field.get_bit_plain_field(), sizeof(uint64_t)*64);
     uint64_t buf = 1;
     uint64_t mask[64];
     for(int i=63;i>=0;i--) mask[i] = buf << i;
