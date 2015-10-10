@@ -18,6 +18,7 @@ sticky_beam::sticky_beam(problem_type _problem) : origin_problem(_problem)
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
+    for(std::size_t i = 0; i < HOLD_FIELD_NUM; ++i) second_sons.emplace_back(node_with_field_num(NULL,-1));
 }
 
 sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),origin_problem(_problem)
@@ -25,6 +26,7 @@ sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),ori
     algorithm_name = "sticky_beam";
     ALL_STONES_NUM = _problem.stones.size();
     holding_problems.reserve(HOLD_FIELD_NUM);
+    for(std::size_t i = 0; i < HOLD_FIELD_NUM; ++i) second_sons.emplace_back(node_with_field_num(NULL,-1));
 }
 
 sticky_beam::~sticky_beam()
@@ -37,7 +39,7 @@ void sticky_beam::run()
 
     //一つは探索する
     holding_problems.emplace_back(origin_problem,0);
-    put_a_stone(holding_problems[0].problem,0,0);
+    put_a_stone(0,0);
 
     //残りはrandom
     std::random_device seed_gen;
@@ -58,40 +60,57 @@ void sticky_beam::run()
         {
             holding_problems.emplace_back(origin_problem,0);
             holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
-            std::cout << "start by x = " << x << " y = " << y << " angle = " << angle << "side = " << side << std::endl;
+            std::cout << boost::format("start by x = %3d y = %3d angle = %3d side = %d\n")%x %y %angle %side;
         }
     }
 
+    QVector<int> data;
+    data.reserve((FIELD_SIZE+STONE_SIZE)*(FIELD_SIZE+STONE_SIZE)*8);
     //石の数ループ
     for(++now_put_stone_num; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
-        //保持するフィールドの数ループ
-        for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
+        data.clear();
+        //保持するフィールドの数ループ　並列処理
+        for(int field_num = 0; field_num < static_cast<int>(holding_problems.size()); ++field_num)
         {
-            put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
+            data.push_back(field_num);
         }
+        QFuture<void> threads = QtConcurrent::map(
+            data,
+            [this](int each_field_num)
+            {
+                this->put_a_stone(each_field_num, now_put_stone_num);
+            });
+        threads.waitForFinished();
 
-        //次男が居ない
-        if(second_sons.size() == 0) continue;
         //今までの最悪値
         auto worst_element = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
         {
             return lhs.score < rhs.score;
         });
+
         //際優良次男
+        for(std::vector<node_with_field_num>::iterator it = second_sons.begin();it != second_sons.end();)
+        {
+            // 削除条件に合う要素が見つかった
+            if (it->field_num == -1) it = second_sons.erase(it); // erase()の戻り値をitで受ける！
+            else ++it;
+        }
         auto const& best_second_son = std::max_element(second_sons.begin(),second_sons.end(),[](const auto& lhs, const auto& rhs)
         {
             return lhs.first_put->score < rhs.first_put->score;
         });
-        holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_side(best_second_son->first_put->side).set_angle(best_second_son->first_put->angle);
+
+        //次男が居ない
+        if(second_sons.size() == 0) continue;
+
+
         //置き換える場合
         if(worst_element->score < best_second_son->first_put->score)
         {
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num));
             holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_angle(best_second_son->first_put->angle).set_side(best_second_son->first_put->side);
-            if(worst_element->problem.field.is_puttable_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
-                    best_second_son->first_put->point.y, best_second_son->first_put->point.x) == false) std::cout << "dame" << std::endl;
             worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
                     best_second_son->first_put->point.y, best_second_son->first_put->point.x);
             worst_element->score = best_second_son->first_put->score;
@@ -113,8 +132,9 @@ void sticky_beam::run()
 
 
 //1つの石を置く
-void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
+void sticky_beam::put_a_stone(int field_num, int stone_num)
 {
+    problem_type& problem = holding_problems[field_num].problem;
     std::size_t i = 0;
     std::shared_ptr<node> first_put1;
     std::shared_ptr<node> first_put2;
@@ -123,17 +143,6 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
 
     search(problem.field, field_num, stone_num, root);
 
-    /*
-    for(auto& each : result_vec[field_num])
-    {
-        first_put1 = each;
-        while(first_put1->stone_num > now_put_stone_num)
-        {
-            first_put1 = first_put1->parent;
-        }
-        std::cout << "each" << first_put1->point.y << " " << first_put1->point.x << " " << first_put1->angle << " " << std::endl;
-    }
-*/
     //自分の長男残す
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -164,20 +173,10 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
         //長男を置く
         problem.field.put_stone_basic(problem.stones.at(stone_num), first_put1->point.y, first_put1->point.x);
         //std::cout << "tyounan = " << first_put1->point.y << " " << first_put1->point.x << " " << first_put1->angle << std::endl;
+        holding_problems[field_num].score = first_put1->score;
         break;
     }
 
-/*
-    for(auto& each : result_vec[field_num])
-    {
-        first_put2 = each;
-        while(first_put2->stone_num > now_put_stone_num)
-        {
-            first_put2 = first_put2->parent;
-        }
-        std::cout << "each" << first_put2->point.y << " " << first_put2->point.x << " " << first_put2->angle << " " << each->score << std::endl;
-    }
-*/
     //次男が居れば保存する
     for(i = 0; i < result_vec[field_num].size(); ++i)
     {
@@ -213,7 +212,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
             continue;
         }
 
-        second_sons.push_back(node_with_field_num{first_put2,field_num});
+        second_sons[field_num] = node_with_field_num{first_put2,field_num};
         //std::cout << "push_back to second_sons" << std::endl;
         break;
     }
@@ -281,8 +280,6 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
             }
         }
     }
-
-    //for(auto& each : nodes) if(each->stone_num < stone_num) throw std::runtime_error("This element eroor");
 
     if(nodes.size() == 0) return 0;
     //探索の最下層だったら結果をresult_vec入れる

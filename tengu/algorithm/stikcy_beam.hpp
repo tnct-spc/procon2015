@@ -71,7 +71,7 @@ private:
     evaluator eval = evaluator();
     static constexpr std::size_t MAX_SEARCH_DEPTH = 15;
     static constexpr std::size_t MAX_SEARCH_WIDTH = 3;
-    static constexpr std::size_t HOLD_FIELD_NUM = 4;
+    static constexpr std::size_t HOLD_FIELD_NUM = 50;
     std::size_t ALL_STONES_NUM;
     std::size_t now_put_stone_num = 0;
     problem_type const origin_problem;
@@ -80,7 +80,7 @@ private:
     std::vector<node_with_field_num> second_sons;
     std::array<std::vector<std::shared_ptr<node>>,HOLD_FIELD_NUM> result_vec;
 
-    void put_a_stone(problem_type& problem, int field_num, int stone_num);
+    void put_a_stone(int field_num, int stone_num);
     int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky
