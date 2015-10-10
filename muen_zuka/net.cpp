@@ -38,8 +38,9 @@ std::string net::get()
 std::string net::get_from_official_server(){
     QEventLoop eventloop;
     connect(manager,SIGNAL(finished(QNetworkReply*)),&eventloop,SLOT(quit()));
-    QUrl requrl=_server_url.toString()+"/quest"+QString::number(_problem_num)+".txt?token=0123456789abcdef";
+    QUrl requrl=_server_url.toString()+"/quest"+QString::number(_problem_num)+".txt?token=66b77ce56fd29d27";
     //66b77ce56fd29d27
+    //0123456789abcdef
     QNetworkReply *reply = manager->get(QNetworkRequest(requrl));
     connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
     eventloop.exec();
