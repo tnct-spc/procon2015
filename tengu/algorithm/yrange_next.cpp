@@ -121,7 +121,7 @@ yrange_next::search_type yrange_next::search(field_type& _field, stone_type& sto
 
 bool yrange_next::pass(search_type const& search)
 {
-    if(search.score  < 0.35) return true;
+    if(search.score  < 0.20) return true;
     else return false;
 }
 
