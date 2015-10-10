@@ -25,7 +25,7 @@ yrange_next::~yrange_next()
 
 void yrange_next::run()
 {
-    limit_timer.start();
+    //limit_timer.start();
     qDebug("yrange_next start");
 
     std::array<int,39> start_y{{24,-7,29,13,-1,9,30,19,15,-4,18,17,20,-2,23,10,4,-6,7,-5,31,3,8,21,5,16,-3,0,11,22,14,27,2,26,28,1,12,6,25}};
@@ -50,16 +50,16 @@ void yrange_next::run()
                     answer_send(field);
 
                     //----------勝敗には関係ない----------------------------------------------------------------------------------
-                    int const t = static_cast<int>(limit_timer.elapsed());
-                    if(t > time_limit)
-                    {
-                        qDebug("time limit!");
-                        return;
-                    }
+                    //int const t = static_cast<int>(limit_timer.elapsed());
+                    //if(t > time_limit)
+                    //{
+                    //    qDebug("time limit!");
+                    //    return;
+                    //}
                     emit_count++;
                     int const score = field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
-                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d time = %d emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,t,emit_count);
+                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,emit_count);
                     if(best_score > score)
                     {
                         print_text((boost::format("score = %d")%field.get_score()).str());
