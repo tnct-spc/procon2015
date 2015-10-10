@@ -19,7 +19,8 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/read_ahead.cpp \
     algorithm/new_beam.cpp \
     algorithm/stikcy_beam.cpp \
-    algorithm/yrange_based_yayoi.cpp
+    algorithm/yrange_based_yayoi.cpp \
+    algorithm/yrange_next.cpp
 
 
 HEADERS += tengu.hpp\
@@ -31,7 +32,8 @@ HEADERS += tengu.hpp\
     algorithm/read_ahead.hpp \
     algorithm/new_beam.hpp \
     algorithm/stikcy_beam.hpp \
-    algorithm/yrange_based_yayoi.h
+    algorithm/yrange_based_yayoi.h \
+    algorithm/yrange_next.h
 
 LIBS += -lQt5Concurrent
 
