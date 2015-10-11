@@ -222,7 +222,7 @@ void sticky_beam::put_a_stone(problem_with_score_type& problem_with_score, int f
 int sticky_beam::search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent)
 {
     if(parent->search_depth == 0) return 0;
-    std::cout << "now_put_stone_num = " << now_put_stone_num << " stone_num" << stone_num << " parent->search_dpeth = " << parent->search_depth << std::endl;
+    //std::cout << "now_put_stone_num = " << now_put_stone_num << " stone_num" << stone_num << " parent->search_dpeth = " << parent->search_depth << std::endl;
     stone_type& stone = holding_problems[field_num].problem.stones.at(stone_num);
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
