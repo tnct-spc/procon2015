@@ -84,6 +84,7 @@ void Master::Service(QHttpRequest *request, QHttpResponse *response) {
 }
 
 void Master::ServiceRequestCompleted(QByteArray lowdata){
+    network_mutex.lock();
     QHttpResponse *response=new_response_;
 
     //Get request data
@@ -149,6 +150,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
         response->write("Master : no send.\n");
     }
     response->end();
+    network_mutex.unlock();
 }
 
 QString Master::get_sendurl(){

@@ -23,6 +23,7 @@
 #include "src/qhttprequest.h"
 #include "src/qhttpresponse.h"
 #include <QSettings>
+#include <mutex>
 
 namespace Ui {
 class Master;
@@ -53,6 +54,8 @@ private:
 
     QString get_sendurl();
     QSettings* settings;
+
+    std::mutex network_mutex;
 
 private slots:
     void change_token_box();
