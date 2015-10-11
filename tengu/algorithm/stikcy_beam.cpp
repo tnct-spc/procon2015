@@ -221,11 +221,13 @@ void sticky_beam::put_a_stone(problem_with_score_type& problem_with_score, int f
 //おける場所の中から評価値の高いものつをMAX_SEARCH_WIDTH選びsearch_depthまで潜る
 int sticky_beam::search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent)
 {
+    if(parent->search_depth == 0) return 0;
+    std::cout << "now_put_stone_num = " << now_put_stone_num << " stone_num" << stone_num << " parent->search_dpeth = " << parent->search_depth << std::endl;
     stone_type& stone = holding_problems[field_num].problem.stones.at(stone_num);
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
 
-    if(result_vec[field_num].size() == 0)
+    //if(result_vec[field_num].size() == 0)
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -249,11 +251,11 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
                                 angle,
                                 static_cast<stone_type::Sides>(side),
                                 score,
-                                stone_num == parent->stone_num ? eval.search_depth(_field, {stone,{y,x}}) : parent->search_depth
+                                now_put_stone_num == stone_num ? eval.search_depth(_field, {stone,{y,x}}) : parent->search_depth
                                 )
                             );
 #ifdef QT_DEBUG
-                //if(stone_num == parent->stone_num) std::cout << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
+                if(now_put_stone_num == stone_num ) std::cout << "field_num = " << field_num << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
 #endif
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
@@ -279,7 +281,7 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
 
     if(nodes.size() == 0) return 0;
     //探索の最下層だったら結果をresult_vec入れる
-    else if(parent->stone_num - now_put_stone_num >= parent->search_depth - 2 || stone_num >= ALL_STONES_NUM-1)
+    else if(stone_num - now_put_stone_num >= parent->search_depth - 1 || stone_num >= ALL_STONES_NUM-1)
     {
         auto max = std::max_element(nodes.begin(),nodes.end(),[](auto const&lhs, auto const& rhs)
         {

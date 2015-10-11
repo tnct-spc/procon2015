@@ -71,7 +71,7 @@ private:
     evaluator eval = evaluator();
     static constexpr std::size_t MAX_SEARCH_DEPTH = 15;
     static constexpr std::size_t MAX_SEARCH_WIDTH = 3;
-    static constexpr std::size_t HOLD_FIELD_NUM = 100;
+    static constexpr std::size_t HOLD_FIELD_NUM = 4;
     std::size_t ALL_STONES_NUM;
     std::size_t now_put_stone_num = 0;
     problem_type const origin_problem;
