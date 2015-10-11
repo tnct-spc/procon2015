@@ -102,15 +102,17 @@ yrange_next::search_type yrange_next::search(field_type& _field, stone_type& sto
                                                          origin_problem.stones,
                                                          bit_process_type(stone.get_nth(),static_cast<int>(side),angle,point_type{y,x}));
             _field.put_stone_basic(stone,y,x);
-            int const island_num = count_island_fast(_field);
-            if(best.score < score || (best.score == score && best.island_num > island_num))
+            if(best.score <= score)
             {
-                if((island_num - base_island_num) >= 2){
-                    //change to pass
-                    best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
-                }else{
-                    //best change
-                    best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, island_num};
+                int const island_num = count_island_fast(_field);
+                if(best.score < score || (best.score == score && best.island_num > island_num)){
+                    if((island_num - base_island_num) >= 2){
+                        //change to pass
+                        best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
+                    }else{
+                        //best change
+                        best = {point_type{y,x}, angle, static_cast<stone_type::Sides>(side), score, island_num};
+                    }
                 }
             }
             _field.remove_stone_basic(stone);
