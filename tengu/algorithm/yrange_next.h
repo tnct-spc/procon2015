@@ -10,9 +10,11 @@ class yrange_next : public algorithm_type
 {
     Q_OBJECT
 public:
-    yrange_next(problem_type _problem, int time_limit, evaluator _eval);
+    yrange_next(problem_type _problem, int time_limit, evaluator _eval, int _mode);
     ~yrange_next();
     void run();
+
+    const int mode;
 
 private:
     struct search_type
@@ -26,7 +28,6 @@ private:
 
     problem_type origin_problem;
     evaluator eval;
-    void solve();
     void one_try(field_type &field, std::size_t stone_num);
     search_type search(field_type& _field, stone_type& stone);
     bool pass(search_type const& search);

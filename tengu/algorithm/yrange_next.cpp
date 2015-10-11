@@ -12,7 +12,7 @@
 #include <QFuture>
 #include <QIODevice>
 
-yrange_next::yrange_next(problem_type _problem, int _time_limit, evaluator _eval):eval(_eval),time_limit(_time_limit)
+yrange_next::yrange_next(problem_type _problem, int _time_limit, evaluator _eval, int _mode):eval(_eval),time_limit(_time_limit),mode(_mode)
 {
     algorithm_name = "yrange_next";
     origin_problem = _problem;
@@ -25,6 +25,17 @@ yrange_next::~yrange_next()
 
 void yrange_next::run()
 {
+    int x_start,x_end;
+    if(mode==0){
+        x_start = 0;
+        x_end = 12;
+    }else if(mode==1){
+        x_start = 13;
+        x_end = 25;
+    }else{
+        x_start = 26;
+        x_end = 38;
+    }
     //limit_timer.start();
     qDebug("yrange_next start");
 
@@ -33,7 +44,7 @@ void yrange_next::run()
 
     for(std::size_t stone_num = 0; stone_num < origin_problem.stones.size(); ++stone_num)
     {
-        for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
+        for(std::size_t i = x_start; i <= x_end; ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
         {
             int y = start_y[j];
             int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
