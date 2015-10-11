@@ -30,7 +30,7 @@ private:
     void one_try(field_type &field, std::size_t stone_num);
     search_type search(field_type& _field, stone_type& stone);
     bool pass(search_type const& search);
-    int count_island_fast(field_type const& field);
+    int count_island_fast(field_type const& field, int& one_island_num);
 
     //Time
     QElapsedTimer limit_timer;

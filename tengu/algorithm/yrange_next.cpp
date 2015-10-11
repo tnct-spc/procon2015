@@ -59,7 +59,7 @@ void yrange_next::run()
                     emit_count++;
                     int const score = field.get_score();
                     std::string const flip = side == 0 ? "Head" : "Tail";
-                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,emit_count);
+                    qDebug("emit starting by stone=%3lu x=%2d, y=%2d angle=%3lu %s score = %3d processes_num = %3zu emit_count= %d",stone_num, y,x,angle,flip.c_str(), score,field.processes.size(),emit_count);
                     if(best_score > score)
                     {
                         print_text((boost::format("score = %d")%field.get_score()).str());
@@ -91,7 +91,8 @@ void yrange_next::one_try(field_type& field, std::size_t stone_num)
 yrange_next::search_type yrange_next::search(field_type& _field, stone_type& stone)
 {
     search_type best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
-    int base_island_num = count_island_fast(_field);
+    int base_one_island_num;
+    int base_island_num = count_island_fast(_field, base_one_island_num);
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
@@ -104,9 +105,10 @@ yrange_next::search_type yrange_next::search(field_type& _field, stone_type& sto
             _field.put_stone_basic(stone,y,x);
             if(best.score <= score)
             {
-                int const island_num = count_island_fast(_field);
+                int one_island_num;
+                int const island_num = count_island_fast(_field, one_island_num);
                 if(best.score < score || (best.score == score && best.island_num > island_num)){
-                    if((island_num - base_island_num) >= 2){
+                    if((island_num - base_island_num) >= 2 || ((island_num - base_island_num) == 1 && (one_island_num - base_one_island_num) >= 1)){
                         //change to pass
                         best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
                     }else{
@@ -123,11 +125,11 @@ yrange_next::search_type yrange_next::search(field_type& _field, stone_type& sto
 
 bool yrange_next::pass(search_type const& search)
 {
-    if(search.score  < 0.20) return true;
+    if(search.score  < 0.375) return true;
     else return false;
 }
 
-int yrange_next::count_island_fast(const field_type &field)
+int yrange_next::count_island_fast(const field_type &field, int& one_island_num)
 {
     //static init
     static short labeling_field[32][32];
@@ -144,6 +146,7 @@ int yrange_next::count_island_fast(const field_type &field)
     memcpy(bit_field, field.get_bit_plain_field(), sizeof(uint64_t)*64);
     for(int i=0;i<32;++i)for(int j=0;j<32;j++) labeling_field[i][j] = 0;
     int island_num = 0;
+    one_island_num = 0;
     //search
     int up_label_num,left_label_num;
     int label_count = 0;
@@ -156,6 +159,7 @@ int yrange_next::count_island_fast(const field_type &field)
         table_count++;
         labeling_field[0][0] = table_count;
         rooting_table[table_count] = table_count;//分かりやすいので１から使う
+        if((bit_field[17] & mask[16]) >= 1 && (bit_field[16] & mask[17]) >= 1) one_island_num++;
     }
     //when y==0 x!=0
     for(int x=1;x<32;++x){
@@ -169,6 +173,7 @@ int yrange_next::count_island_fast(const field_type &field)
                 table_count++;
                 labeling_field[0][x] = table_count;
                 rooting_table[table_count] = table_count;//分かりやすいので１から使う
+                if((bit_field[17] & mask[x+16]) >= 1 && (bit_field[16] & mask[x+17]) >= 1) one_island_num++;
             }else{
                 //左に空白があったので、左と同じラベルを貼る
                 labeling_field[0][x] = left_label_num;
@@ -187,6 +192,7 @@ int yrange_next::count_island_fast(const field_type &field)
                 table_count++;
                 labeling_field[y][0] = table_count;
                 rooting_table[table_count] = table_count;//分かりやすいので１から使う
+                if((bit_field[y+17] & mask[16]) >= 1 && (bit_field[y+16] & mask[17]) >= 1) one_island_num++;
             }else{
                 //上に空白があったので、上と同じラベルを貼る
                 labeling_field[y][0] = up_label_num;
@@ -200,12 +206,12 @@ int yrange_next::count_island_fast(const field_type &field)
                 up_label_num = labeling_field[y-1][x];
                 left_label_num = labeling_field[y][x-1];
                 if(up_label_num == 0 && left_label_num == 0){
-                    //どちらも空白ではなかったので、新しくラベルを追加する
+                    //どちらも空白だったので、新しくラベルを追加する
                     label_count++;
                     table_count++;
-                    //qDebug("add label at y=%d x=%d %d %d",y,x,label_count,table_count);
                     labeling_field[y][x] = table_count;
                     rooting_table[table_count] = table_count;//分かりやすいので１から使う
+                    if((bit_field[y+17] & mask[x+16]) >= 1 && (bit_field[y+16] & mask[x+17]) >= 1) one_island_num++;
                 }else if(up_label_num > 0 && left_label_num == 0){
                     //上に空白があったので、上と同じラベルを貼る
                     labeling_field[y][x] = up_label_num;
