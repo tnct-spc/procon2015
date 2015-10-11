@@ -2,6 +2,7 @@
 #define STICKY_BEAM_HPP
 #include <takao.hpp>
 #include "evaluator.hpp"
+#include <mutex>
 #include <array>
 #include <queue>
 #include <memory>
@@ -75,12 +76,13 @@ private:
     std::size_t ALL_STONES_NUM;
     std::size_t now_put_stone_num = 0;
     problem_type const origin_problem;
+    std::mutex second_sons_mutex;
 
     std::vector<problem_with_score_type> holding_problems;
     std::vector<node_with_field_num> second_sons;
     std::array<std::vector<std::shared_ptr<node>>,HOLD_FIELD_NUM> result_vec;
 
-    void put_a_stone(problem_with_score_type &problem_with_score, int field_num, int stone_num);
+    void put_a_stone(int field_num, int stone_num);
     int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky
