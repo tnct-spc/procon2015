@@ -15,9 +15,18 @@ void algorithm_type::answer_send(field_type ans){
     ans_emit_mtx.lock();
     if(ans.get_score() < static_cast<size_t>(_best_score)){
         _best_score = ans.get_score();
+        _best_processes_num = ans.processes.size();
         emit answer_ready(ans);
         //50ms待つ
         QThread::msleep(50);
+    }else if(ans.get_score() == static_cast<size_t>(_best_score)){
+        if(ans.processes.size() < static_cast<size_t>(_best_processes_num)){
+            _best_score = ans.get_score();
+            _best_processes_num = ans.processes.size();
+            emit answer_ready(ans);
+            //50ms待つ
+            QThread::msleep(50);
+        }
     }
     ans_emit_mtx.unlock();
 }

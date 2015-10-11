@@ -17,6 +17,7 @@ class algorithm_type : public QThread
         void print_text(std::string str);
         //Qtのemitが遅いのでalgorithm自身が送信するかどうか判断するためのClass変数
         static int _best_score;
+        static int _best_processes_num;
     protected:
         problem_type problem;
         std::string algorithm_name;
