@@ -19,11 +19,11 @@
 #include "net.hpp"
 #include "takao.hpp"
 #include "muen_zuka.hpp"
-#include "src/qhttpserver.h"
-#include "src/qhttprequest.h"
-#include "src/qhttpresponse.h"
 #include <QSettings>
 #include <mutex>
+
+#include <boostconnect/server.hpp>
+#include <boostconnect/session_type/http_session.hpp>
 
 namespace Ui {
 class Master;
@@ -34,12 +34,17 @@ class Master : public QWidget
     Q_OBJECT
 
 public:
+    typedef bstcon::server<bstcon::session::http_session> http_server;
+    typedef boost::shared_ptr<bstcon::session::http_session> session_ptr;
+    typedef bstcon::request request_type;
+
     explicit Master(QWidget *parent = 0);
     ~Master();
 
 private:
     Ui::Master *ui;
-    QHttpResponse *new_response_;
+
+    // Client
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
     struct answer_data_type{
@@ -55,9 +60,13 @@ private:
     QString get_sendurl();
     QSettings* settings;
 
-    std::mutex network_mutex;
+    // Server thread
+    boost::shared_ptr<boost::asio::io_service> io_service_;
+    boost::shared_ptr<http_server> server_;
+    std::unique_ptr<std::thread> thread_;
 
 private slots:
+    // GUI
     void change_token_box();
     void reset_point();
     void select_send_1();
@@ -66,7 +75,9 @@ private slots:
     void change_url_1();
     void change_url_2();
     void change_url_3();
-    void Service(QHttpRequest *request, QHttpResponse *response);
+
+    // HTTP Request Handler
+    void Service(boost::shared_ptr<request_type> const req, session_ptr session);
     void ServiceRequestCompleted(QByteArray lowdata);
 };
 
