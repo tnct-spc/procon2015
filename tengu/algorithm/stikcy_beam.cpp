@@ -90,8 +90,6 @@ void sticky_beam::run()
             worst_element->problem.field = holding_problems[best_second_son->field_num].problem.field;
             worst_element->problem.field.remove_stone_basic();
             holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num).set_angle(best_second_son->first_put->angle).set_side(best_second_son->first_put->side);
-            if(worst_element->problem.field.is_puttable_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
-                    best_second_son->first_put->point.y, best_second_son->first_put->point.x) == false) std::cout << "dame" << std::endl;
             worst_element->problem.field.put_stone_basic(holding_problems[best_second_son->field_num].problem.stones.at(now_put_stone_num),
                     best_second_son->first_put->point.y, best_second_son->first_put->point.x);
             worst_element->score = best_second_son->first_put->score;
