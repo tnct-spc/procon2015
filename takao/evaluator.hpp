@@ -2,6 +2,7 @@
 #define EVALUATOR_HPP
 #include <field_type.hpp>
 #include <limits>
+#include <cstdlib>
 
 /*
  * 評価関数クラス
@@ -68,6 +69,7 @@ public:
         field.put_stone_basic(process.stone, process.position.y, process.position.x);
         evaluation_value += w_complexity * field.evaluate_normalized_complexity();
         field.remove_stone_basic();
+        evaluation_value *= -50.0 + 100.0 * rand() / RAND_MAX;
         return evaluation_value;
     }
 
