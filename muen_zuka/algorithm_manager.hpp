@@ -25,6 +25,7 @@ private:
     std::mutex mtx;
     problem_type problem;
     u_int64_t best_zk = std::numeric_limits<u_int64_t>::max();
+    u_int64_t best_processes_num = std::numeric_limits<u_int64_t>::max();
 
 signals:
     void answer_ready(field_type ans);

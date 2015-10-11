@@ -80,7 +80,14 @@ void algorithm_manager::get_answer(field_type ans){
     //前より良ければemit
     if(best_zk > ans.get_score()){
         best_zk = ans.get_score();
+        best_processes_num = ans.processes.size();
         emit answer_ready(ans);
+    }else if(best_zk == ans.get_score()){
+        if(best_processes_num > ans.processes.size()){
+            best_zk = ans.get_score();
+            best_processes_num = ans.processes.size();
+            emit answer_ready(ans);
+        }
     }
     mtx.unlock();
 }
