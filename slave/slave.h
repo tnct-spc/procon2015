@@ -28,6 +28,7 @@ private:
     net *network;
     algorithm_manager *algo_manager;
     std::mutex net_mtx;
+    std::mutex file_mtx;
     problem_type _problem;
     field_type _answer;
 
@@ -42,6 +43,7 @@ private slots:
     void answer_send(field_type answer);
     void text_box_clear();
     void answer_save_to_file();
+    void answer_auto_save_to_file(field_type answer);
     void problem_load_from_file();
     void print_algorithm_message(std::string str);
     void post_button_1_pushed();
