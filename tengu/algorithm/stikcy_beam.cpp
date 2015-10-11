@@ -41,6 +41,8 @@ void sticky_beam::run()
     holding_problems.emplace_back(origin_problem,0);
     put_a_stone(0,0);
 
+    holding_problems[0].problem.field.init_route_map();
+
     //残りはrandom
     std::random_device seed_gen;
     std::mt19937_64 engine(seed_gen());
@@ -60,7 +62,9 @@ void sticky_beam::run()
         {
             holding_problems.emplace_back(origin_problem,0);
             holding_problems.back().problem.field.put_stone_basic(first_stone,y,x);
+#ifdef QT_DEBUG
             std::cout << boost::format("start by x = %3d y = %3d angle = %3d side = %d\n")%x %y %angle %side;
+#endif
         }
     }
 
@@ -69,6 +73,7 @@ void sticky_beam::run()
     //石の数ループ
     for(++now_put_stone_num; now_put_stone_num < holding_problems[0].problem.stones.size(); ++now_put_stone_num)
     {
+        /*
         data.clear();
         //保持するフィールドの数ループ　並列処理
         for(int field_num = 0; field_num < static_cast<int>(holding_problems.size()); ++field_num)
@@ -82,7 +87,8 @@ void sticky_beam::run()
                 this->put_a_stone(each_field_num, now_put_stone_num);
             });
         threads.waitForFinished();
-
+        */
+        put_a_stone(0, now_put_stone_num);
         //今までの最悪値
         auto worst_element = std::min_element(holding_problems.begin(),holding_problems.end(),[](auto const& lhs, auto const&rhs)
         {
@@ -125,7 +131,9 @@ void sticky_beam::run()
 
     for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
     {
+#ifdef QT_DEBUG
         qDebug("emit sticky-beam. score = %3zu",holding_problems[field_num].problem.field.get_score());
+#endif
         answer_send(holding_problems[field_num].problem.field);
     }
 }
