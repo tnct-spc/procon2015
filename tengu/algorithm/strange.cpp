@@ -27,15 +27,18 @@ strange::~strange()
 std::vector<stranger::field_with_score_type>
 strange::force_put(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, bit_process_type process)
 {
-    result_stone.clear();
     int bak_angle = stone.get_angle();
     stone_type::Sides bak_side = stone.get_side();
+
     stone.set_angle(process.angle);
     stone.set_side(static_cast<stone_type::Sides>(process.flip));
+
     field_type field = pattern.at(0).field;
     field.put_stone_basic(stone, process.position.y, process.position.x);
+
     stone.set_angle(bak_angle);
     stone.set_side(bak_side);
+
     pattern.emplace_back(field, 0.0);
     return std::move(pattern);
 }
@@ -43,73 +46,69 @@ strange::force_put(stone_type& stone, std::vector<stranger::field_with_score_typ
 std::vector<stranger::field_with_score_type>
 strange::eval_pattern(stone_type& stone, std::vector<stranger::field_with_score_type> pattern, int search_width)
 {
-    result_stone.clear();
-    std::vector<stranger::stone_params_type> stone_placement_vector;
-    stone_placement_vector.reserve(search_width);
+    std::vector<stranger::stone_params_type> beam_params; // stone_placement_vector
+    beam_params.reserve(search_width);
     for(stranger::field_with_score_type& _eval_field : pattern) {
         for(int flip = 0; flip <= 1 ; flip++, stone.flip()) for(int angle = 0; angle <= 270; angle += 90, stone.rotate(90)) for(int dy = -7; dy <= 32; dy++) for(int dx = -7; dx <= 32; dx++) {
             if(_eval_field.field.is_puttable_basic(stone, dy, dx)) {
-                double score;
                 bool should_pass = false;
                 //should_pass = _evaluator.should_pass(_eval_field.field,origin_problem.stones,bit_process_type(stone.get_nth(),flip,angle,{dy,dx}),get_rem_stone_zk(stone));
-                score = _evaluator.move_goodness(_eval_field.field,
-                                                 origin_problem.stones,
-                                                 bit_process_type(stone.get_nth(), flip, angle, {dy, dx}));
+                double score = _evaluator.move_goodness(_eval_field.field,
+                                                        origin_problem.stones,
+                                                        bit_process_type(stone.get_nth(), flip, angle, {dy, dx}));
                 //ビームサーチの幅制限
-                if(stone_placement_vector.size() < (std::size_t)search_width) {
+                if(beam_params.size() < (std::size_t)search_width) {
                     if(should_pass) {
-                        stone_placement_vector.emplace_back(dy, dx, angle, static_cast<stone_type::Sides>(flip), _eval_field.score, true, &_eval_field.field);
+                        beam_params.emplace_back(dy, dx, angle, static_cast<stone_type::Sides>(flip), _eval_field.score, true, &_eval_field.field);
                     } else {
-                        stone_placement_vector.emplace_back(dy, dx, angle, static_cast<stone_type::Sides>(flip), score, false, &_eval_field.field);
+                        beam_params.emplace_back(dy, dx, angle, static_cast<stone_type::Sides>(flip), score, false, &_eval_field.field);
                     }
                 } else {
+                    // 最悪な要素と差し替え
+                    // 追加して最悪な要素1つを削除するのと等価
                     auto worst_stone_param =
-                            std::min_element(stone_placement_vector.begin(),
-                                             stone_placement_vector.end(),
+                            std::min_element(beam_params.begin(),
+                                             beam_params.end(),
                                              [](auto const &t1, auto const &t2) { return t1.score < t2.score; });
                     if(should_pass) {
                         if(_eval_field.score > worst_stone_param->score) {
                             //(*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),_eval_field.score,true,&_eval_field.field};
                             (*worst_stone_param) = stranger::stone_params_type(dy, dx, angle, static_cast<stone_type::Sides>(flip), _eval_field.score, true, &_eval_field.field);
                         }
-                    } else {
-                        if(score > worst_stone_param->score) {
+                    } else if(score > worst_stone_param->score) {
                             //(*worst_stone_param) = {dy,dx,angle,static_cast<stone_type::Sides>(flip),score,false,&_eval_field.field};
                             (*worst_stone_param) = stranger::stone_params_type(dy, dx, angle, static_cast<stone_type::Sides>(flip), score, false, &_eval_field.field);
-                        }
                     }
                 }
             }
         }
     }
-    for(stranger::stone_params_type& stone_params : stone_placement_vector) {
+
+    // stone_params_typeからfield_with_score_typeに変換
+    std::vector<stranger::field_with_score_type> fields;
+    for(stranger::stone_params_type& stone_params : beam_params) {
         if(stone_params.pass) {
-            result_stone.emplace_back(*(stone_params.field), stone_params.score);
+            fields.emplace_back(*(stone_params.field), stone_params.score);
         } else {
             field_type field = *(stone_params.field);
             field.put_stone_basic(stone.set_angle(stone_params.process.angle).set_side(static_cast<stone_type::Sides>(stone_params.process.flip)), stone_params.process.position.y, stone_params.process.position.x);
             if(field.processes.size() == 1)
                 field.init_route_map();
-            result_stone.push_back({field, stone_params.score});
+            fields.push_back({field, stone_params.score});
         }
     }
-    if(result_stone.size() == 0)
+    if(fields.size() == 0)
         return std::move(pattern);
-    return std::move(result_stone);
+    return std::move(fields);
 }
 
 void strange::run()
 {
-    QElapsedTimer timer;
-    timer.start();
-    std::vector<stranger::field_with_score_type> pattern;
-    pattern.emplace_back(problem.field, 0);
-
     std::vector<bit_process_type> init_moves = [this]() -> std::vector<bit_process_type>
     {
         std::vector<bit_process_type> ret;
         field_type& field = problem.field;
-        stone_type& stone = problem.stones[0];
+        stone_type& stone = problem.stones.at(0);
         stone_type::Sides bak_side = stone.get_side();
         int bak_angle = stone.get_angle();
         for(int x = -7; x < 32; x++)
@@ -127,19 +126,35 @@ void strange::run()
         return std::move(ret);
     }();
     std::shuffle(init_moves.begin(), init_moves.end(), std::mt19937());
-    // saisho no ishi
-    pattern = force_put(problem.stones.at(0), std::move(pattern), init_moves[0]);
 
-    // 2banme ikou no ishi
-    size_t cnt = problem.stones.size() - 1;
-    for(auto it = problem.stones.begin() + 1; it != problem.stones.end(); it++) {
-        print_text(std::to_string(cnt--));
-        pattern = eval_pattern(*it, std::move(pattern), SEARCH_WIDTH);
+    unsigned int best_score = FIELD_SIZE * FIELD_SIZE; // smaller is better
+    for(int i = 0; i < init_moves.size(); i++) {
+        print_text(std::to_string(i + 1) + "/" + std::to_string(init_moves.size()));
+        QElapsedTimer timer;
+        timer.start();
+        std::vector<stranger::field_with_score_type> pattern;
+        pattern.emplace_back(problem.field, 0);
+
+        // saisho no ishi
+        pattern = force_put(problem.stones.at(0), std::move(pattern), init_moves.at(i));
+
+        // 2banme ikou no ishi
+        for(auto it = problem.stones.begin() + 1; it != problem.stones.end(); it++) {
+            pattern = eval_pattern(*it, std::move(pattern), SEARCH_WIDTH);
+        }
+
+        stranger::field_with_score_type best_ans =
+                *std::min_element(pattern.begin(), pattern.end(),
+                                  [](auto  &t1, auto  &t2) { return t1.field.get_score() < t2.field.get_score(); });
+
+        int time = timer.elapsed();
+        print_text(std::to_string(time) + "msかかった");
+        if(best_ans.field.get_score() < best_score) { // u r great!
+            best_score = best_ans.field.get_score();
+            answer_send(best_ans.field);
+            print_text("sent, score = " + std::to_string(best_score));
+        } else { // too bad...
+            print_text("not sent, score = " + std::to_string(best_ans.field.get_score()));
+        }
     }
-    stranger::field_with_score_type best_ans =
-            *std::min_element(pattern.begin(), pattern.end(),
-                              [](auto  &t1, auto  &t2) { return t1.field.get_score() < t2.field.get_score(); });
-    int time = timer.elapsed();
-    print_text(std::to_string(time) + "msかかった");
-    answer_send(best_ans.field);
 }
