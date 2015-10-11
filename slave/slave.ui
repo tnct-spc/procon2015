@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
+    <width>631</width>
     <height>534</height>
    </rect>
   </property>
@@ -409,6 +409,9 @@
    <property name="text">
     <string>公式から取得</string>
    </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QCheckBox" name="checkBoxofSendOfiicialServer">
    <property name="geometry">
@@ -421,6 +424,9 @@
    </property>
    <property name="text">
     <string>公式へ送信</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_7">
@@ -538,6 +544,40 @@
    </property>
    <property name="text">
     <string>yrange_next</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>40</y>
+     <width>251</width>
+     <height>451</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>初回起動時
+・サーバーホスト (172.16.1.2) 
+を「送信先」に書く
+・サーバーホスト (172.16.1.2) 
+を「取得元」に書く
+
+
+起動時
+・公式へ送信にチェック
+・公式から取得にチェック
+
+・問題番号を合わせる
+
+・アルゴリズムにチェックを
+入れる
+
+</string>
    </property>
   </widget>
   <action name="problem_load_action">
