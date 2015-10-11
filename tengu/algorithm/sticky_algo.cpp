@@ -16,6 +16,10 @@ sticky_algo::sticky_algo(problem_type _problem, evaluator _eval) : _evaluator(_e
 {
     algorithm_name = "sticky";
 }
+sticky_algo::sticky_algo(problem_type _problem, std::string algo_name, evaluator _eval) : _evaluator(_eval), origin_problem(_problem), problem(_problem)
+{
+    algorithm_name = algo_name;
+}
 sticky_algo::~sticky_algo(){
 
 }

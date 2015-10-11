@@ -31,6 +31,7 @@ class sticky_algo : public algorithm_type
 public:
     sticky_algo(problem_type _problem);
     sticky_algo(problem_type _problem, evaluator _eval);
+    sticky_algo(problem_type _problem, std::string algo_name, evaluator _eval);
     ~sticky_algo();
     void run();
 

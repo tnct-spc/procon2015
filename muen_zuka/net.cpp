@@ -70,7 +70,7 @@ std::string net::send_to_official_server(field_type answer){
     QHttpMultiPart multi_part(QHttpMultiPart::FormDataType);
     QHttpPart token_part;
     token_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"token\""));
-    token_part.setBody("0123456789abcdef");
+    token_part.setBody("66b77ce56fd29d27");
     //66b77ce56fd29d27
     QHttpPart answer_part;
     answer_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"answer\"; filename=\"Phantasmagoria_of_Flower_View.txt\""));
@@ -94,7 +94,7 @@ std::string net::send_to_official_server(std::string answer_text){
     QHttpMultiPart multi_part(QHttpMultiPart::FormDataType);
     QHttpPart token_part;
     token_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"token\""));
-    token_part.setBody("0123456789abcdef");
+    token_part.setBody("66b77ce56fd29d27");
     //66b77ce56fd29d27
     QHttpPart answer_part;
     answer_part.setHeader(QNetworkRequest::ContentDispositionHeader,QVariant("form-data; name=\"answer\"; filename=\"Phantasmagoria_of_Flower_View.txt\""));
