@@ -54,7 +54,7 @@ public:
         double evaluation_value = 0.0;
         evaluation_value += w_contact_move * normalized_contact(field, process);
         field.put_stone_basic(process.stone, process.position.y, process.position.x);
-        evaluation_value += w_nextbranches * nextbranches(field, next_stone);
+        //evaluation_value += w_nextbranches * nextbranches(field, next_stone);
         evaluation_value += w_complexity * field.evaluate_normalized_complexity();
         field.remove_stone_basic();
         return evaluation_value;
