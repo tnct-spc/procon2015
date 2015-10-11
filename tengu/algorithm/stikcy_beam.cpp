@@ -225,8 +225,6 @@ int sticky_beam::search(field_type& _field, int field_num, std::size_t const sto
     std::vector<std::shared_ptr<node>> nodes;
     nodes.reserve(MAX_SEARCH_WIDTH);
 
-    if(result_vec[field_num].size() == 0)
-
     //おける可能性がある場所すべてにおいてみる
     for(int y = 1 - STONE_SIZE; y < FIELD_SIZE; ++y) for(int x = 1 - STONE_SIZE; x < FIELD_SIZE; ++x) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
     {
