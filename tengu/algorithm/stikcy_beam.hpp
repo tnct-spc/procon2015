@@ -80,7 +80,7 @@ private:
     std::vector<node_with_field_num> second_sons;
     std::array<std::vector<std::shared_ptr<node>>,HOLD_FIELD_NUM> result_vec;
 
-    void put_a_stone(problem_type& problem, int field_num, int stone_num);
+    void put_a_stone(problem_with_score_type &problem_with_score, int field_num, int stone_num);
     int search(field_type& _field, int field_num, std::size_t const stone_num, std::shared_ptr<node> parent);
 
     //sticky

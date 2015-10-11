@@ -37,7 +37,7 @@ void sticky_beam::run()
 
     //一つは探索する
     holding_problems.emplace_back(origin_problem,0);
-    put_a_stone(holding_problems[0].problem,0,0);
+    put_a_stone(holding_problems[0],0,0);
 
     //残りはrandom
     std::random_device seed_gen;
@@ -68,7 +68,7 @@ void sticky_beam::run()
         //保持するフィールドの数ループ
         for(std::size_t field_num = 0; field_num < holding_problems.size(); ++field_num)
         {
-            put_a_stone(holding_problems[field_num].problem, field_num, now_put_stone_num);
+            put_a_stone(holding_problems[field_num], field_num, now_put_stone_num);
         }
 
         //次男が居ない
@@ -113,8 +113,9 @@ void sticky_beam::run()
 
 
 //1つの石を置く
-void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_num)
+void sticky_beam::put_a_stone(problem_with_score_type& problem_with_score, int field_num, int stone_num)
 {
+    problem_type& problem = problem_with_score.problem;
     std::size_t i = 0;
     std::shared_ptr<node> first_put1;
     std::shared_ptr<node> first_put2;
@@ -162,6 +163,7 @@ void sticky_beam::put_a_stone(problem_type& problem, int field_num, int stone_nu
 
         //長男を置く
         problem.field.put_stone_basic(problem.stones.at(stone_num), first_put1->point.y, first_put1->point.x);
+        problem_with_score.score = first_put1->score;
         //std::cout << "tyounan = " << first_put1->point.y << " " << first_put1->point.x << " " << first_put1->angle << std::endl;
         break;
     }
