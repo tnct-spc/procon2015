@@ -28,6 +28,7 @@ private:
     net *network;
     algorithm_manager *algo_manager;
     std::mutex net_mtx;
+    std::mutex file_mtx;
     problem_type _problem;
     field_type _answer;
 
@@ -57,6 +58,7 @@ private slots:
     void ui_button_playerid_pushed();
     void get_from_official_server();
     void sent_to_official_server();
+    void answer_auto_save_to_file(field_type answer);
 };
 
 #endif // SLAVE_H

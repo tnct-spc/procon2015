@@ -108,6 +108,7 @@ void Slave::clicked_run_button(){
     algo_manager = new algorithm_manager(_problem,enable_algo,time_limit);
     algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_auto_save_to_file);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
     connect(algo_manager,&algorithm_manager::destroyed,[=](){std::cout << "manager殺した" << std::endl;});
     connect(algo_manager,&algorithm_manager::finished,&algorithm_manager::deleteLater);
@@ -188,7 +189,18 @@ void Slave::sent_to_official_server(){
     auto str = network->send_to_official_server(_answer);
     qDebug() << str.c_str();
 }
-
+void Slave::answer_auto_save_to_file(field_type answer){
+    file_mtx.lock();
+    QDateTime dateTime = QDateTime::currentDateTimeUtc();
+    QString filename;
+    filename += QString("S") += QString::number(answer.get_score()) += QString("N") += QString::number(answer.get_stone_num()) += QString("T") += dateTime.time().toString("hh:mm:ss") += QString(".txt");
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << _answer.get_answer().c_str();
+    file.close();
+    file_mtx.unlock();
+}
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}
 void Slave::post_button_2_pushed(){settings->setValue("POST_BUTTON",2);}
 void Slave::get_button_1_pushed(){settings->setValue("GET_BUTTON",1);}
