@@ -116,6 +116,7 @@ field_type algorithm_evaluater::evaluate(problem_type problem,evaluator _eval){
     /********************************/
     std::mutex mtx;
     algorithm_type::_best_score = std::numeric_limits<int>::max();
+    algorithm_type::_best_processes_num = std::numeric_limits<int>::max();
     connect(&algo,&algorithm_type::answer_ready,[&](field_type ans){
         mtx.lock();
         if(ans.get_score() < best_score){

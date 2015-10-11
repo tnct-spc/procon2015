@@ -20,6 +20,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     enable_algorithm_list = enable_algo;
     //アルゴリズムの最適解値を初期化
     algorithm_type::_best_score = std::numeric_limits<int>::max();
+    algorithm_type::_best_processes_num = std::numeric_limits<int>::max();
     // 評価関数をインスタンス化
     evaluator eval(-10, 1, 1, 0.5);
     //動かしたいアルゴリズムを配列に入れる

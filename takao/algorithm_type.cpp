@@ -8,6 +8,7 @@ algorithm_type::algorithm_type(problem_type const& _problem): problem(_problem)
 */
 std::mutex algorithm_type::ans_emit_mtx;
 int algorithm_type::_best_score = std::numeric_limits<int>::max();
+int algorithm_type::_best_processes_num = std::numeric_limits<int>::max();
 void algorithm_type::print_text(std::string str){
     emit send_text("<" + algorithm_name + ">" + str);
 }
