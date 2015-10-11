@@ -13,7 +13,6 @@ class sticky_beam : public algorithm_type
     Q_OBJECT
 
 public:
-    sticky_beam(problem_type _problem);
     sticky_beam(problem_type _problem,evaluator eval);
     ~sticky_beam();
     void run();
@@ -102,6 +101,5 @@ private:
     };
     problem_type sticky_problem;
     evaluator eval = evaluator();
-    one_try one_try_ins;
 };
 #endif // STICKY_BEAM_HPP

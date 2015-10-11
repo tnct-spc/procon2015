@@ -14,7 +14,7 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QFuture>
 
-sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),sticky_problem(_problem), one_try_ins(_problem,eval,this)
+sticky_beam::sticky_beam(problem_type _problem, evaluator eval) : eval(eval),sticky_problem(_problem)
 {
     ALL_STONES_NUM = _problem.stones.size();
     algorithm_name = "sticky_beam";
@@ -35,29 +35,28 @@ void sticky_beam::run()
     for(NOW_FIRST_STONE_NUM = 0; NOW_FIRST_STONE_NUM < sticky_problem.stones.size(); ++NOW_FIRST_STONE_NUM)
     {
         stone_type first_stone = sticky_problem.stones[NOW_FIRST_STONE_NUM];
-        for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t j = 0; j < start_x.size(); ++j)
+        for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
         {
-            int y = start_y[j];
-            int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
-            for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+            data.clear();
+            for(std::size_t j = 0; j < start_x.size(); ++j)
             {
+                int y = start_y[j];
+                int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
                 first_stone.set_angle(angle).set_side(static_cast<stone_type::Sides>(side));
                 if(sticky_problem.field.is_puttable_basic(first_stone,y,x) == true)
                 {
-                    //data.push_back(std::make_tuple(y,x,angle,side));
-                    one_try_ins.one_try_run(y,x,angle,side);
+                    data.push_back(std::make_tuple(y,x,angle,side));
+                    //one_try_ins.one_try_run(y,x,angle,side);
                 }
             }
+            QFuture<void> threads = QtConcurrent::map(
+                        data,
+                        [this](auto& each_start)
+                        {
+                            one_try(sticky_problem,eval,this).one_try_run(std::get<0>(each_start),std::get<1>(each_start),std::get<2>(each_start),std::get<3>(each_start));
+                        });
+                    threads.waitForFinished();
         }
-        /*
-        QFuture<void> threads = QtConcurrent::map(
-                    data,
-                    [this](auto& each_start)
-                    {
-                        this->one_try_ins.one_try_run(std::get<0>(each_start),std::get<1>(each_start),std::get<2>(each_start),std::get<3>(each_start));
-                    });
-                threads.waitForFinished();
-        */
     }
 }
 
@@ -273,7 +272,7 @@ int sticky_beam::one_try::search(field_type& _field, int field_num, std::size_t 
                                 )
                             );
 #ifdef QT_DEBUG
-                if(now_put_stone_num == stone_num ) std::cout << "field_num = " << field_num << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
+                //if(now_put_stone_num == stone_num ) std::cout << "field_num = " << field_num << "search_depth = " << eval.search_depth(_field, {stone,{y,x}}) << std::endl;
 #endif
                 //if(stone_num < now_put_stone_num) throw std::runtime_error("This stone is wrong");
             }
