@@ -44,6 +44,7 @@ private:
     struct answer_data_type{
         QString answer_raw_data;
         int answer_point;
+        int answer_processes_size;
         QString problem_number;
     };
 

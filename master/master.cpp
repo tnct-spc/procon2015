@@ -89,6 +89,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     //Get request data
     QUrlQuery url_query(lowdata);
     int post_point=url_query.queryItemValue("point").toInt();
+    int post_processes_size=url_query.queryItemValue("processes_size").toInt();
     QString post_problem_number=url_query.queryItemValue("quest_number");
     QString post_raw_answer_data=url_query.queryItemValue("answer");
     QString slave_name = url_query.queryItemValue("id");
@@ -103,6 +104,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     //Set
     answer_data_type answer_data;
     answer_data.answer_point=post_point;
+    answer_data.answer_processes_size=post_processes_size;
     answer_data.answer_raw_data=post_raw_answer_data;
     answer_data.problem_number=post_problem_number;
     answer_data_.push_back(answer_data);
@@ -110,7 +112,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     //PointCheck
     bool upload_flag=1;
     for(unsigned int i=0;i<answer_data_.size()-1;i++){
-        if(post_problem_number == answer_data_[i].problem_number && post_point >= answer_data_[i].answer_point){
+        if(post_problem_number == answer_data_[i].problem_number && (post_point > answer_data_[i].answer_point || (post_point == answer_data_[i].answer_point && post_processes_size >= answer_data_[i].answer_processes_size))){
             upload_flag=0;
             break;
         }

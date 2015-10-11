@@ -52,6 +52,7 @@ std::string net::send(field_type answer){
     QEventLoop eventloop;
     QUrlQuery postData;
     postData.addQueryItem("point",QString::number(answer.get_score()));
+    postData.addQueryItem("processes_size",QString::number(answer.processes.size()));
     postData.addQueryItem("quest_number",QString::number(_problem_num));
     postData.addQueryItem("answer",answer.get_answer().c_str());
     postData.addQueryItem("id",_player_id);
