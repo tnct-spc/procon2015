@@ -19,7 +19,13 @@ HEADERS  += master.h
 
 FORMS    += master.ui
 
+
 QMAKE_CXXFLAGS += -std=c++14
+
+unix:!macx: LIBS += -lboost_system
+
+INCLUDEPATH += $$PWD/../lib/boostconnect/
+DEPENDPATH += $$PWD/../lib/boostconnect/
 
 unix:!macx: LIBS += -L$$OUT_PWD/../muen_zuka/ -lmuen_zuka
 
@@ -35,8 +41,6 @@ unix:!macx: LIBS += -L$$OUT_PWD/../tengu/ -ltengu
 
 INCLUDEPATH += $$PWD/../tengu
 DEPENDPATH += $$PWD/../tengu
-
-include(../lib/qhttpserver/qhttpserver.pri)
 
 unix {
     target.path = /usr/local/bin

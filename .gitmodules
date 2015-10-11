@@ -1,0 +1,3 @@
+[submodule "lib/boostconnect"]
+	path = lib/boostconnect
+	url = git@github.com:godai0519/BoostConnect.git
