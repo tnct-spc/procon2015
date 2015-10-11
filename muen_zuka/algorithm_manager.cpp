@@ -28,8 +28,8 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(4))algo_vec.push_back(new yrange(problem,time_limit));
     if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
     if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
-    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(-10,1,1,0.5)));
-    if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(0.7,0.3,0.2)));
+    if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(0.7,0.3,0.2)));
     if(enable_algo.at(9))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit));
 
 
@@ -73,7 +73,7 @@ void algorithm_manager::run(){
 void algorithm_manager::get_answer(field_type ans){
     mtx.lock();
     //前より良ければemit
-    if(best_zk > ans.get_score()){
+    if(best_zk >= ans.get_score()){
         best_zk = ans.get_score();
         emit answer_ready(ans);
     }
