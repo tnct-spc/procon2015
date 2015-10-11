@@ -35,10 +35,10 @@ void sticky_beam::run()
     for(NOW_FIRST_STONE_NUM = 0; NOW_FIRST_STONE_NUM < sticky_problem.stones.size(); ++NOW_FIRST_STONE_NUM)
     {
         stone_type first_stone = sticky_problem.stones[NOW_FIRST_STONE_NUM];
-        for(std::size_t i = 0; i < start_x.size(); ++i) for(std::size_t angle = 0; angle < 360; angle += 90) for(int side = 0; side < 2; ++side)
+        for(std::size_t i = 0; i < start_x.size(); ++i) for(int side = 0; side < 2; ++side)
         {
             data.clear();
-            for(std::size_t j = 0; j < start_x.size(); ++j)
+            for(std::size_t j = 0; j < start_x.size(); ++j) for(std::size_t angle = 0; angle < 360; angle += 90)
             {
                 int y = start_y[j];
                 int x = start_x[(j+i < start_x.size()) ? j+i : j+i-start_x.size()];
@@ -113,7 +113,7 @@ void sticky_beam::one_try::one_try_run(int y, int x, std::size_t angle, int side
 
         second_sons.clear();
 //#ifdef QT_DEBUG
-        std::cout << "now_put_stone_num = " << now_put_stone_num << std::endl;
+//        std::cout << "now_put_stone_num = " << now_put_stone_num << std::endl;
 //        std::cout << "holding problems = " << holding_problems.size() << std::endl;
 //#endif
     }
