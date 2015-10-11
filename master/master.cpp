@@ -95,6 +95,10 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     QString post_raw_answer_data=url_query.queryItemValue("answer");
     QString slave_name = url_query.queryItemValue("id");
 
+    //Connection Cut
+    response->write("Master:OK.");
+    response->end();
+
     //encode
     std::string post_answer_data_encoded = boost::algorithm::replace_all_copy(post_raw_answer_data.toStdString(),"%0D%0A","\r\n");
 
@@ -143,13 +147,13 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
             //if(network_error_flag)return std::string("");
 
             //Response
-            response->write(reply->readAll());
+            //response->write(reply->readAll());
         }
-        response->write("Master : send ok.\n");
+        //response->write("Master : send ok.\n");
     }else{
-        response->write("Master : no send.\n");
+        //response->write("Master : no send.\n");
     }
-    response->end();
+    //response->end();
     network_mutex.unlock();
 }
 
