@@ -37,7 +37,7 @@ public:
 
 private:
 
-    static constexpr std::size_t SEARCH_WIDTH = 100;
+    static constexpr std::size_t SEARCH_WIDTH = 800;
 
     evaluator _evaluator = evaluator(-0.5,0.1,0.3,0.5);
     problem_type origin_problem;

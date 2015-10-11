@@ -84,7 +84,8 @@ void sticky_algo::run(){
     size_t cnt = problem.stones.size();
     for(auto stone_itr = problem.stones.begin();stone_itr != problem.stones.end();stone_itr++){
         //最後の石の時
-        print_text(std::to_string(cnt--));
+        //print_text(std::to_string(cnt--));
+        std::cout << algorithm_name << ":" << cnt-- << std::endl;
         if(stone_itr + 1 == problem.stones.end()){
             pattern = eval_pattern(*stone_itr,std::move(pattern),SEARCH_WIDTH);
         }else{
