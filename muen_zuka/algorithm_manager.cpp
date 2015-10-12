@@ -35,7 +35,8 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem, eval));
     if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(-10,1,1,0.5)));
     if(enable_algo.at(9))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit,eval));
-    if(enable_algo.at(10))algo_vec.push_back(new yrange_next(problem,time_limit,eval));
+    if(enable_algo.at(10))algo_vec.push_back(new yrange_next(problem,time_limit,eval,0));
+    if(enable_algo.at(11))algo_vec.push_back(new yrange_next(problem,time_limit,eval,1));
 
 
     for(auto algo : algo_vec){
@@ -70,6 +71,7 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(8))emit send_text("stiky_beam動作");
     if(enable_algorithm_list.at(9))emit send_text("yrange_based_yayoi動作");
     if(enable_algorithm_list.at(10))emit send_text("yrange_next動作");
+    if(enable_algorithm_list.at(11))emit send_text("yrange_next_no_2_stones_Ban動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();

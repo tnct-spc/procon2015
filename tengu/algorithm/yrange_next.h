@@ -10,9 +10,11 @@ class yrange_next : public algorithm_type
 {
     Q_OBJECT
 public:
-    yrange_next(problem_type _problem, int time_limit, evaluator _eval);
+    yrange_next(problem_type _problem, int time_limit, evaluator _eval, int _mode);
     ~yrange_next();
     void run();
+
+    int const mode;
 
 private:
     struct search_type
@@ -33,8 +35,8 @@ private:
     int count_island_fast(field_type const& field, int& one_island_num);
 
     //Time
-    QElapsedTimer limit_timer;
-    const int time_limit;
+    //QElapsedTimer limit_timer;
+    //const int time_limit;
     int emit_count=0;
     int best_score = FIELD_SIZE * FIELD_SIZE;
 };
