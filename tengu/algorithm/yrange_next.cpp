@@ -14,7 +14,7 @@
 
 yrange_next::yrange_next(problem_type _problem, int _time_limit, evaluator _eval, int _mode):eval(_eval),mode(_mode)
 {
-    algorithm_name = "yrange_next";
+    algorithm_name = "yrange_next"+QString::number(mode).toStdString();
     origin_problem = _problem;
 }
 
@@ -162,6 +162,10 @@ int yrange_next::count_island_fast(const field_type &field, int& one_island_num)
         if((bit_field[17] & mask[16]) >= 1 && (bit_field[16] & mask[17]) >= 1) one_island_num++;
         if(mode==1) if((bit_field[17] & mask[16]) >= 1 && (bit_field[15] & mask[17]) >= 1 && (bit_field[17] & mask[17]) >= 1 && (bit_field[16] & mask[18]) >= 1) one_island_num++;
         if(mode==1) if((bit_field[16] & mask[17]) >= 1 && (bit_field[17] & mask[15]) >= 1 && (bit_field[17] & mask[17]) >= 1 && (bit_field[18] & mask[16]) >= 1) one_island_num++;
+        if(mode==2) if((bit_field[17] & mask[15]) >= 1 && (bit_field[18] & mask[16]) >= 1 && (bit_field[16] & mask[17]) >= 1 && (bit_field[18] & mask[17]) >= 1 && (bit_field[17] & mask[18]) >= 1) one_island_num++;
+        if(mode==2) if((bit_field[16] & mask[17]) >= 1 && (bit_field[17] & mask[15]) >= 1 && (bit_field[17] & mask[17]) >= 1 && (bit_field[18] & mask[15]) >= 1 && (bit_field[18] & mask[17]) >= 1 && (bit_field[19] & mask[16]) >= 1) one_island_num++;
+        if(mode==2) if((bit_field[15] & mask[17]) >= 1 && (bit_field[16] & mask[18]) >= 1 && (bit_field[17] & mask[16]) >= 1 && (bit_field[17] & mask[18]) >= 1 && (bit_field[18] & mask[17]) >= 1) one_island_num++;
+        if(mode==2) if((bit_field[17] & mask[16]) >= 1 && (bit_field[15] & mask[17]) >= 1 && (bit_field[17] & mask[17]) >= 1 && (bit_field[15] & mask[18]) >= 1 && (bit_field[17] & mask[18]) >= 1 && (bit_field[16] & mask[19]) >= 1) one_island_num++;
     }
     //when y==0 x!=0
     for(int x=1;x<32;++x){
@@ -178,6 +182,10 @@ int yrange_next::count_island_fast(const field_type &field, int& one_island_num)
                 if((bit_field[17] & mask[x+16]) >= 1 && (bit_field[16] & mask[x+17]) >= 1) one_island_num++;
                 if(mode==1) if((bit_field[17] & mask[x+16]) >= 1 && (bit_field[15] & mask[x+17]) >= 1 && (bit_field[17] & mask[x+17]) >= 1 && (bit_field[16] & mask[x+18]) >= 1) one_island_num++;
                 if(mode==1) if((bit_field[16] & mask[x+17]) >= 1 && (bit_field[17] & mask[x+15]) >= 1 && (bit_field[17] & mask[x+17]) >= 1 && (bit_field[18] & mask[x+16]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[17] & mask[x+15]) >= 1 && (bit_field[18] & mask[x+16]) >= 1 && (bit_field[16] & mask[x+17]) >= 1 && (bit_field[18] & mask[x+17]) >= 1 && (bit_field[17] & mask[x+18]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[16] & mask[x+17]) >= 1 && (bit_field[17] & mask[x+15]) >= 1 && (bit_field[17] & mask[x+17]) >= 1 && (bit_field[18] & mask[x+15]) >= 1 && (bit_field[18] & mask[x+17]) >= 1 && (bit_field[19] & mask[x+16]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[15] & mask[x+17]) >= 1 && (bit_field[16] & mask[x+18]) >= 1 && (bit_field[17] & mask[x+16]) >= 1 && (bit_field[17] & mask[x+18]) >= 1 && (bit_field[18] & mask[x+17]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[17] & mask[x+16]) >= 1 && (bit_field[15] & mask[x+17]) >= 1 && (bit_field[17] & mask[x+17]) >= 1 && (bit_field[15] & mask[x+18]) >= 1 && (bit_field[17] & mask[x+18]) >= 1 && (bit_field[16] & mask[x+19]) >= 1) one_island_num++;
             }else{
                 //左に空白があったので、左と同じラベルを貼る
                 labeling_field[0][x] = left_label_num;
@@ -199,6 +207,10 @@ int yrange_next::count_island_fast(const field_type &field, int& one_island_num)
                 if((bit_field[y+17] & mask[16]) >= 1 && (bit_field[y+16] & mask[17]) >= 1) one_island_num++;
                 if(mode==1) if((bit_field[y+17] & mask[16]) >= 1 && (bit_field[y+15] & mask[17]) >= 1 && (bit_field[y+17] & mask[17]) >= 1 && (bit_field[y+16] & mask[18]) >= 1) one_island_num++;
                 if(mode==1) if((bit_field[y+16] & mask[17]) >= 1 && (bit_field[y+17] & mask[15]) >= 1 && (bit_field[y+17] & mask[17]) >= 1 && (bit_field[y+18] & mask[16]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[y+17] & mask[15]) >= 1 && (bit_field[y+18] & mask[16]) >= 1 && (bit_field[y+16] & mask[17]) >= 1 && (bit_field[y+18] & mask[17]) >= 1 && (bit_field[y+17] & mask[18]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[y+16] & mask[17]) >= 1 && (bit_field[y+17] & mask[15]) >= 1 && (bit_field[y+17] & mask[17]) >= 1 && (bit_field[y+18] & mask[15]) >= 1 && (bit_field[y+18] & mask[17]) >= 1 && (bit_field[y+19] & mask[16]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[y+15] & mask[17]) >= 1 && (bit_field[y+16] & mask[18]) >= 1 && (bit_field[y+17] & mask[16]) >= 1 && (bit_field[y+17] & mask[18]) >= 1 && (bit_field[y+18] & mask[17]) >= 1) one_island_num++;
+                if(mode==2) if((bit_field[y+17] & mask[16]) >= 1 && (bit_field[y+15] & mask[17]) >= 1 && (bit_field[y+17] & mask[17]) >= 1 && (bit_field[y+15] & mask[18]) >= 1 && (bit_field[y+17] & mask[18]) >= 1 && (bit_field[y+16] & mask[19]) >= 1) one_island_num++;
             }else{
                 //上に空白があったので、上と同じラベルを貼る
                 labeling_field[y][0] = up_label_num;
@@ -220,6 +232,10 @@ int yrange_next::count_island_fast(const field_type &field, int& one_island_num)
                     if((bit_field[y+17] & mask[x+16]) >= 1 && (bit_field[y+16] & mask[x+17]) >= 1) one_island_num++;
                     if(mode==1) if((bit_field[y+17] & mask[x+16]) >= 1 && (bit_field[y+15] & mask[x+17]) >= 1 && (bit_field[y+17] & mask[x+17]) >= 1 && (bit_field[y+16] & mask[x+18]) >= 1) one_island_num++;
                     if(mode==1) if((bit_field[y+16] & mask[x+17]) >= 1 && (bit_field[y+17] & mask[x+15]) >= 1 && (bit_field[y+17] & mask[x+17]) >= 1 && (bit_field[y+18] & mask[x+16]) >= 1) one_island_num++;
+                    if(mode==2) if((bit_field[y+17] & mask[x+15]) >= 1 && (bit_field[y+18] & mask[x+16]) >= 1 && (bit_field[y+16] & mask[x+17]) >= 1 && (bit_field[y+18] & mask[x+17]) >= 1 && (bit_field[y+17] & mask[x+18]) >= 1) one_island_num++;
+                    if(mode==2) if((bit_field[y+16] & mask[x+17]) >= 1 && (bit_field[y+17] & mask[x+15]) >= 1 && (bit_field[y+17] & mask[x+17]) >= 1 && (bit_field[y+18] & mask[x+15]) >= 1 && (bit_field[y+18] & mask[x+17]) >= 1 && (bit_field[y+19] & mask[x+16]) >= 1) one_island_num++;
+                    if(mode==2) if((bit_field[y+15] & mask[x+17]) >= 1 && (bit_field[y+16] & mask[x+18]) >= 1 && (bit_field[y+17] & mask[x+16]) >= 1 && (bit_field[y+17] & mask[x+18]) >= 1 && (bit_field[y+18] & mask[x+17]) >= 1) one_island_num++;
+                    if(mode==2) if((bit_field[y+17] & mask[x+16]) >= 1 && (bit_field[y+15] & mask[x+17]) >= 1 && (bit_field[y+17] & mask[x+17]) >= 1 && (bit_field[y+15] & mask[x+18]) >= 1 && (bit_field[y+17] & mask[x+18]) >= 1 && (bit_field[y+16] & mask[x+19]) >= 1) one_island_num++;
                 }else if(up_label_num > 0 && left_label_num == 0){
                     //上に空白があったので、上と同じラベルを貼る
                     labeling_field[y][x] = up_label_num;

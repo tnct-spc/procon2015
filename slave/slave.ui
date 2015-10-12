@@ -587,7 +587,7 @@ IPアドレスを「送信先」に書いて、
   <widget class="QCheckBox" name="checkBox_11">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>120</x>
      <y>510</y>
      <width>221</width>
      <height>22</height>
@@ -595,6 +595,19 @@ IPアドレスを「送信先」に書いて、
    </property>
    <property name="text">
     <string>yrange_next(no 2 stone Ban)</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_12">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>510</y>
+     <width>221</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_next(no 3 stone Ban)</string>
    </property>
   </widget>
   <action name="problem_load_action">

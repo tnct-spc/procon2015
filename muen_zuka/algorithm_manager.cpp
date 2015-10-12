@@ -37,6 +37,7 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     if(enable_algo.at(9))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit,eval));
     if(enable_algo.at(10))algo_vec.push_back(new yrange_next(problem,time_limit,eval,0));
     if(enable_algo.at(11))algo_vec.push_back(new yrange_next(problem,time_limit,eval,1));
+    if(enable_algo.at(12))algo_vec.push_back(new yrange_next(problem,time_limit,eval,2));
 
 
     for(auto algo : algo_vec){
@@ -72,6 +73,7 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(9))emit send_text("yrange_based_yayoi動作");
     if(enable_algorithm_list.at(10))emit send_text("yrange_next動作");
     if(enable_algorithm_list.at(11))emit send_text("yrange_next_no_2_stones_Ban動作");
+    if(enable_algorithm_list.at(12))emit send_text("yrange_next_no_3_stones_Ban動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();
