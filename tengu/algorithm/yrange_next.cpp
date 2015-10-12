@@ -49,6 +49,12 @@ void yrange_next::run()
                     //Send
                     answer_send(field);
 
+                    //processes size ave seigen
+                    processes_size_sum+=field.processes.size();
+                    processes_size_ave=processes_size_sum/(emit_count+1);
+                    processes_cut_line=static_cast<double>(processes_size_ave)*(8.0/10.0);
+                    qDebug("proc=%d %d",processes_cut_line,processes_size_ave);
+
                     //----------勝敗には関係ない----------------------------------------------------------------------------------
                     //int const t = static_cast<int>(limit_timer.elapsed());
                     //if(t > time_limit)
@@ -108,7 +114,7 @@ yrange_next::search_type yrange_next::search(field_type& _field, stone_type& sto
                 int one_island_num;
                 int const island_num = count_island_fast(_field, one_island_num);
                 if(best.score < score || (best.score == score && best.island_num > island_num)){
-                    if((island_num - base_island_num) >= 2 || ((island_num - base_island_num) == 1 && (one_island_num - base_one_island_num) >= 1)){
+                    if((island_num - base_island_num) >= 2 || (_field.processes.size() < processes_cut_line && (island_num - base_island_num) == 1 && (one_island_num - base_one_island_num) >= 1)){
                         //change to pass
                         best = {{-FIELD_SIZE,-FIELD_SIZE},0,stone_type::Sides::Head,-1,-2};
                     }else{

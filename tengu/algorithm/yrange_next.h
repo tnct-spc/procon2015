@@ -39,6 +39,10 @@ private:
     //const int time_limit;
     int emit_count=0;
     int best_score = FIELD_SIZE * FIELD_SIZE;
+
+    int processes_size_sum = 0;
+    int processes_size_ave = -1;
+    int processes_cut_line = 256;
 };
 
 
