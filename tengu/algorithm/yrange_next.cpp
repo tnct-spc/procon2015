@@ -81,7 +81,7 @@ void yrange_next::one_try(field_type& field, std::size_t stone_num)
         stone_type& each_stone = origin_problem.stones.at(stone_num);
         search_type next = std::move(search(field,each_stone));
         //どこにも置けなかった or pass
-        if(next.point.y == -FIELD_SIZE || pass(next)) continue;
+        if(next.point.y == -FIELD_SIZE/* || pass(next)*/) continue;
         each_stone.set_angle(next.angle).set_side(next.side);
         field.put_stone_basic(each_stone,next.point.y,next.point.x);
     }
