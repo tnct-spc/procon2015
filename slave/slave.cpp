@@ -71,6 +71,54 @@ Slave::~Slave()
     delete ui;
 }
 
+void Slave::force_start(QString playerid)
+{
+     if(!ui->ofline_mode_check_box->isChecked()){
+        network = new net(get_geturl(),
+                          get_posturl(),
+                          playerid,
+                          1
+                          );
+        std::string str;
+        if(ui->checkBoxofRaciveOfiicialServer->isChecked()){
+            str = network->get_from_official_server();
+        }else{
+            str = network->get();
+        }
+        if(network->is_error()){
+            print_text(QString("🍣ネットワークエラーコード ") + QString::number(network->what_error()));
+            return;
+        }
+        print_text("問題を受信しました");
+        problem_type problem(str);
+        _problem = problem;
+    }
+    //solve
+    std::vector<bool> enable_algo(13);
+    ui->checkBox_0->isChecked() ? enable_algo.at(0) = true : enable_algo.at(0) = false;
+    ui->checkBox_1->isChecked() ? enable_algo.at(1) = true : enable_algo.at(1) = false;
+    ui->checkBox_2->isChecked() ? enable_algo.at(2) = true : enable_algo.at(2) = false;
+    ui->checkBox_3->isChecked() ? enable_algo.at(3) = true : enable_algo.at(3) = false;
+    ui->checkBox_4->isChecked() ? enable_algo.at(4) = true : enable_algo.at(4) = false;
+    ui->checkBox_5->isChecked() ? enable_algo.at(5) = true : enable_algo.at(5) = false;
+    ui->checkBox_6->isChecked() ? enable_algo.at(6) = true : enable_algo.at(6) = false;
+    ui->checkBox_7->isChecked() ? enable_algo.at(7) = true : enable_algo.at(7) = false;
+    ui->checkBox_8->isChecked() ? enable_algo.at(8) = true : enable_algo.at(8) = false;
+    ui->checkBox_9->isChecked() ? enable_algo.at(9) = true : enable_algo.at(9) = false;
+    ui->checkBox_10->isChecked() ? enable_algo.at(10) = true : enable_algo.at(10) = false;
+    ui->checkBox_11->isChecked() ? enable_algo.at(11) = true : enable_algo.at(11) = false;
+    ui->checkBox_12->isChecked() ? enable_algo.at(12) = true : enable_algo.at(12) = false;
+    int time_limit = 1000 * (ui->limit_m->text().toInt() * 60 + ui->limit_s->text().toInt());
+    algo_manager = new algorithm_manager(_problem,enable_algo,time_limit);
+    algo_manager->setParent(this);
+    connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_auto_save_to_file);
+    connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
+    connect(algo_manager,&algorithm_manager::destroyed,[=](){std::cout << "manager殺した" << std::endl;});
+    connect(algo_manager,&algorithm_manager::finished,&algorithm_manager::deleteLater);
+    algo_manager->run();
+}
+
 void Slave::clicked_run_button(){
     if(!ui->ofline_mode_check_box->isChecked()){
         network = new net(get_geturl(),
@@ -203,6 +251,55 @@ void Slave::answer_auto_save_to_file(field_type answer){
     out << _answer.get_answer().c_str();
     file.close();
     file_mtx.unlock();
+}
+
+void Slave::force_enable_algorithm(int algo)
+{
+    // 最悪
+    switch(algo) {
+    case 0:
+        ui->checkBox_0->setChecked(true);
+        break;
+    case 1:
+        ui->checkBox_1->setChecked(true);
+        break;
+    case 2:
+        ui->checkBox_2->setChecked(true);
+        break;
+    case 3:
+        ui->checkBox_3->setChecked(true);
+        break;
+    case 4:
+        ui->checkBox_4->setChecked(true);
+        break;
+    case 5:
+        ui->checkBox_5->setChecked(true);
+        break;
+    case 6:
+        ui->checkBox_6->setChecked(true);
+        break;
+    case 7:
+        ui->checkBox_7->setChecked(true);
+        break;
+    case 8:
+        ui->checkBox_8->setChecked(true);
+        break;
+    case 9:
+        ui->checkBox_9->setChecked(true);
+        break;
+    case 10:
+        ui->checkBox_10->setChecked(true);
+        break;
+    case 11:
+        ui->checkBox_11->setChecked(true);
+        break;
+    case 12:
+        ui->checkBox_12->setChecked(true);
+        break;
+    default:
+        qDebug() << "no such algorithm";
+        break;
+    }
 }
 
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}

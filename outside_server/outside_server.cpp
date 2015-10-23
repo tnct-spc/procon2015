@@ -195,6 +195,23 @@ void OutsideServer::loadbutton_clicked()
     }
 }
 
+void OutsideServer::Force_set_problem_file(QString filename)
+{
+    // この関数上のとだいたい同じ
+    for(int i = 0; i < 6; i++) {
+        game_stage_[i].stop_animation_timer();
+    }
+    ResetFolder(ProblemFolderName);
+    Decode_problem_and_set(filename);
+    for(int m = 0; m < 6; m++) {
+        game_stage_[m].MakeStageData(m);
+    }
+    g_user_data.clear();
+    QFile::copy(filename,ProblemFolderName+"problem1.txt");
+    g_problem_number = 1;
+    problem_flag = true;
+}
+
 void OutsideServer::Decode_problem_and_set(QString problem_file_name){
     QFile rawdata(problem_file_name);
     rawdata.open(QIODevice::ReadOnly);

@@ -29,6 +29,10 @@ int main(int argc, char *argv[])
     //Screen
     OutsideServer w;
     w.show();
+    if(argc == 2) {
+        w.showFullScreen();
+        w.Force_set_problem_file(argv[1]);
+    }
     //Server
     RequestMapper request_mapper;
 

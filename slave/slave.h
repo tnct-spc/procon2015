@@ -22,6 +22,8 @@ class Slave : public QWidget
 public:
     explicit Slave(QWidget *parent = 0);
     ~Slave();
+    void force_enable_algorithm(int algo);
+    void force_start(QString playerid);
 
 private:
     Ui::Slave *ui;

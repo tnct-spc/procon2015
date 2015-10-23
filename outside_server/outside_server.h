@@ -22,6 +22,7 @@ class OutsideServer : public QWidget
 public:
     explicit OutsideServer(QWidget *parent = 0);
     ~OutsideServer();
+    void Force_set_problem_file(QString filename);
 
 public slots:
     //ui_func
