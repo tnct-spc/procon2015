@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
-    <height>495</height>
+    <width>631</width>
+    <height>534</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -127,7 +127,7 @@
     <rect>
      <x>10</x>
      <y>100</y>
-     <width>341</width>
+     <width>241</width>
      <height>171</height>
     </rect>
    </property>
@@ -340,6 +340,9 @@
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -366,6 +369,9 @@
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -394,20 +400,23 @@
   <widget class="QCheckBox" name="checkBoxofRaciveOfiicialServer">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>70</y>
-     <width>101</width>
+     <width>111</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
     <string>公式から取得</string>
    </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QCheckBox" name="checkBoxofSendOfiicialServer">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>140</x>
      <y>70</y>
      <width>101</width>
      <height>21</height>
@@ -415,6 +424,9 @@
    </property>
    <property name="text">
     <string>公式へ送信</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_7">
@@ -428,6 +440,174 @@
    </property>
    <property name="text">
     <string>new_beam</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>130</y>
+     <width>67</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TimeLimit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>190</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>s</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>160</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>m</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="limit_m">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>160</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>3</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="limit_s">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>190</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>00</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_8">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>490</y>
+     <width>101</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>sticky_beam</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_9">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>490</y>
+     <width>161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_based_yayoi</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_10">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>510</y>
+     <width>161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_next</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>40</y>
+     <width>251</width>
+     <height>461</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>初回起動時
+・マスターサーバーのパソコンの
+IPアドレスを「送信先」に書いて、
+:8081をつけて、選択状態にする
+・サーバーホスト (172.16.1.2) 
+を「取得元」に書いて、
+選択状態にする
+
+
+起動時
+・（公式へ送信にチェックは
+入れない）
+
+・公式から取得にチェック
+
+・問題番号を合わせる
+
+・アルゴリズムにチェックを
+入れる
+
+</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_11">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>510</y>
+     <width>221</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_next(no 2 stone Ban)</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_12">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>510</y>
+     <width>221</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>yrange_next(no 3 stone Ban)</string>
    </property>
   </widget>
   <action name="problem_load_action">
@@ -455,7 +635,7 @@
      <y>10</y>
     </hint>
     <hint type="destinationlabel">
-     <x>377</x>
+     <x>357</x>
      <y>120</y>
     </hint>
    </hints>
@@ -471,7 +651,7 @@
      <y>288</y>
     </hint>
     <hint type="destinationlabel">
-     <x>440</x>
+     <x>357</x>
      <y>284</y>
     </hint>
    </hints>
@@ -487,7 +667,7 @@
      <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>438</x>
+     <x>357</x>
      <y>310</y>
     </hint>
    </hints>
@@ -503,7 +683,7 @@
      <y>348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>440</x>
+     <x>357</x>
      <y>348</y>
     </hint>
    </hints>
@@ -519,7 +699,7 @@
      <y>367</y>
     </hint>
     <hint type="destinationlabel">
-     <x>436</x>
+     <x>357</x>
      <y>379</y>
     </hint>
    </hints>
@@ -535,7 +715,7 @@
      <y>392</y>
     </hint>
     <hint type="destinationlabel">
-     <x>441</x>
+     <x>357</x>
      <y>395</y>
     </hint>
    </hints>
@@ -631,7 +811,7 @@
      <y>44</y>
     </hint>
     <hint type="destinationlabel">
-     <x>417</x>
+     <x>357</x>
      <y>71</y>
     </hint>
    </hints>

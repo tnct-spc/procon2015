@@ -17,9 +17,10 @@ SOURCES += algorithm/simple_algorithm.cpp \
     algorithm/yrange.cpp \
     algorithm/sticky_algo.cpp \
     algorithm/read_ahead.cpp \
-    algorithm/square.cpp \
-    algorithm/yrange2.cpp \
-    algorithm/new_beam.cpp
+    algorithm/new_beam.cpp \
+    algorithm/stikcy_beam.cpp \
+    algorithm/yrange_based_yayoi.cpp \
+    algorithm/yrange_next.cpp
 
 
 HEADERS += tengu.hpp\
@@ -29,14 +30,16 @@ HEADERS += tengu.hpp\
     algorithm/yrange.hpp \
     algorithm/sticky_algo.hpp \
     algorithm/read_ahead.hpp \
-    algorithm/square.hpp \
-    algorithm/yrange2.hpp \
-    algorithm/new_beam.hpp
+    algorithm/new_beam.hpp \
+    algorithm/stikcy_beam.hpp \
+    algorithm/yrange_based_yayoi.h \
+    algorithm/yrange_next.h
 
 LIBS += -lQt5Concurrent
 
 unix {
-    target.path = /usr/lib
+    target.path = /usr/local/lib
+    target.extra = ldconfig
     INSTALLS += target
 }
 

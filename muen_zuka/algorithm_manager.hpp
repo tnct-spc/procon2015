@@ -14,7 +14,7 @@ class algorithm_manager : public QObject
     Q_OBJECT
 public:
     explicit algorithm_manager(QObject *parent = 0);
-    algorithm_manager(problem_type _problem, std::vector<bool> enable_algo);
+    algorithm_manager(problem_type _problem, std::vector<bool> enable_algo, int time_limit);
     ~algorithm_manager();
     int run_thread_num();
     void run();
@@ -25,6 +25,7 @@ private:
     std::mutex mtx;
     problem_type problem;
     u_int64_t best_zk = std::numeric_limits<u_int64_t>::max();
+    u_int64_t best_processes_num = std::numeric_limits<u_int64_t>::max();
 
 signals:
     void answer_ready(field_type ans);

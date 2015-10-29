@@ -2,16 +2,27 @@
 #include "master.h"
 #include "ui_master.h"
 
+#define BOOSTCONNECT_LIB_BUILD
+#include <boostconnect/server.hpp>
+#include <boostconnect/session_type/http_session.hpp>
+#include <boostconnect/session_type/impl/http_session.ipp>
+#include <boostconnect/utility/impl/http.ipp>
+#include <boostconnect/application_layer/impl/tcp_socket.ipp>
+#include <boostconnect/connection_type/impl/async_connection.ipp>
+
 Master::Master(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Master)
+    ui(new Ui::Master),
+    io_service_(boost::make_shared<boost::asio::io_service>()),
+    server_(boost::make_shared<http_server>(io_service_, 8081))
 {
     ui->setupUi(this);
 
-    QHttpServer *server = new QHttpServer;
-    QObject::connect(server, SIGNAL(newRequest(QHttpRequest*,QHttpResponse*)), this, SLOT(Service(QHttpRequest*,QHttpResponse*)));
-
-    server->listen(8081);
+    // Serverの開始と，実行スレッドのぶん投げ
+    server_->start(std::bind(&Master::Service, this, std::placeholders::_1, std::placeholders::_2));
+    thread_.reset(
+        new std::thread([&]{ io_service_->run(); })
+        );
 
     //setting load
     settings = new QSettings("setting.ini",QSettings::IniFormat);
@@ -52,57 +63,59 @@ void Master::reset_point(){
     answer_data_.clear();
 }
 
-void Master::Service(QHttpRequest *request, QHttpResponse *response) {
-    new_response_=response;
+void Master::Service(boost::shared_ptr<request_type> const req, session_ptr session)
+{
+    if(req->method == "POST")
+    {
+        // ソルバーから解答を受信
+        auto response = boost::make_shared<bstcon::response>();
+        response->http_version = "1.1";
+        response->status_code = 200;
+        response->reason_phrase = "OK";
+        response->body = "Master : OK\r\n";
+        response->header["Content-Length"] = std::to_string(response->body.length());
+        response->header["Content-Type"] = "text/html; charset=UTF-8";
+        session->set_all(response);
 
-    if(request->method()==QHttpRequest::HTTP_POST){
-        if(request->body().isEmpty()){
-            //Wait get body
-            connect(request,SIGNAL(data(QByteArray)),this,SLOT(ServiceRequestCompleted(QByteArray)));
-        }else{
-            ServiceRequestCompleted(request->body());
-        }
-    }else{
-        //Form
-
-        response->setHeader("Content-Type", "text/html; charset=UTF-8");
-        response->writeHead(200);
-        response->write("<html><head><title>MASTER FORM</title></head><body>");
-        response->write("<form method='POST' action='/answer'>");
-        response->write("Master From:<br>");
-        response->write("Point:  <input type='text' name='point'><br>");
-        response->write("ProblemNumber: <input type='text' name='quest_number'><br>");
-        response->write("Answer: <textarea name='answer' cols='100' rows='40'></textarea><br>");
-        response->write("<input type='submit'>");
-        response->write("</form>");
-        response->write("</body></html>");
-
-        response->end();
-
-        response->end();
+        // Requestをもらったことを，比較器に通知g
+        ServiceRequestCompleted(req->body.c_str());
+    }
+    else
+    {
+        // 移植元がこうだったので従ったけれど，
+        // よくわからないので，解る人，コメントお願いいたします
+        auto response = boost::make_shared<bstcon::response>();
+        response->http_version = "1.1";
+        response->status_code = 200;
+        response->reason_phrase = "OK";
+        response->body = "<html><head><title>MASTER FORM</title></head><body>\r\n"
+                         "<form method='POST' action='/answer'>\r\n"
+                         "Master From:<br>\r\n"
+                         "Point:  <input type='text' name='point'><br>\r\n"
+                         "ProblemNumber: <input type='text' name='quest_number'><br>\r\n"
+                         "Answer: <textarea name='answer' cols='100' rows='40'></textarea><br>\r\n"
+                         "<input type='submit'>\r\n"
+                         "</form>\r\n"
+                         "</body></html>\r\n";
+        response->header["Content-Length"] = std::to_string(response->body.length());
+        response->header["Content-Type"] = "text/html; charset=UTF-8";
+        session->set_all(response);
     }
 }
 
 void Master::ServiceRequestCompleted(QByteArray lowdata){
-    QHttpResponse *response=new_response_;
-
     //Get request data
     QUrlQuery url_query(lowdata);
     int post_point=url_query.queryItemValue("point").toInt();
+    int post_processes_size=url_query.queryItemValue("processes_size").toInt();
     QString post_problem_number=url_query.queryItemValue("quest_number");
     QString post_raw_answer_data=url_query.queryItemValue("answer");
     QString slave_name = url_query.queryItemValue("id");
 
-    //encode
-    std::string post_answer_data_encoded = boost::algorithm::replace_all_copy(post_raw_answer_data.toStdString(),"%0D%0A","\r\n");
-
-    //response head
-    response->setHeader("Content-Type", "text/html; charset=UTF-8");
-    response->writeHead(200);
-
     //Set
     answer_data_type answer_data;
     answer_data.answer_point=post_point;
+    answer_data.answer_processes_size=post_processes_size;
     answer_data.answer_raw_data=post_raw_answer_data;
     answer_data.problem_number=post_problem_number;
     answer_data_.push_back(answer_data);
@@ -110,7 +123,7 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     //PointCheck
     bool upload_flag=1;
     for(unsigned int i=0;i<answer_data_.size()-1;i++){
-        if(post_problem_number == answer_data_[i].problem_number && post_point >= answer_data_[i].answer_point){
+        if(post_problem_number == answer_data_[i].problem_number && (post_point > answer_data_[i].answer_point || (post_point == answer_data_[i].answer_point && post_processes_size >= answer_data_[i].answer_processes_size))){
             upload_flag=0;
             break;
         }
@@ -123,6 +136,9 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
     }
     if(upload_flag){
         if(ui->checkBox_sendOfficialServer->isChecked()){
+            //encode
+            std::string post_answer_data_encoded = boost::algorithm::replace_all_copy(post_raw_answer_data.toStdString(),"%0D%0A","\r\n");
+
             net network(QString(""),get_sendurl());
             network.send_to_official_server(post_answer_data_encoded);
         }else{
@@ -137,16 +153,8 @@ void Master::ServiceRequestCompleted(QByteArray lowdata){
             QNetworkReply *reply = manager->post(req,postData.toString(QUrl::FullyEncoded).toUtf8());
             //connect(reply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(networkerror(QNetworkReply::NetworkError)));
             eventloop.exec();
-            //if(network_error_flag)return std::string("");
-
-            //Response
-            response->write(reply->readAll());
         }
-        response->write("Master : send ok.\n");
-    }else{
-        response->write("Master : no send.\n");
     }
-    response->end();
 }
 
 QString Master::get_sendurl(){

@@ -93,7 +93,7 @@ void Slave::clicked_run_button(){
         _problem = problem;
     }
     //solve
-    std::vector<bool> enable_algo(8);
+    std::vector<bool> enable_algo(13);
     ui->checkBox_0->isChecked() ? enable_algo.at(0) = true : enable_algo.at(0) = false;
     ui->checkBox_1->isChecked() ? enable_algo.at(1) = true : enable_algo.at(1) = false;
     ui->checkBox_2->isChecked() ? enable_algo.at(2) = true : enable_algo.at(2) = false;
@@ -102,9 +102,16 @@ void Slave::clicked_run_button(){
     ui->checkBox_5->isChecked() ? enable_algo.at(5) = true : enable_algo.at(5) = false;
     ui->checkBox_6->isChecked() ? enable_algo.at(6) = true : enable_algo.at(6) = false;
     ui->checkBox_7->isChecked() ? enable_algo.at(7) = true : enable_algo.at(7) = false;
-    algo_manager = new algorithm_manager(_problem,enable_algo);
+    ui->checkBox_8->isChecked() ? enable_algo.at(8) = true : enable_algo.at(8) = false;
+    ui->checkBox_9->isChecked() ? enable_algo.at(9) = true : enable_algo.at(9) = false;
+    ui->checkBox_10->isChecked() ? enable_algo.at(10) = true : enable_algo.at(10) = false;
+    ui->checkBox_11->isChecked() ? enable_algo.at(11) = true : enable_algo.at(11) = false;
+    ui->checkBox_12->isChecked() ? enable_algo.at(12) = true : enable_algo.at(12) = false;
+    int time_limit = 1000 * (ui->limit_m->text().toInt() * 60 + ui->limit_s->text().toInt());
+    algo_manager = new algorithm_manager(_problem,enable_algo,time_limit);
     algo_manager->setParent(this);
     connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_send);
+    connect(algo_manager,&algorithm_manager::answer_ready,this,&Slave::answer_auto_save_to_file);
     connect(algo_manager,&algorithm_manager::send_text,this,&Slave::print_algorithm_message);
     connect(algo_manager,&algorithm_manager::destroyed,[=](){std::cout << "manager殺した" << std::endl;});
     connect(algo_manager,&algorithm_manager::finished,&algorithm_manager::deleteLater);
@@ -135,7 +142,7 @@ void Slave::text_box_clear(){
     ui->textBrowser->setPlainText("");
 }
 void Slave::answer_save_to_file(){
-    auto filename = QFileDialog::getOpenFileName(this);
+    auto filename = QFileDialog::getSaveFileName(this);
     if(filename.isEmpty())return;
     QFile file(filename);
     if(!file.open(QIODevice::WriteOnly))return;
@@ -184,6 +191,18 @@ void Slave::sent_to_official_server(){
     network->setParent(this);
     auto str = network->send_to_official_server(_answer);
     qDebug() << str.c_str();
+}
+void Slave::answer_auto_save_to_file(field_type answer){
+    file_mtx.lock();
+    QDateTime dateTime = QDateTime::currentDateTimeUtc();
+    QString filename;
+    filename += QString("S") += QString::number(answer.get_score()) += QString("N") += QString::number(answer.get_stone_num()) += QString("T") += dateTime.time().toString("hh:mm:ss") += QString(".txt");
+    QFile file(filename);
+    if(!file.open(QIODevice::WriteOnly))return;
+    QTextStream out(&file);
+    out << _answer.get_answer().c_str();
+    file.close();
+    file_mtx.unlock();
 }
 
 void Slave::post_button_1_pushed(){settings->setValue("POST_BUTTON",1);}

@@ -155,7 +155,7 @@ void square::put_stone_hole(stone_type& stone,int dy,int dx)
         min_x = dx;
         min_stone = stone;
     }
-    problem.field.remove_stone_basic();
+    problem.field.remove_stone_basic(stone);
 }
 
 

@@ -17,6 +17,7 @@ class algorithm_type : public QThread
         void print_text(std::string str);
         //Qtのemitが遅いのでalgorithm自身が送信するかどうか判断するためのClass変数
         static int _best_score;
+        static int _best_processes_num;
     protected:
         problem_type problem;
         std::string algorithm_name;
@@ -25,6 +26,7 @@ class algorithm_type : public QThread
         //static int _best_score;
         void answer_send(field_type ans);
         int get_rem_stone_zk(stone_type& stone);
+        int get_rem_stone_zk(int stone_num);
     signals:
         void answer_ready(field_type ans);
         //void print_text(std::string str);

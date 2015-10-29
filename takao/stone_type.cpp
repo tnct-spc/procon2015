@@ -16,6 +16,8 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <QDebug>
+
 namespace std
 {
     ostream& operator << (ostream& os, stone_type::Sides const& sides)
@@ -85,11 +87,25 @@ void stone_type::init_stone()
     }
 
     //area
+    area = 0;
     for(auto const& each_raw_data:get_raw_data())
     {
         area += std::count(each_raw_data.begin(),each_raw_data.end(),1);
     }
 
+}
+
+bit_process_type stone_type::current_process(point_type position) const
+{
+    return bit_process_type(nth, (int)current_side, current_angle, position);
+}
+
+void stone_type::apply_process(bit_process_type process)
+{
+    if((unsigned int)nth != process.nth)
+        qDebug() << "apply_process: nth does not match";
+    set_side((stone_type::Sides)process.flip);
+    set_angle(process.angle);
 }
 
 //時計回りを正方向として指定された角度だけ回転する

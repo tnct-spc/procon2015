@@ -9,5 +9,8 @@
 #include "algorithm/square.hpp"
 #include "algorithm/read_ahead.hpp"
 #include "algorithm/new_beam.hpp"
+#include "algorithm/stikcy_beam.hpp"
+#include "algorithm/yrange_based_yayoi.h"
+#include "algorithm/yrange_next.h"
 
 #endif // TENGU_HPP

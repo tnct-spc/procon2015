@@ -20,9 +20,11 @@ HEADERS += muen_zuka.hpp\
     algorithm_manager.hpp
 
 unix {
-    target.path = /usr/lib
+    target.path = /usr/local/lib
+    target.extra = ldconfig
     INSTALLS += target
 }
+
 LIBS += -lboost_system
 unix:!macx: LIBS += -L$$OUT_PWD/../takao/ -ltakao
 QMAKE_CXXFLAGS += -std=c++14

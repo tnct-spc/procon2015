@@ -32,3 +32,8 @@ INCLUDEPATH += $$PWD/../takao
 INCLUDEPATH += $$PWD/../tengu
 DEPENDPATH += $$PWD/../takao
 DEPENDPATH += $$PWD/../tengu
+
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}

@@ -35,3 +35,8 @@ FORMS    += outside_server.ui
 QMAKE_CXXFLAGS += -std=c++14
 
 include(../lib/qhttpserver/qhttpserver.pri)
+
+unix {
+    target.path = /usr/local/bin
+    INSTALLS += target
+}

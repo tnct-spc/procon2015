@@ -11,7 +11,7 @@
 algorithm_manager::algorithm_manager(QObject *parent) : QObject(parent)
 {
 }
-algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> enable_algo)
+algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> enable_algo, int time_limit)
 {
     //Qtのsignal,slotで使いたい型の登録
     qRegisterMetaType<field_type>();
@@ -20,15 +20,25 @@ algorithm_manager::algorithm_manager(problem_type _problem,std::vector<bool> ena
     enable_algorithm_list = enable_algo;
     //アルゴリズムの最適解値を初期化
     algorithm_type::_best_score = std::numeric_limits<int>::max();
+    algorithm_type::_best_processes_num = std::numeric_limits<int>::max();
+    // 評価関数をインスタンス化
+    evaluator eval(-10, 1, 1, 0.5);
     //動かしたいアルゴリズムを配列に入れる
     if(enable_algo.at(0))algo_vec.push_back(new simple_algorithm(problem));
     if(enable_algo.at(1))algo_vec.push_back(new poor_algo(problem));
-    if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem));
-    if(enable_algo.at(3))algo_vec.push_back(new square(problem));
-    if(enable_algo.at(4))algo_vec.push_back(new yrange(problem));
-    if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
-    if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem));
-    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(2))algo_vec.push_back(new sticky_algo(problem,"okuno-hosomichi",evaluator(0.4,0.1,0.5)));
+    //if(enable_algo.at(3))algo_vec.push_back(new square(problem));
+    if(enable_algo.at(4))algo_vec.push_back(new yrange(problem, time_limit,eval));
+    //if(enable_algo.at(5))algo_vec.push_back(new yrange2(problem));
+    if(enable_algo.at(6))algo_vec.push_back(new read_ahead(problem, eval));
+    if(enable_algo.at(7))algo_vec.push_back(new new_beam(problem, eval));
+    if(enable_algo.at(8))algo_vec.push_back(new sticky_beam(problem,evaluator(-10,1,1,0.5)));
+    if(enable_algo.at(9))algo_vec.push_back(new yrange_based_yayoi(problem,time_limit,eval));
+    if(enable_algo.at(10))algo_vec.push_back(new yrange_next(problem,time_limit,eval,0));
+    if(enable_algo.at(11))algo_vec.push_back(new yrange_next(problem,time_limit,eval,1));
+    if(enable_algo.at(12))algo_vec.push_back(new yrange_next(problem,time_limit,eval,2));
+
 
     for(auto algo : algo_vec){
         algo->setParent(this);
@@ -59,6 +69,11 @@ void algorithm_manager::run(){
     if(enable_algorithm_list.at(5))emit send_text("yrange2動作");
     if(enable_algorithm_list.at(6))emit send_text("read_ahead動作");
     if(enable_algorithm_list.at(7))emit send_text("new_beam動作");
+    if(enable_algorithm_list.at(8))emit send_text("stiky_beam動作");
+    if(enable_algorithm_list.at(9))emit send_text("yrange_based_yayoi動作");
+    if(enable_algorithm_list.at(10))emit send_text("yrange_next動作");
+    if(enable_algorithm_list.at(11))emit send_text("yrange_next_no_2_stones_Ban動作");
+    if(enable_algorithm_list.at(12))emit send_text("yrange_next_no_3_stones_Ban動作");
     mtx.lock();
     for(algorithm_type* algo : algo_vec){
         algo->start();
@@ -70,7 +85,14 @@ void algorithm_manager::get_answer(field_type ans){
     //前より良ければemit
     if(best_zk > ans.get_score()){
         best_zk = ans.get_score();
+        best_processes_num = ans.processes.size();
         emit answer_ready(ans);
+    }else if(best_zk == ans.get_score()){
+        if(best_processes_num > ans.processes.size()){
+            best_zk = ans.get_score();
+            best_processes_num = ans.processes.size();
+            emit answer_ready(ans);
+        }
     }
     mtx.unlock();
 }
