@@ -6,7 +6,7 @@
 
 ## 順位
 ### 26th-procon
-どの学校がNAPROCKか知らないから，誰か修正しておいて
+12位
 
 ### NAPROCK2014
 13位
@@ -14,7 +14,7 @@
 ## 開発環境
 LinuxのQtCreator依存．MSVCが頭良ければ，Windowsでも行けるのでは？
 
-* (Arch|Gentoo|Kubuntu) Linux
+* (Arch|Gentoo|Kubuntu|Lubuntu) Linux
     * gcc 5.2.0
 
 外部ライブラリとしては，以下の2つを利用しています．
@@ -26,7 +26,8 @@ LinuxのQtCreator依存．MSVCが頭良ければ，Windowsでも行けるので�
 
 ## 実行方法
 1. QtCreatorを起動後，全プロジェクトをビルド．
-1. masterやらslaveやらoutside_serverやらを立ち上げれば良い．先にサーバを立ち上げ，問題を起動しておく必要がある．
+2. slaveを立ち上げ,適宜設定をする.複数slaveの解答を合わせて送信する時はmasterを立ち上げ,これも適宜設定をする.また,外部大会サーバー互換機を使いたい場合はoutside_serverを立ち上げ,問題を選択する.
+3. slaveの実行ボタンを押す.問題取得から解答送信まで自動で行われる.
 
 ##ディレクトリ構造
 
